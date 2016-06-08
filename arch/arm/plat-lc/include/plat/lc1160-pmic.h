@@ -963,7 +963,6 @@ extern int lc1160_read_adc(u8 val, u16 *out);
 extern int lc1160_int_mask(int mask);
 extern int lc1160_int_unmask(int mask);
 extern int lc1160_int_status_get(void);
-extern int lc1160_power_type_get(void);
 
 #endif /* __LC1160H_PMIC_H__ */
 

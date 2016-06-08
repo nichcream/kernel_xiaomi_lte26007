@@ -34,11 +34,6 @@
 #define no_cali_prox_thh  180
 #define no_cali_prox_thl  120
 #define LTR553_PS__dynamic_CALIBERATE 1
-#define ALS_AVR_COUNT 8
-static int als_times = 0;
-static int als_temp[ALS_AVR_COUNT] = {0};
-static int first_cycle = 1;
-
 
 //may adjust later
 #define PS_DETECTED_THRES	        100
@@ -108,7 +103,7 @@ static  struct ltr55x_reg ltr553reg_tbl[] = {
 		.name   = "ALS_CONTR",
 		.addr   = 0x80,
 		.defval = 0x00,
-		.curval = 0x19,
+		.curval = 0x0D,
 	},
 	{
 		.name = "PS_CONTR",
@@ -588,8 +583,6 @@ static int ltr55x_als_read(struct ltr55x_data *data,int gainrange)
 	unsigned int alsval_ch0, alsval_ch1;
 	int luxdata = 0;
 	int ratio;
-	int sum = 0;
-	int i;
 
 	alsval_ch1_lo = ltr55x_i2c_read_reg(data->client,LTR55x_ALS_DATA_CH1_0);
 	alsval_ch1_hi = ltr55x_i2c_read_reg(data->client,LTR55x_ALS_DATA_CH1_1);
@@ -607,13 +600,13 @@ static int ltr55x_als_read(struct ltr55x_data *data,int gainrange)
 
 	if (alsval_ch0 < 60000) {
 		if (ratio < 50) {
-			luxdata =(17743 * alsval_ch0 + 11059 * alsval_ch1)*8 / (20000*4);
+			luxdata =(17743 * alsval_ch0 + 11059 * alsval_ch1)*8/ 20000;
 		} else if ((ratio >= 50) && (ratio < 68)) {
-			luxdata = (42785 * alsval_ch0 - 19548 * alsval_ch1)*10 / (16666*4);
+			luxdata = (42785 * alsval_ch0 - 19548 * alsval_ch1)*10/ 16666;
 		} else if ((ratio >= 68) && (ratio < 83)) {
-			luxdata = (5926 * alsval_ch0 + 1185 * alsval_ch1)*9 / (40000*4);
+			luxdata = (5926 * alsval_ch0 + 1185 * alsval_ch1)*9/ 40000;
 		} else if ((ratio >= 83) && (ratio < 90)) {
-			luxdata = (5926 * alsval_ch0 + 1185 * alsval_ch1)*3 / (23000*4);
+			luxdata = (5926 * alsval_ch0 + 1185 * alsval_ch1)*3/ 23000;
 		} else {
 			luxdata = 0;
 		}
@@ -621,27 +614,8 @@ static int ltr55x_als_read(struct ltr55x_data *data,int gainrange)
 	if ((alsval_ch0 >= 60000) ||(alsval_ch1 >= 60000))
 		luxdata = 65536;
 
-	als_temp[als_times] = luxdata;
-	als_times++;
-
-	if(first_cycle){
-		for(i=0; i<als_times; i++){
-			sum+=als_temp[i];
-		}
-		luxdata = sum / als_times;
-	}else{
-		for(i=0; i<ALS_AVR_COUNT; i++){
-			sum+=als_temp[i];
-		}
-		luxdata = sum / ALS_AVR_COUNT;
-	}
-
-	if(als_times >= ALS_AVR_COUNT){
-		als_times = 0;
-		first_cycle = 0;
-	}
-
 	return luxdata;
+
 }
 
 // Put ALS into Standby mode
@@ -664,7 +638,7 @@ static int ltr55xals_startup(struct ltr55x_data *data)
 	int als_cntr = 0;
 
        if(ltr55x_chipid == LTR553) {
-		als_gainrange = LTR553_ALS_RANGE_1300;
+		als_gainrange = LTR553_ALS_RANGE_8K;
 
 		switch (als_gainrange)
 		{
@@ -734,13 +708,7 @@ static int ltr55xals_startup(struct ltr55x_data *data)
 
 static int ltr55x_enable_als_sensor(struct ltr55x_data * data,unsigned int val)
 {
-	int i;
 	printk(KERN_DEBUG "%s,val=%d\n",__FUNCTION__,val);
-	als_times = 0;
-	for(i=0;i<ALS_AVR_COUNT;i++){
-		als_temp[i] = 0;
-	}
-	first_cycle = 1;
 	if (val == 1) {
 		//turn on light  sensor
 		if (data->enable_als_sensor==0) {
@@ -1273,8 +1241,7 @@ static void ltr55x_ps_update(struct ltr55x_data *data)
 	mutex_lock(&ltr55x_gdata->update_lock);
 
 	tmp_data = ltr55x_als_read(ltr55x_gdata, als_gainrange);
-	if (tmp_data > 50000)
-		tmp_data = 50000;
+
 	if ((tmp_data >= 0) && (tmp_data != ltr55x_gdata->gluxValue))
 		ltr55x_gdata->gluxValue = tmp_data;
 

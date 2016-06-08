@@ -66,7 +66,7 @@
 #define VENDOR_O_FILM           0x51
 #define VENDOR_GIS              0x8f
 #define VENDOR_WINTEK           0x89
-#define VENDOR_YILI		0x54
+
 
 struct ft5x06_info {
 	int (*reset)(struct device *);

@@ -190,11 +190,6 @@ struct comipfb_prefer_ce {
 	struct prefer_ce_info *info;
 };
 
-struct icn6201_reg {
-	unsigned char addr;
-	unsigned char  val;
-};
-
 struct comipfb_dev {
 	const char* name;	/* Device name. */
 	unsigned int interface_info;//interface infomation  MIPI or RGB
@@ -220,9 +215,6 @@ struct comipfb_dev {
 	struct comipfb_dev_cmds cmds_resume;
 	struct comipfb_dev_cmds cmds_pre_suspend;
 	struct bl_cmds backlight_info;
-
-	void *lvds_reg;
-	int reg_num;
 
 	struct comipfb_prefer_ce resume_prefer_info;
 	struct comipfb_prefer_ce display_prefer_info;

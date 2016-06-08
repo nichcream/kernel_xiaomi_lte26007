@@ -43,8 +43,5 @@ obj-$(CONFIG_LCD_JD_9365HSD) += lcd_jd_9365hsd.o
 obj-$(CONFIG_LCD_AUO_R61308OTP) +=  lcd_auo_r61308otp.o
 obj-$(CONFIG_LCD_HT_H8394D) += lcd_ht_h8394d.o
 obj-$(CONFIG_LCD_HS_EK79007) += lcd_ws_l706_mipi_ek79007_ips.o
-obj-$(CONFIG_MIPI_LVDS_ICN6201) += mipi_lvds_icn6201.o
-obj-$(CONFIG_LCD_LVDS_1280X800) += lcd_lvds_1280x800.o
 #obj-$(CONFIG_LCD_HS_EK79007) += lcd_hs_ek79007.o
-obj-$(CONFIG_LCD_FL10802) += lcd_fl10802.o
 

@@ -769,6 +769,9 @@ static int serial_comip_dma_init(struct uart_comip_port *up)
 			ret = serial_comip_rx_gpio_irq_init(up);
 			if (ret)
 				goto rxirq_err_init;
+		} else {
+			hrtimer_start(&up->rx_hrtimer,
+				ktime_set(0, UART_COMIP_RX_CHECK_TIMEOUT), HRTIMER_MODE_REL_PINNED);
 		}
 
 		up->rx_stop = 0;

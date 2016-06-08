@@ -26,7 +26,6 @@
 #include <linux/gpio.h>
 #include <plat/lc1160.h>
 #include <plat/lc1160-pmic.h>
-#include <plat/mfp.h>
 
 static struct i2c_client *lc1160_client;
 static DEFINE_MUTEX(lc1160_reg_lock);
@@ -222,18 +221,6 @@ static int __exit lc1160_remove(struct i2c_client *client)
 	return 0;
 }
 
-static void lc1160_shutdown(struct i2c_client *client)
-{
-#if defined(CONFIG_OTG_GPIO_CTL)
-    int otg_gpio = MFP_PIN_GPIO(160);
-    gpio_direction_output(otg_gpio, 1);
-    gpio_set_value(otg_gpio,0);
-
-    gpio_free(otg_gpio);
-#endif
-    return;
-}
-
 static const struct i2c_device_id lc1160_id[] = {
 	{ "lc1160", 0 },
 	{ },
@@ -245,7 +232,6 @@ static struct i2c_driver lc1160_driver = {
 	},
 	.probe		= lc1160_probe,
 	.remove 	= __exit_p(lc1160_remove),
-       .shutdown = lc1160_shutdown,
 	.id_table	= lc1160_id,
 };
 

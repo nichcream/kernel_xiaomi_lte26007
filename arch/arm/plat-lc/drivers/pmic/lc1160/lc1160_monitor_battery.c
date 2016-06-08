@@ -49,8 +49,6 @@
 #include <plat/lc1160_monitor_battery.h>
 #include <plat/lc1160_adc.h>
 #include "lc1160_capacity_lookup.h"
-#include <linux/gpio.h>
-#include <plat/mfp.h>
 
 
 struct pmic_charge_param {
@@ -135,9 +133,6 @@ struct monitor_battery_device_info {
 #ifdef CONFIG_HAS_EARLYSUSPEND
         struct early_suspend early_suspend;
 #endif
-        unsigned int fgchip_type; 
-        int cap_valid_count;
-        int cap_adjust_flag;
 };
 
 struct monitor_battery_device_info *bci;
@@ -772,11 +767,6 @@ static void monitor_charger_interrupt(int event, void *puser, void* pargs)
                                 di->capacity = 0;
                         }
                 }
-                else
-               {
-                    pr_info("%s: adapter/usb unplugged\n", __func__);
-                    goto err;
-               }
         }
 
         ret = pmic_read_byte(di,CHARGER_STATUS_REG, &pmic_charge_sts);
@@ -842,9 +832,6 @@ err:
 }
 
 #ifndef CONFIG_EXTERN_CHARGER
-#if defined(CONFIG_OTG_GPIO_CTL)
-#define OTG_GPIO_EN MFP_PIN_GPIO(161)
-#endif
 static int monitor_set_charging_enable(bool enable)
 {
         struct monitor_battery_device_info *di = bci;
@@ -1040,44 +1027,9 @@ static void monitor_stop_charger(struct monitor_battery_device_info *di)
         di->param.charge_status = POWER_SUPPLY_STATUS_DISCHARGING;
         di->param.charger_health = POWER_SUPPLY_HEALTH_UNKNOWN;
         di->hand_flag = 1;
-
-#if defined(CONFIG_OTG_GPIO_CTL)
-        //stop charging
-        di->param.enable_iterm = EOC_DIS;
-        di->param.enable_charger = ACHGON_DIS;
-        monitor_charger_control_reg_set(di);
-        
-        gpio_set_value(OTG_GPIO_EN,0);
-
-        gpio_free(OTG_GPIO_EN);
-#endif
         return;
 }
 
-#if defined(CONFIG_OTG_GPIO_CTL)
-static void monitor_start_otg(struct monitor_battery_device_info *di,bool enable)
-{
-    if(enable){
-       di->charger_source = POWER_SUPPLY_TYPE_BATTERY;
-       di->param.charge_status = POWER_SUPPLY_STATUS_DISCHARGING;
-       di->param.charger_health = POWER_SUPPLY_HEALTH_UNKNOWN;
-       di->hand_flag = 1;
-        dev_info(di->dev, "monitor_start_otg\n");
-        gpio_direction_output(OTG_GPIO_EN, 1);
-        gpio_set_value(OTG_GPIO_EN,1);
-
-        gpio_free(OTG_GPIO_EN);
-    }
-    else{
-        gpio_direction_output(OTG_GPIO_EN, 1);
-        gpio_set_value(OTG_GPIO_EN,0);
-
-        gpio_free(OTG_GPIO_EN);
-    }
-
-    return;
-}
-#endif
 static int monitor_set_charging_source(int charging_source)
 {
         struct monitor_battery_device_info *di = bci;
@@ -1100,9 +1052,6 @@ static int monitor_set_charging_source(int charging_source)
                 monitor_stop_charger(di);
                 break;
         case LCUSB_EVENT_OTG:
-#if defined(CONFIG_OTG_GPIO_CTL)
-                monitor_start_otg(di,1);
-#endif
                 break;
         default:
                 break;
@@ -1595,7 +1544,7 @@ static int monitor_battery_capacity_filter(struct monitor_battery_device_info *d
     if(curr_capacity == 0){
         soc  = 0;
     }
-	return curr_capacity;
+    return soc;
 }
 /*if use gasgauge*/
 static int monitor_capacity_from_voltage(struct monitor_battery_device_info *di)
@@ -1676,14 +1625,7 @@ static int capacity_monitor_thread(struct monitor_battery_device_info *di)
                 }
             }else{
                 if(curr_capacity > (di->prev_capacity + 2)) {
-                    if(di->fgchip_type != FG_CHIP_TYPE_CW2015)
-                    {
-                        curr_capacity = di->prev_capacity + 1;
-                    }
-                    else if((di->fgchip_type == FG_CHIP_TYPE_CW2015)&&(di->cap_adjust_flag ==1))
-                    {
-                        curr_capacity = di->prev_capacity + 1;
-                    }
+                    curr_capacity = di->prev_capacity + 1;
                     if(curr_capacity > 100){
                         curr_capacity = 100;
                     }
@@ -1698,28 +1640,11 @@ static int capacity_monitor_thread(struct monitor_battery_device_info *di)
 
         if(di->charger_source == POWER_SUPPLY_TYPE_BATTERY) {
                 if(curr_capacity > di->prev_capacity) {
-                    if(di->fgchip_type != FG_CHIP_TYPE_CW2015)
                     curr_capacity = di->prev_capacity;
-                    else if((di->fgchip_type == FG_CHIP_TYPE_CW2015)&&(di->cap_adjust_flag ==1))
-                   {
-                       pr_info("monitor_battery: in battery mode adjust curr_capacity= %d(%d)\n",curr_capacity,di->prev_capacity);
-                       curr_capacity = di->prev_capacity;
-                   }
                 }
-                
-                if(di->fgchip_type != FG_CHIP_TYPE_CW2015)
-               {
                 if((curr_capacity >=0)&&(di->capacity <= 10)&&(di->capacity >= 1)&&(voltage_filter <= 3500)){
                     pr_info("monitor_battery: low curr_capacity = %d(%d mV)\n",curr_capacity,voltage_filter);
-	                    curr_capacity = di->capacity --;
-	                }
-               }
-               else
-              {
-                       if((curr_capacity >=0)&&(di->capacity <= 10)&&(di->capacity >= 1)&&(voltage_filter <= 3450)){
-	                    pr_info("monitor_battery: low curr_capacity = %d(%d mV)\n",curr_capacity,voltage_filter);
-	                    curr_capacity = di->capacity --;
-	                }
+                    curr_capacity = di->capacity--;
                 }
         }
 
@@ -1763,9 +1688,7 @@ static void monitor_battery_work(struct work_struct *work)
         unsigned long timeout = jiffies + 6*HZ;
         int curr_capacity = 0,i = 0;
 #endif
-        unsigned int power_on_type;
         wake_lock(&di->monitor_wakelock);
-        power_on_type = lc1160_power_type_get();
 
         monitor_battery_update_data(di);
 #ifdef CONFIG_BATTERY_BQ27421
@@ -1785,19 +1708,6 @@ static void monitor_battery_work(struct work_struct *work)
                         msleep(1000);
                     }
                     pr_info("bq27421-battery: firmware init ok\n");
-                } else {
-                    pr_info("monitor_battery_work: power_on_type = %d\n",power_on_type);	
-                    if(power_on_type ==PU_REASON_USB_CHARGER){
-                        msleep(7000);
-                    }
-                    else if(power_on_type == PU_REASON_REBOOT_RECOVERY)
-                    { 
-                        //nothing
-                    }
-                    else
-                    {
-                        msleep(4000);
-                    }
                 }
                 exit:
                 if(di->battery_info->battery_capacity) {
@@ -1814,43 +1724,14 @@ static void monitor_battery_work(struct work_struct *work)
                 //schedule_work(&di->fg_update_work);
         }
 
-       if((di->fgchip_type == FG_CHIP_TYPE_CW2015)&&(di->cap_valid_count < 5))
-       {
-            di->cap_valid_count ++;
-
-            if(di->cap_valid_count == 5)
-            {
-                 di->cap_adjust_flag = 1;
-            }
-       }
         ret = capacity_monitor_thread(di);
         if (ret)
                 power_supply_changed(&di->bat);
-         if(di->fgchip_type != FG_CHIP_TYPE_CW2015)
-         {
         if(di->capacity < 15){
             schedule_delayed_work(&di->battery_monitor_work, msecs_to_jiffies(1000 * 5));
         }else{
             schedule_delayed_work(&di->battery_monitor_work,
                 msecs_to_jiffies(1000 * di->monitoring_interval));
-              }
-         }
-            else   //cw2015 fg
-            {
-               if(di->cap_adjust_flag == 1)
-               {
-                   if(di->capacity < 15){
-                      schedule_delayed_work(&di->battery_monitor_work, msecs_to_jiffies(1000 * 5));
-                   }else{
-                  schedule_delayed_work(&di->battery_monitor_work,
-                               msecs_to_jiffies(1000 * di->monitoring_interval));
-                   }
-               }
-               else
-               {
-                   pr_info("monitor_battery_work: 5s work timer\n");
-                   schedule_delayed_work(&di->battery_monitor_work, msecs_to_jiffies(1000 * 5));
-            }
         }
 
         wake_unlock(&di->monitor_wakelock);
@@ -2603,7 +2484,6 @@ static int __init monitor_battery_probe(struct platform_device *pdev)
         di->param.voltagemV = di->param.max_voltagemV ;
         di->param.rechg_voltagemV = di->platform_data->rechg_voltagemV;
         di->adc_temp_chnl = ADC_TEMP_CHANNEL;
-        di->fgchip_type = FG_CHIP_TYPE_UNKNOWN;
 
         di->dev = &pdev->dev;
         bci = di;
@@ -2679,8 +2559,6 @@ static int __init monitor_battery_probe(struct platform_device *pdev)
         di->dbb_hot = THERMAL_TEMP_HOT;
         di->dbb_normal = THERMAL_TEMP_NORMAL;
 
-        di->cap_valid_count = 0;
-        di->cap_adjust_flag = -1;
 
 #ifndef CONFIG_BATTERY_FG
         di->param.currentmA = 100;
@@ -2704,9 +2582,6 @@ static int __init monitor_battery_probe(struct platform_device *pdev)
         di->rbuf_fgvolt[i] = di->bat_voltage_mV;
             di->capacity_filter[i] = curr_capacity;
         }
-        if(di->battery_info->get_fgchip_detect)
-                di->fgchip_type = di->battery_info->get_fgchip_detect();
-        dev_info(&pdev->dev, "fgchip_type is %d\n",di->fgchip_type);
 #endif
         dev_info(&pdev->dev, "Battery Voltage at Bootup is %d mV\n",
                  di->bat_voltage_mV);
@@ -2868,15 +2743,6 @@ static void monitor_battery_resume(struct device *dev)
 #define monitor_battery_resume  NULL
 #endif /* CONFIG_PM */
 
-static void monitor_battery_shutdown(struct platform_device *pdev)
-{
-#if defined(CONFIG_OTG_GPIO_CTL)
-    printk(KERN_DEBUG "monitor_battery:%s:shutdown\n", __func__);
-    struct monitor_battery_device_info *di = platform_get_drvdata(pdev);
-    monitor_start_otg(di,0);
-#endif
-    return;
-}
 static const struct dev_pm_ops pm_ops = {
         .prepare  = monitor_battery_suspend,
         .complete = monitor_battery_resume,
@@ -2884,7 +2750,6 @@ static const struct dev_pm_ops pm_ops = {
 
 static struct platform_driver monitor_battery_driver = {
         .remove    = __exit_p(monitor_battery_remove),
-        .shutdown = monitor_battery_shutdown,
         .driver    = {
                 .name = "monitor_battery",
                 .pm	= &pm_ops,

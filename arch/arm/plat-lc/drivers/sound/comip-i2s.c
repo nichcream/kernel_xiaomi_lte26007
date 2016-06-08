@@ -68,7 +68,6 @@ static int comip_i2s_startup(struct snd_pcm_substream *substream,
 {
 	struct comip_i2s_data *i2s = dev_get_drvdata(dai->dev);
 	int ret = 0;
-	unsigned long flags;
 
 	i2s->clk = clk_get(dai->dev, "i2s_clk");
 	if (IS_ERR(i2s->clk)) {
@@ -77,10 +76,8 @@ static int comip_i2s_startup(struct snd_pcm_substream *substream,
 		goto exit;
 	}
 
-	spin_lock_irqsave(&i2s->lock, flags);
 	clk_set_rate(i2s->clk, COMIP_I2S_CLK_RATE);
 	clk_enable(i2s->clk);
-	spin_unlock_irqrestore(&i2s->lock, flags);
 
 exit:
 	return ret;

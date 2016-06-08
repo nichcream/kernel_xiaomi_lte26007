@@ -97,7 +97,7 @@ struct yas_cdriver {
 };
 
 static const struct yas_matrix no_conversion
-	= { {9903, -239, 446, -49, 10037, -22, -385,-348,10046} };
+	= { {10000, 0, 0, 0, 10000, 0, 0, 0, 10000} };
 static const int measure_time_worst[] = {800, 1100, 1500};
 
 static const int8_t YAS537_TRANSFORMATION[][9] = {

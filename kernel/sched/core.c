@@ -4713,36 +4713,6 @@ void show_state_filter(unsigned long state_filter)
 		debug_show_all_locks();
 }
 
-void show_running_task(void)
-{
-	struct task_struct *g, *p;
-
-#if BITS_PER_LONG == 32
-	printk(KERN_INFO
-		"  task                PC stack   pid father\n");
-#else
-	printk(KERN_INFO
-		"  task                        PC stack   pid father\n");
-#endif
-	rcu_read_lock();
-	do_each_thread(g, p) {
-		/*
-		 * reset the NMI-timeout, listing all files on a slow
-		 * console might take a lot of time:
-		 */
-		touch_nmi_watchdog();
-		if (!p->state)
-			sched_show_task(p);
-	} while_each_thread(g, p);
-
-	touch_all_softlockup_watchdogs();
-
-#ifdef CONFIG_SCHED_DEBUG
-	sysrq_sched_debug_show();
-#endif
-	rcu_read_unlock();
-}
-
 void __cpuinit init_idle_bootup_task(struct task_struct *idle)
 {
 	idle->sched_class = &idle_sched_class;

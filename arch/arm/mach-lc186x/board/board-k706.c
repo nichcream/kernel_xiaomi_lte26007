@@ -111,7 +111,7 @@ static struct platform_device adc_dev = {
 };
 #endif
 
-#if defined(CONFIG_BATTERY_MAX17058)|| defined(CONFIG_CW201X_BATTERY)
+#if defined(CONFIG_BATTERY_MAX17058)
 static int batt_temp_table[] = {
 	/* adc code for temperature in degree C */
 	2295, 2274, 2253, 2232, 2210, 2188, 2165, 2142, 2118, 2094,/* -20 ,-11 */
@@ -131,7 +131,7 @@ static int batt_temp_table[] = {
 *  max1705_battery.c defines for battery_id about data_baseaddr
 * so they continue to match the order in this table.
 */
-static int fg_batt_model_table[64*7] = {
+static int fg_batt_model_table[64*4] = {
 	/*default battery (data_baseaddr = 0)*/
 	0xAE,0xF0,0xB7,0x70,0xB8,0x80,0xB9,0xE0,
 	0xBB,0x70,0xBC,0x50,0xBD,0x30,0xBE,0x60,
@@ -168,33 +168,6 @@ static int fg_batt_model_table[64*7] = {
 	0x50,0xE0,0x27,0x20,0x77,0x30,0x20,0xA0,
 	0x3A,0xD0,0x12,0xF0,0x15,0xF0,0x11,0xE0,
 	0x11,0xE0,0x0D,0xF0,0x0D,0x20,0x0D,0x20,
-	/*FOR CW201:GUANGYU (data_baseaddr =256)*/
-	0x16,0xF9,0x66,0x67,0x63,0x61,0x5F,0x4C,
-	0x7F,0x4E,0x4B,0x5D,0x5A,0x46,0x3F,0x33,
-	0x2D,0x26,0x22,0x21,0x2C,0x32,0x40,0x4B,
-	0x1E,0x57,0x0B,0x85,0x33,0x53,0x78,0x8B,
-	0x9E,0x99,0x96,0x98,0x41,0x1B,0x45,0x3A,
-	0x17,0x3D,0x52,0x87,0x8F,0x91,0x94,0x52,
-	0x82,0x8C,0x92,0x96,0x00,0x9B,0x93,0xCB,
-	0x2F,0x7D,0x72,0xA5,0xB5,0xC1,0x95,0x21,
-	/*FOR CW201:DESAI (data_baseaddr =320)*/
-	0x17,0x63,0x6A,0x68,0x6A,0x65,0x63,0x60,
-	0x5C,0x5D,0x54,0x55,0x5B,0x54,0x46,0x3E,
-	0x34,0x2B,0x24,0x1D,0x1E,0x3B,0x4C,0x55,
-	0x16,0x44,0x0B,0x85,0x2E,0x4E,0x53,0x5C,
-	0x65,0x5F,0x5E,0x61,0x3D,0x1A,0x70,0x38,
-	0x0C,0x45,0x52,0x87,0x8F,0x91,0x94,0x52,
-	0x82,0x8C,0x92,0x96,0x79,0x98,0xCF,0xCB,
-	0x2F,0x7D,0x72,0xA5,0xB5,0xC1,0x95,0x31,
-	/*FOR CW201:XINWANGDA (data_baseaddr =384)*/
-	0x17,0x5C,0x6C,0x66,0x6B,0x64,0x63,0x61,
-	0x5D,0x5B,0x59,0x53,0x53,0x4E,0x45,0x41,
-	0x34,0x31,0x28,0x27,0x2E,0x3E,0x49,0x53,
-	0x27,0x5D,0x0B,0x85,0x44,0x68,0x5B,0x67,
-	0x6D,0x63,0x5F,0x61,0x40,0x1B,0x83,0x2A,
-	0x14,0x46,0x52,0x87,0x8F,0x91,0x94,0x52,
-	0x82,0x8C,0x92,0x96,0x6E,0x96,0xCE,0xCB,
-	0x2F,0x7D,0x72,0xA5,0xB5,0xC1,0x95,0x29,
 };
 
 struct comip_fuelgauge_info fg_data = {
@@ -399,18 +372,6 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 	{SP2529_POWERDOWN_PIN,		MFP_PIN_MODE_GPIO},
 	{SP2529_RESET_PIN,		MFP_PIN_MODE_GPIO},
 #endif
-#if defined(CONFIG_VIDEO_OV5648_2LANE_26M)
-	{ov5648_POWERDOWN_PIN,		MFP_PIN_MODE_GPIO},
-	{ov5648_RESET_PIN,		MFP_PIN_MODE_GPIO},
-#endif
-#if defined(CONFIG_VIDEO_GC2755)
-	{gc2755_POWERDOWN_PIN,		MFP_PIN_MODE_GPIO},
-	{gc2755_RESET_PIN,		MFP_PIN_MODE_GPIO},
-#endif
-#if defined(CONFIG_VIDEO_GC0310)
-	{gc0310_POWERDOWN_PIN,		MFP_PIN_MODE_GPIO},
-	{gc0310_RESET_PIN,		MFP_PIN_MODE_GPIO},
-#endif
 
 
 	/*mfp low power config*/
@@ -430,7 +391,6 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 #if defined(CONFIG_COMIP_PROJECT_K706_V1_0)
 	{MFP_PIN_GPIO(LCD_PWR_CTRL), 	MFP_PIN_MODE_GPIO},
 #endif 	
-    {MFP_PIN_GPIO(160), 	MFP_PIN_MODE_GPIO},
 };
 
 static struct mfp_pull_cfg comip_mfp_pull_cfg[] = {
@@ -442,8 +402,8 @@ static struct mfp_pull_cfg comip_mfp_pull_cfg[] = {
 #endif
 	{COMIP_GPIO_KEY_VOLUMEUP,	MFP_PULL_UP},
 	{COMIP_GPIO_KEY_VOLUMEDOWN,	MFP_PULL_UP},
-#if defined(CONFIG_RTK_BLUETOOTH) || defined(CONFIG_BRCM_BLUETOOTH)
-	{UART2_CTS_PIN,	MFP_PULL_DOWN},
+#if defined(CONFIG_RTK_BLUETOOTH)
+	{RTK_BT_UART_CTS_PIN,	MFP_PULL_DOWN},
 #endif
 	/*mfp low power config*/
 	{MFP_PIN_GPIO(72),		MFP_PULL_UP},
@@ -481,7 +441,6 @@ static struct mfp_pull_cfg comip_mfp_pull_cfg[] = {
 #if defined(CONFIG_COMIP_PROJECT_K706_V1_0)
 	{MFP_PIN_GPIO(LCD_PWR_CTRL), 	MFP_PULL_DISABLE},
 #endif
-	{MFP_PIN_GPIO(160), 	MFP_PULL_DOWN},
 
 };
 
@@ -613,7 +572,7 @@ static struct lc1160_platform_data i2c_lc1160_info = {
 /* accel */
 #if defined (CONFIG_SENSORS_BMA222E)
 static struct bma2x2_platform_data bma2x2_pdata = {
-	.position = 9,
+	.position = 5,
 };
 #endif
 
@@ -877,12 +836,6 @@ static struct rtk_fm_platform_data rtk_fm_data = {
 /* NFC. */
 static struct i2c_board_info comip_i2c0_board_info[] = {
 	// TODO:  to be continue for device
-#if defined (CONFIG_CW201X_BATTERY)
-	{
-		I2C_BOARD_INFO("cw201x", 0x62),
-		.platform_data = &fg_data,
-	},
-#endif
 };
 
 /* Sensors. */
@@ -1354,165 +1307,6 @@ static struct i2c_board_info sp2529_board_info = {
 
 #endif
 
-#if defined(CONFIG_VIDEO_OV5648_2LANE_26M)
-static int ov5648_pwdn = mfp_to_gpio(ov5648_POWERDOWN_PIN);
-static int ov5648_rst = mfp_to_gpio(ov5648_RESET_PIN);
-static int ov5648_power(int onoff)
-{
-	printk("ov5648 power : %d\n", onoff);
-
-	gpio_request(ov5648_pwdn, "OV5648 Powerdown");
-	gpio_request(ov5648_rst, "OV5648 Reset");
-	if (onoff) {
-		gpio_direction_output(ov5648_pwdn, 0);
-		gpio_direction_output(ov5648_rst, 1);
-		pmic_voltage_set(PMIC_POWER_CAMERA_IO, 0, PMIC_POWER_VOLTAGE_ENABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_ANALOG, 0, PMIC_POWER_VOLTAGE_ENABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_CORE, 0, PMIC_POWER_VOLTAGE_ENABLE);
-		mdelay(10);
-		gpio_direction_output(ov5648_pwdn, 1);//OV5648 different from OV5647
-		gpio_direction_output(ov5648_rst, 0);
-		msleep(50);
-		gpio_direction_output(ov5648_rst, 1);
-	} else {
-		pmic_voltage_set(PMIC_POWER_CAMERA_IO, 0, PMIC_POWER_VOLTAGE_DISABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_ANALOG, 0, PMIC_POWER_VOLTAGE_DISABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_CORE, 0, PMIC_POWER_VOLTAGE_DISABLE);
-
-		gpio_direction_output(ov5648_pwdn, 0);
-		gpio_direction_output(ov5648_rst, 0);
-	}
-	gpio_free(ov5648_pwdn);
-	gpio_free(ov5648_rst);
-
-	return 0;
-}
-
-static int ov5648_reset(void)
-{
-	printk("ov5648 reset\n");
-
-	return 0;
-}
-
-static struct comip_camera_subdev_platform_data ov5648_setting = {
-	.flags = CAMERA_SUBDEV_FLAG_FLIP,
-	//.flags = CAMERA_SUBDEV_FLAG_MIRROR,
-};
-
-static struct i2c_board_info ov5648_board_info = {
-	.type = "ov5648-mipi-raw",
-	.addr = 0x36,
-	.platform_data = &ov5648_setting,
-};
-#endif
-#if defined(CONFIG_VIDEO_GC2755)
-
-static int gc2755_pwdn = mfp_to_gpio(gc2755_POWERDOWN_PIN);
-static int gc2755_rst = mfp_to_gpio(gc2755_RESET_PIN);
-static int gc2755_power(int onoff)
-{
-	printk("############## GC2755 Back power : %d################\n", onoff);
-    
-    gpio_request(gc2755_pwdn, "GC2755 Powerdown");
-	gpio_request(gc2755_rst, "GC2755 Reset");
-	if (onoff) {
-		gpio_direction_output(gc2755_pwdn, 1);
-		gpio_direction_output(gc2755_rst, 1);
-		mdelay(10);
-		pmic_voltage_set(PMIC_POWER_CAMERA_IO, 0, PMIC_POWER_VOLTAGE_ENABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_ANALOG, 0, PMIC_POWER_VOLTAGE_ENABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_CORE, 0, PMIC_POWER_VOLTAGE_ENABLE);
-		gpio_direction_output(gc2755_pwdn, 0);
-		mdelay(10);
-		gpio_direction_output(gc2755_rst, 0);
-		mdelay(50);
-		gpio_direction_output(gc2755_rst, 1);
-	} else {
-		pmic_voltage_set(PMIC_POWER_CAMERA_IO, 0, PMIC_POWER_VOLTAGE_DISABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_ANALOG, 0, PMIC_POWER_VOLTAGE_DISABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_CORE, 0, PMIC_POWER_VOLTAGE_DISABLE);
-		gpio_direction_output(gc2755_pwdn, 0);
-		gpio_direction_output(gc2755_rst, 0);
-	}
-	gpio_free(gc2755_pwdn);
-	gpio_free(gc2755_rst);
-	
-	return 0;
-}
-
-static int gc2755_reset(void)
-{
-
-	return 0;
-}
-
-static struct i2c_board_info gc2755_board_info = {
-	.type = "gc2755",
-	.addr = 0x3c,
-};
-#endif
-
-
-
-#if defined(CONFIG_VIDEO_GC0310)
-static int gc0310_pwdn = mfp_to_gpio(gc0310_POWERDOWN_PIN);
-static int gc0310_rst = mfp_to_gpio(gc0310_RESET_PIN);
-static int gc0310_power(int onoff)
-{
-	printk("GC0310 power : %d\n", onoff);
-
-	gpio_request(gc0310_pwdn, "gc0310 Powerdown Pin");
-	gpio_request(gc0310_rst, "gc0310 Reset");
-	if (onoff) {
-		gpio_direction_output(gc0310_pwdn, 1);
-		gpio_direction_output(gc0310_rst, 1);
-		mdelay(10);
-		pmic_voltage_set(PMIC_POWER_CAMERA_IO, 1, PMIC_POWER_VOLTAGE_ENABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_ANALOG, 1, PMIC_POWER_VOLTAGE_ENABLE);
-	//	pmic_voltage_set(PMIC_POWER_CAMERA_CORE, 1, PMIC_POWER_VOLTAGE_ENABLE);
-
-		gpio_direction_output(gc0310_pwdn, 0);
-		mdelay(10);
-		gpio_direction_output(gc0310_rst, 1);
-	       mdelay(20);
-		gpio_direction_output(gc0310_rst, 0);
-		mdelay(20);
-		gpio_direction_output(gc0310_rst, 1);
-	} else {
-		pmic_voltage_set(PMIC_POWER_CAMERA_IO, 1, PMIC_POWER_VOLTAGE_DISABLE);
-		pmic_voltage_set(PMIC_POWER_CAMERA_ANALOG, 1, PMIC_POWER_VOLTAGE_DISABLE);
-		//pmic_voltage_set(PMIC_POWER_CAMERA_CORE, 1, PMIC_POWER_VOLTAGE_DISABLE);
-
-		gpio_request(gc0310_pwdn, "gc0310 Powerdown Pin");
-		gpio_direction_output(gc0310_pwdn, 0);
-		gpio_direction_output(gc0310_rst, 0);
-	}
-	gpio_free(gc0310_pwdn);
-	gpio_free(gc0310_rst);
-
-	return 0;
-}
-
-static int gc0310_reset(void)
-{
-	printk("gc0310 reset\n");
-
-	return 0;
-}
-
-static struct comip_camera_subdev_platform_data gc0310_setting = {
-	//.flags = CAMERA_SUBDEV_FLAG_MIRROR | CAMERA_SUBDEV_FLAG_FLIP,
-};
-
-static struct i2c_board_info gc0310_board_info = {
-	.type = "gc0310-mipi-yuv",
-	.addr = 0x21,
-	.platform_data = &gc0310_setting,
-};
-#endif
-
-
 
 #ifdef CONFIG_VIDEO_CHIP_PMU
 static init_flag = 0;
@@ -1648,74 +1442,6 @@ static struct comip_camera_client comip_camera_clients[] = {
 		.mipi_lane_num = 1,
 		.power = sp0a20_power,
 		.reset = sp0a20_reset,
-	},
-#endif
-
-
-#if defined(CONFIG_VIDEO_OV5648_2LANE_26M)
-	{
-		.board_info = &ov5648_board_info,
-		.flags = CAMERA_CLIENT_IF_MIPI
-			|CAMERA_CLIENT_FRAMERATE_DYN
-			|CAMERA_CLIENT_CLK_EXT,
-		.caps = CAMERA_CAP_FOCUS_INFINITY
-		| CAMERA_CAP_FOCUS_AUTO
-		| CAMERA_CAP_FOCUS_CONTINUOUS_AUTO
-		| CAMERA_CAP_METER_CENTER
-		| CAMERA_CAP_METER_DOT
-		| CAMERA_CAP_FACE_DETECT
-		| CAMERA_CAP_ANTI_SHAKE_CAPTURE
-		| CAMERA_CAP_HDR_CAPTURE,
-		.if_id = 0,
-		.mipi_lane_num = 2,
-		.mclk_parent_name = "pll1_mclk",
-		.mclk_name = "clkout1_clk",
-		.mclk_rate = 26000000,
-		.power = ov5648_power,
-		.reset = ov5648_reset,
-	},
-#endif
-
-
-#if defined(CONFIG_VIDEO_GC2755)
-	{
-		.board_info = &gc2755_board_info,
-		.flags = CAMERA_CLIENT_IF_MIPI
-			|CAMERA_CLIENT_FRAMERATE_DYN
-			|CAMERA_CLIENT_CLK_EXT,
-		.caps = CAMERA_CAP_FOCUS_INFINITY
-		| CAMERA_CAP_FOCUS_AUTO
-		| CAMERA_CAP_FOCUS_CONTINUOUS_AUTO
-		| CAMERA_CAP_METER_CENTER
-		| CAMERA_CAP_METER_DOT
-		| CAMERA_CAP_FACE_DETECT
-		| CAMERA_CAP_ANTI_SHAKE_CAPTURE
-		| CAMERA_CAP_HDR_CAPTURE,
-		.if_id = 0,
-		.mipi_lane_num = 2,
-		.mclk_parent_name = "pll1_mclk",
-		.mclk_name = "clkout1_clk",
-		.mclk_rate = 26000000,
-		.power = gc2755_power,
-		.reset = gc2755_reset,
-	},
-#endif
-
-
-#if defined(CONFIG_VIDEO_GC0310)
-	{
-		.board_info = &gc0310_board_info,
-		.flags = CAMERA_CLIENT_IF_MIPI
-			|CAMERA_CLIENT_YUV_DATA,
-		.caps = CAMERA_CAP_METER_CENTER
-			| CAMERA_CAP_METER_DOT
-			| CAMERA_CAP_FACE_DETECT
-			| CAMERA_CAP_ANTI_SHAKE_CAPTURE
-			| CAMERA_CAP_HDR_CAPTURE,
-		.if_id = 1,
-		.mipi_lane_num = 1,
-		.power = gc0310_power,
-		.reset = gc0310_reset,
 	},
 #endif
 

@@ -4407,7 +4407,7 @@ static int bma2x2_read_accel_xyz(struct i2c_client *client,
 	return comres;
 }
 
-static int bma2x2_position_setting[10][3][3] = {
+static int bma2x2_position_setting[9][3][3] = {
 	{{ 1,  0,  0}, { 0,  1,	0}, {0, 0,	1}},
 	{{-1,  0,  0}, { 0, -1, 0}, {0, 0,	1}},
 	{{ 0, -1,  0}, { 1,  0,	0}, {0, 0,	1}},
@@ -4418,7 +4418,6 @@ static int bma2x2_position_setting[10][3][3] = {
 	{{ 0,  1,  0}, { 1,  0,	0}, {0, 0,  -1}},
 	{{ 1,  0,  0}, { 0, -1,	0}, {0, 0,  -1}},
 	{{ -1,  0,  0}, { 0, -1, 0}, {0, 0,	-1}},
-	{{ 0,  -1,  0}, { -1, 0, 0}, {0, 0, -1}},
 };
 
 static int bma2x2_data_convert(struct bma2x2_data* bma2x2,struct bma2x2acc *axis_data)
@@ -4426,7 +4425,7 @@ static int bma2x2_data_convert(struct bma2x2_data* bma2x2,struct bma2x2acc *axis
 	short rawdata[3],data[3];
 	int i,j;
 	int position = bma2x2->position ;
-	if(position < 0 || position > 9 )
+	if(position < 0 || position > 8 )
 		position = 0;
 	rawdata [0] = axis_data->x ;
 	rawdata [1] = axis_data->y ;

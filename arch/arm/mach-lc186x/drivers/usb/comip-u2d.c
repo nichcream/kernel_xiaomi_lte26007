@@ -833,7 +833,6 @@ int comip_usb_power_set(int onoff)
 		ret = pmic_voltage_set(PMIC_POWER_USB, 0, PMIC_POWER_VOLTAGE_DISABLE);
 		ret = pmic_voltage_set(PMIC_POWER_USB, 1, PMIC_POWER_VOLTAGE_DISABLE);
 		ret = pmic_voltage_set(PMIC_POWER_USB_ETH, 0, PMIC_POWER_VOLTAGE_DISABLE);
-		ret = pmic_voltage_set(PMIC_POWER_USB_HSIC, 0, PMIC_POWER_VOLTAGE_DISABLE);
 		usb_power_state = 0;
 		printk( "set USB power off.\n");
 		count = 0;
@@ -842,7 +841,6 @@ int comip_usb_power_set(int onoff)
 		ret = pmic_voltage_set(PMIC_POWER_USB, 0, PMIC_POWER_VOLTAGE_ENABLE);
 		ret = pmic_voltage_set(PMIC_POWER_USB, 1, PMIC_POWER_VOLTAGE_ENABLE);
 		ret = pmic_voltage_set(PMIC_POWER_USB_ETH, 0, PMIC_POWER_VOLTAGE_ENABLE);
-		ret = pmic_voltage_set(PMIC_POWER_USB_HSIC, 0, PMIC_POWER_VOLTAGE_ENABLE);
 		usb_power_state = 1;
 		printk( "set USB power on.\n");
 	}
@@ -957,7 +955,7 @@ static int u2d_usb_init(void)
 		val = comip_u2d_read_reg32(USB_GRSTCTL);
 	}
 
-	val = USB_GAHBCFG_DMAEN | USB_GAHBCFG_GLBINTMSK | USB_GAHBCFG_HBLEN; /* DMA mode */
+	val = USB_GAHBCFG_DMAEN | USB_GAHBCFG_GLBINTMSK; /* DMA mode */
 	comip_u2d_write_reg32(val, USB_GAHBCFG);
 	val = comip_u2d_read_reg32(USB_GAHBCFG);
 

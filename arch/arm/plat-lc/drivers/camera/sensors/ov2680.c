@@ -1275,7 +1275,7 @@ static int ov2680_get_module_factory(struct v4l2_subdev *sd, char **module_facto
 
 	if (client->addr == I2C_ADDR_OFLIM)
 		*module_factory = factory_ofilm;
-	else if (client->addr == I2C_ADDR_SUNNY)
+	else if (client->addr == I2C_ADDR_OFLIM)
 		*module_factory = factory_sunny;
 	else
 		*module_factory = factory_unknown;

@@ -15,7 +15,7 @@
 #include <linux/i2c.h>
 #include <linux/rtc.h>
 #include <linux/syscalls.h>
-#include "isp-ctrl.h"
+
 #include "comip-isp-dev.h"
 #include "comip-video.h"
 #include "comip-videobuf.h"
@@ -396,72 +396,6 @@ int comip_debugtool_load_firmware(char* filename, u8* dest, const u8* array_src,
 	}
 
 	return real_len;
-}
-
-int comip_debugtool_preview_load_raw_file(struct comip_camera_dev* camdev, char* filename)
-{
-	struct isp_device *isp = camdev->isp;
-	struct isp_parm *iparm = &isp->parm;
-	int size = iparm->in_width * iparm->in_height * 2;
-	char val;
-	off_t file_len = 0;
-	mm_segment_t old_fs;
-	unsigned char gain[2], exp[2], *g_info;
-	unsigned int lexp;
-	unsigned short sgain;
-
-	//if (isp->vraw_addr == NULL) {
-	//	printk("isp->vraw_addr **in_width = %d, in_height**lyly*****\n"iparm->in_width,iparm->in_height);
-	//	isp->vraw_addr = dma_alloc_writecombine(isp->dev, size, (dma_addr_t *)&(isp->praw_addr), GFP_KERNEL);
-	//}
-	if (isp->raw_file == NULL) {
-                printk("****isp->raw_open ***\n");
-		isp->raw_file = filp_open(filename, O_RDWR, 0644);
-		if (IS_ERR(isp->raw_file)) {
-			printk(" %s: open file: %s error!\n", __FUNCTION__, filename);
-		} else {
-			old_fs = get_fs();
-			set_fs(KERNEL_DS);
-			file_len = isp->raw_file->f_dentry->d_inode->i_size;
-			//isp->raw_file->f_op->read(isp->raw_file, (char *)isp->vraw_addr, file_len, &file->f_pos);
-			isp->raw_file->f_op->read(isp->raw_file, (char *)camdev->preview_vaddr, file_len, &isp->raw_file->f_pos);
-			set_fs(old_fs);
-		}
-		printk("isp->raw write reg *********\n");
-		g_info = (unsigned char *)(camdev->preview_vaddr + size);
-                printk("**read val*00**\n");
-		gain[0] = *(g_info + 4);
-		gain[1] = *(g_info + 5);
-		exp[0] = *(g_info + 6);
-		exp[1] = *(g_info + 7);
-                printk("**read val*0* gain[0] = %x gain[1] = %x exp[0] = %x, exp[1] = %x*\n", gain[0],gain[1],exp[0],exp[1]);
-		sgain = (unsigned short) (gain[1] << 8 | gain[0]);
-		lexp = (unsigned int) (exp[1] << 8 | exp[0]);
-		lexp *= 16;
-                printk("**read val***\n");
-		isp_reg_writeb(isp,0x01, 0x1c174);
-
-		isp_reg_writel(isp,lexp, 0x1c168);
-		isp_reg_writew(isp,sgain, 0x1c170);
-
-
-		isp_reg_writeb(isp,exp[1], 0x1e934);
-		isp_reg_writeb(isp,exp[0], 0x1e935);
-		isp_reg_writeb(isp,exp[1], 0x1e936);
-		isp_reg_writeb(isp,exp[0], 0x1e937);
-
-		isp_reg_writeb(isp,gain[1], 0x1e938);
-		isp_reg_writeb(isp,gain[0], 0x1e939);
-		isp_reg_writeb(isp,gain[1], 0x1e93a);
-		isp_reg_writeb(isp,gain[0], 0x1e93b);
-		isp_reg_writel(isp, (unsigned int)camdev->preview_paddr, 0x63b20);
-		isp_reg_writel(isp, (unsigned int)camdev->preview_paddr, 0x63b28);
-		val = isp_reg_readb(isp, 0x1e900);
-		val &= 0xc7;
-		val |= 0x20;
-		isp_reg_writeb(isp, val, 0x1e900);
-	}
-    return 0;
 }
 
 int comip_debugtool_load_raw_file(struct comip_camera_dev* camdev, char* filename)
@@ -873,18 +807,6 @@ static ssize_t save_raw_store(struct device *dev, struct device_attribute *attr,
 DEVICE_ATTR(save_raw, S_IRUGO | S_IWUSR, save_raw_show, save_raw_store);
 
 
-static ssize_t load_preview_raw_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	return snprintf(buf, PAGE_SIZE, "%d\n", cam_dev->load_preview_raw);
-}
-static ssize_t load_preview_raw_store(struct device *dev, struct device_attribute *attr,
-				const char *buf, size_t count)
-{
-	sscanf(buf, "%d", &cam_dev->load_preview_raw);
-	return count;
-}
-
-DEVICE_ATTR(load_preview_raw, S_IRUGO | S_IWUSR, load_preview_raw_show, load_preview_raw_store);
 static ssize_t load_raw_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	return snprintf(buf, PAGE_SIZE, "%d\n", cam_dev->load_raw);
@@ -957,7 +879,6 @@ static struct device_attribute* dev_debug_attrs[] = {
 	&dev_attr_save_yuv,
 	&dev_attr_save_raw,
 	&dev_attr_load_raw,
-	&dev_attr_load_preview_raw,
 	&dev_attr_flip,
 	&dev_attr_mirror,
 	&dev_attr_esd_reset,

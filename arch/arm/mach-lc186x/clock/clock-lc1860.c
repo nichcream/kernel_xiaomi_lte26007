@@ -1093,10 +1093,9 @@ static int g8plus1_sdiv_set_rate(struct clk *clk, unsigned long rate)
 				clk->rate = rate;
 				val = (clk->divclk_mask << clk->divclk_we_bit)
 					| (clk->divclk_val << clk->divclk_bit);
-				writel(val, clk->divclk_reg);
-				val = (clk->grclk_mask << clk->grclk_we_bit)
+				val |= (clk->grclk_mask << clk->grclk_we_bit)
 					| (clk->grclk_val << clk->grclk_bit);
-				writel(val, clk->grclk_reg);
+				writel(val, clk->divclk_reg);
 
 				/*restore enable status*/
 				if(clk->mclk_reg) {
@@ -1121,10 +1120,9 @@ static int g8plus1_sdiv_set_rate(struct clk *clk, unsigned long rate)
 
 	val = (clk->divclk_mask << clk->divclk_we_bit)
 		| (clk->divclk_val << clk->divclk_bit);
-	writel(val, clk->divclk_reg);
-	val = (clk->grclk_mask << clk->grclk_we_bit)
+	val |= (clk->grclk_mask << clk->grclk_we_bit)
 		| (clk->grclk_val << clk->grclk_bit);
-	writel(val, clk->grclk_reg);
+	writel(val, clk->divclk_reg);
 
 	/*restore enable status*/
 	if(clk->mclk_reg) {

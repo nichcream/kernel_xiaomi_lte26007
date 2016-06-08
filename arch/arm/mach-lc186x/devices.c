@@ -737,7 +737,7 @@ static struct resource comip_resource_hcd_hsic[] = {
 	},
 };
 struct platform_device comip_device_hcd_hsic = {
-	.name = "comip-hsic",
+	.name = "comip-hcd",
 	.id = HSIC_HW,
 	.dev = {
 		.dma_mask = &comip_usb_dma_mask,

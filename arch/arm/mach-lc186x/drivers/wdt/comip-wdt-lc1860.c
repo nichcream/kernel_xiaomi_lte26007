@@ -736,29 +736,6 @@ static ssize_t comip_wdt_heartbeat_store(struct device *dev, struct device_attri
 	return size;
 }
 static DEVICE_ATTR(wdt_heartbeat, S_IRUGO | S_IWUSR, comip_wdt_heartbeat_show, comip_wdt_heartbeat_store);
-/*Set cpu0 watchdog irq affinity to cpu3 */
-static int __cpuinit comip_wdt_cpu_callback(struct notifier_block *nfb,
-					unsigned long action, void *hcpu)
-{
-	#define AFFINITY_CPU	3
-	unsigned int cpu = (unsigned long)hcpu;
-	struct comip_wdt_data *wdt = &comip_wdt[0];
-
-	if (cpu == AFFINITY_CPU) {
-		switch (action) {
-		case CPU_ONLINE:
-			irq_set_affinity(wdt->irq, cpumask_of(cpu));
-			break;
-		default:
-			break;
-		}
-	}
-	return NOTIFY_OK;
-}
-
-static struct notifier_block __refdata comip_wdt_cpu_notifier = {
-    .notifier_call = comip_wdt_cpu_callback,
-};
 
 #ifdef CONFIG_PM
 static int comip_wdt_suspend_touch(struct device *dev)
@@ -831,7 +808,6 @@ static int comip_wdt_probe(struct platform_device * pdev)
 	initialised[pdev->id] = true;
 
 	if (0 == pdev->id) {
-		register_hotcpu_notifier(&comip_wdt_cpu_notifier);
 		device_create_file(&pdev->dev, &dev_attr_wdt_timeout);
 		device_create_file(&pdev->dev, &dev_attr_wdt_softwdt_threshold);
 		device_create_file(&pdev->dev, &dev_attr_wdt_softwdt_panic);
@@ -856,8 +832,6 @@ static int comip_wdt_remove(struct platform_device *pdev)
 {
 	struct comip_wdt_data *wdt = &comip_wdt[pdev->id];
 
-	if (0 == pdev->id)
-		unregister_hotcpu_notifier(&comip_wdt_cpu_notifier);
 	initialised[pdev->id] = false;
 	devm_iounmap(&pdev->dev, wdt->base);
 	return 0;

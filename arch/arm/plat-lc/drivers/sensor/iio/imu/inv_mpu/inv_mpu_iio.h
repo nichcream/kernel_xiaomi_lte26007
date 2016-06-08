@@ -593,7 +593,6 @@ struct inv_mpu_slave {
 #define MPU6500_ID               0x70      /* unique WHOAMI */
 #define MPU6515_ID				 0x74
 #define MPU6880_ID				 0x78
-#define ICM20608_ID				 0xAF
 #define MPU6500_PRODUCT_REVISION 1
 #define MPU6500_MEM_REV_ADDR     0x17
 #define MPU6500_REV              2

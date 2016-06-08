@@ -230,14 +230,6 @@ enum {
 extern int pm_test_level;
 
 #ifdef CONFIG_SUSPEND_FREEZER
-
-#ifdef CONFIG_CPU_LC1860
-extern int lc_sys_sync_wait(void);
-
-extern bool snd_state;
-
-#endif
-
 static inline int suspend_freeze_processes(void)
 {
 	int error;
@@ -250,22 +242,7 @@ static inline int suspend_freeze_processes(void)
 	if (error)
 		return error;
 
-#ifdef CONFIG_CPU_LC1860
-	if(!snd_state) {
-		error = lc_sys_sync_wait();
-		if (error) {
-			printk(KERN_INFO "PM: sys_sync timeout.\n");
-			goto exit;
-		}
-	}
-#endif
-
 	error = freeze_kernel_threads();
-
-
-#ifdef CONFIG_CPU_LC1860
-exit:
-#endif
 	/*
 	 * freeze_kernel_threads() thaws only kernel threads upon freezing
 	 * failure. So we have to thaw the userspace tasks ourselves.

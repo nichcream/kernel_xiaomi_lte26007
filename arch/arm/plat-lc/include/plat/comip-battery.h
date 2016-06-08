@@ -49,10 +49,6 @@ enum temp_limit_charging_stage {
         TEMP_STAGE_OTHERS,
 };
 
-enum{
-       FG_CHIP_TYPE_UNKNOWN = 0,
-       FG_CHIP_TYPE_CW2015,
-};
 /*1=enable,0=disable*/
 #define HIGHLOW_TEMP_LIMIT_CHARGING_ENABLE    (1)
 
@@ -117,7 +113,6 @@ struct extern_charger_platform_data {
         int ac_battery_currentmA;   /*battery ac charge current*/
         int enable_pin;
         int feature;
-        int (*board_type)(void);
 };
 
 struct extern_charger_chg_config {

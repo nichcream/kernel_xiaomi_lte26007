@@ -472,6 +472,12 @@ void lcdc_init(struct comipfb_info *fbi)
 
 void lcdc_exit(struct comipfb_info *fbi)
 {
+	unsigned int val;
+	int timeout = 100;
+
+	/* Deinitial LCDC IF. */
+	fbi->cif->exit(fbi);
+
 	/* Disable all interrupts. */
 	lcdc_int_enable(fbi, 0xffffffff, 0);
 
@@ -479,20 +485,18 @@ void lcdc_exit(struct comipfb_info *fbi)
 	lcdc_start(fbi, 0);
 	lcdc_refresh_enable(fbi, 0);
 	msleep(30);
-
-	mipi_dsih_hal_power(fbi, 0);
-	mdelay(2);
-	mipi_dsih_hal_power(fbi, 1);
-	mdelay(2);
-
-	/* Deinitial LCDC IF. */
-	fbi->cif->exit(fbi);
-
 	/* Disable  interface. */
 	lcdc_if_enable(fbi, 0);
 
 	/* Display power off. */
-	display_powerdown(fbi);
+	val = readl(io_p2v(AP_PWR_DISPLAY_PD_CTL));
+	val |= (1 << AP_PWR_PD_MK_WE);
+	val &= ~(1 << AP_PWR_PD_MK);
+	val |= ((1 << AP_PWR_PD_EN) | (1 << AP_PWR_PD_EN_WE));
+	writel(val, io_p2v(AP_PWR_DISPLAY_PD_CTL));
+	while((readl(io_p2v(AP_PWR_PDFSM_ST1)) &
+			(0x7 << AP_PWR_PDFSM_ST1_DISPLAY_PD_ST)) != 0x7 && timeout-- > 0)
+		udelay(10);
 }
 
 void lcdc_suspend(struct comipfb_info *fbi)

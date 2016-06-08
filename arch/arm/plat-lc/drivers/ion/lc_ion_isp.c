@@ -121,15 +121,6 @@ void lc_ion_isp_reset_buffer()
 
 int lc_ion_isp_get_offset()
 {
-    //spin_lock(&mem_lock);
-    if(isp_buffer_reset)
-    {
-        printk(KERN_DEBUG "lc_ion_isp_get_offset, reset isp_buffer_offset=%d isp_buffer_size=%d\n", isp_buffer_offset, isp_buffer_size);
-        isp_buffer_reset = 0;
-        isp_buffer_offset = 0;
-    }
-    //spin_unlock(&mem_lock);
-
 	return isp_buffer_offset;
 }
 

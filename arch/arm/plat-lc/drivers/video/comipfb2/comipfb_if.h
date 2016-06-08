@@ -27,8 +27,4 @@ extern int comipfb_read_lcm_id(struct comipfb_info *fbi, void *dev);
 extern int comipfb_display_prefer_set(struct comipfb_info *fbi, int mode);
 extern int comipfb_display_ce_set(struct comipfb_info *fbi, int mode);
 
-#ifdef CONFIG_MIPI_LVDS_ICN6201
-extern void icn6201_chip_init(void *reg_table, int num);
-#endif
-
 #endif /*_COMIPFB_IF_H__*/

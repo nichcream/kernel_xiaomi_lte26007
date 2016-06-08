@@ -36,7 +36,7 @@
 
 #include "comip-snd-dma.h"
 
-//#define COMIP_CODEC_BUFFER_USE_SEC_SRAM
+#define COMIP_CODEC_BUFFER_USE_SEC_SRAM
 #define COMIP_PCM_ONLINE_CAPTURE_SIZE		4096		/* bytes size */
 #define COMIP_PCM_ST_ONLINE_CAPTURE		1
 #define COMIP_PCM_ST_NORMAL			0
@@ -74,7 +74,7 @@ static const struct snd_pcm_hardware comip_pcm_hardware = {
 #else
 	.period_bytes_min	= 32,
 	.period_bytes_max	= 256 * 1024,
-	.periods_min		= 1,
+	.periods_min		= 2,
 	.periods_max		= 255,
 	.buffer_bytes_max	= 256 * 1024,
 	.fifo_size		= 64,

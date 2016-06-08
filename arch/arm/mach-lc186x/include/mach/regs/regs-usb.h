@@ -14,7 +14,7 @@
 #define USB_GAHBCFG_PTXFEL		(1<<8)/*Periodical TX FIFO empty level,0:half;1:full */
 #define USB_GAHBCFG_NPTXFEL		(1<<7)/*None-Periodical TX FIFO empty level,0:half;1:full */
 #define USB_GAHBCFG_DMAEN		(1<<5)/*0:slave 1:DMA*/
-#define USB_GAHBCFG_HBLEN		(0x7<<1)/*AHB burst type*/
+#define USB_GAHBCFG_HBLEN		(0xf<<1)/*AHB burst type*/
 #define USB_GAHBCFG_GLBINTMSK		(1<<0)/*Global interrupt Mask bit,0:mask 1:cancle mask*/
 
 #define USB_GUSBCFG			(USB_BASE + 0x0C)

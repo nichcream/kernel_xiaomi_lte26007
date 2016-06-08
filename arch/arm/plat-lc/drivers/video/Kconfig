@@ -223,13 +223,7 @@ menu "Select LCD Panel"
 		---help---
 	  	LVDS_ZA7783(Driver IC)is a bridge between MIPI and LVDS Pad.
 	  	LVDS_ZA7783 is connected with MIPI interface.
-	config MIPI_LVDS_ICN6201
-		boolean "MIPI_LVDS_ICN6201(Driver IC) Bridge Chip"
-		default n
-		---help---
-		ICN6201(Driver IC)is a bridge between MIPI and LVDS.
-		ICN6201 is connected with MIPI interface.
-	config LCD_AUO_B079XAN01
+config LCD_AUO_B079XAN01
 		boolean "auo lcd panel"
 		---help---
 		It's resolution is 768 x 1024.
@@ -284,18 +278,6 @@ menu "Select LCD Panel"
                 boolean "HS EK79007 lcd panel"
                 ---help---
                 HS EK79007 It's resolution is 1024 x 600.
-                This panel is connected with MIPI interface.
-	config LCD_LVDS_1280X800
-		depends on MIPI_LVDS_ICN6201
-		boolean "lvds lcd panel"
-		---help---
-		It is resolution is 1280 x 800.
-		This panel is connected with LVDS interface.
-
-        config LCD_FL10802
-                boolean "BOE NT35521S lcd panel"
-                ---help---
-                BOE FL10802 It's resolution is 480 x 800.
                 This panel is connected with MIPI interface.
 endmenu
 

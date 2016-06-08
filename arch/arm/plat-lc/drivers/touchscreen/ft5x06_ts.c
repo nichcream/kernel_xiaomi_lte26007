@@ -97,7 +97,6 @@ struct ft5x06_ts_data {
         unsigned long   usb_event;
         unsigned int    is_charger_plug;
         unsigned int    pre_charger_status;
-        unsigned int	resume_end_flag;
 #endif
 };
 
@@ -609,9 +608,6 @@ static void ft5x06_ts_suspend(struct early_suspend *handler)
 	enable_irq_wake(ts->irq);
 #endif
 	mutex_lock(&tp_mutex);
-#ifdef	CTP_CHARGER_DETECT
-	ts->resume_end_flag = 0;
-#endif
 	memset(&(ts->event), 0, sizeof(struct ts_event));  // remove last_id/event
 	ft5x06_ts_release();
 	if(!ts->proxen_flag) {
@@ -654,7 +650,6 @@ static void ft5x06_ts_resume(struct early_suspend *handler)
 		ft5x06_write_reg(FT5X06_REG_MAX_FRAME, 1);
 		FT5X06_PRINT("work on hopping mode after resume\n");
 	}
-	ts->resume_end_flag = 1;
 	mutex_unlock(&tp_mutex);
 #endif
 	FT5X06_PRINT("late resume\n");
@@ -688,6 +683,7 @@ static void ft5x06_ts_very_late_resume(struct early_suspend *handler)
 	//msleep(300);
 	//ts->info->reset(&this_client->dev);
 	ts->suspend = 0;
+
 	desc->irq_data.chip->irq_ack(&desc->irq_data);
 	FT5X06_PRINT("very late resume\n");
 }
@@ -704,7 +700,7 @@ static void ft5x06_monitor_usb_work(struct work_struct *work)
         else
                 ft5x06_ts->is_charger_plug = CHARGER_CONNECT;
 
-        if (ft5x06_ts->resume_end_flag) {  // only when TP was ready can we write FT5X06's regs
+        if (!ft5x06_ts->tp_power_flag) {  // only when power on can we write FT5X06's regs
                 if ((ft5x06_ts->is_charger_plug == CHARGER_CONNECT) &&
                     (ft5x06_ts->pre_charger_status == CHARGER_NONE)) {
                         ft5x06_write_reg(FT5X06_REG_MAX_FRAME, 1);
@@ -772,8 +768,6 @@ static ssize_t fts_show(struct device *dev, struct device_attribute *attr, char 
                 vendor_name = "GIS";
         else if (data->vid == VENDOR_WINTEK)
                 vendor_name = "WINTEK";
-	else if (data->vid == VENDOR_YILI)
-		vendor_name = "YILI";
         else
                 vendor_name = "DEFAULT";
 
@@ -837,8 +831,7 @@ ft5x06_ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	ft5x06_ts->suspend = 0;
 	ft5x06_ts->irq = gpio_to_irq(info->irq_gpio);
 #ifdef CTP_CHARGER_DETECT
-	ft5x06_ts->pre_charger_status = CHARGER_NONE;
-	ft5x06_ts->resume_end_flag = 0;
+        ft5x06_ts->pre_charger_status = CHARGER_NONE;
 #endif
 	i2c_set_clientdata(client, ft5x06_ts);
 	spin_lock_init(&ft5x06_ts->irq_lock);

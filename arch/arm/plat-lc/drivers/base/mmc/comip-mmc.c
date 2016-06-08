@@ -510,6 +510,9 @@ static void comip_mmc_setup_data(struct comip_mmc_host *host,
 	unsigned int reg32;
 	unsigned int nob = data->blocks;
 	unsigned int length;
+#ifdef CONFIG_ARCH_PHYS_ADDR_T_64BIT
+	void *vaddr;
+#endif
 	int i;
 
 	host->data = data;
@@ -538,31 +541,13 @@ static void comip_mmc_setup_data(struct comip_mmc_host *host,
 		for (i = 0; i < data->sg_len; i++) {
 			if (page_to_pfn((struct page *)(data->sg[i].page_link & ~0x3)) >= MMC_IDMAC_PFN_MAX) {
 				if (!(data->flags & MMC_DATA_READ)) {
-					struct page *page = (struct page *)(data->sg[i].page_link & ~0x3);
-					void *backup_vaddr = (void *)host->dma_backup[i] +
-						data->sg[i].offset;
-					unsigned long pfn = page_to_pfn(page) +
-						data->sg[i].offset / PAGE_SIZE;
-					unsigned int offset = data->sg[i].offset % PAGE_SIZE;
-					unsigned int left = sg_dma_len(&data->sg[i]);
-					do {
-						unsigned int len = left;
-						void *vaddr = NULL;
-						page = pfn_to_page(pfn);
-						if (len + offset > PAGE_SIZE)
-							len = PAGE_SIZE - offset;
-						vaddr = kmap(page);
-						if (!vaddr) {
-							MMC_PRINTK("mmc-%d: kmap failed\n", host->id);
-							return;
-						}
-						memcpy(backup_vaddr, vaddr + offset, len);
-						kunmap(page);
-						offset = 0;
-						pfn++;
-						left -= len;
-						backup_vaddr += len;
-					} while (left);
+					vaddr = kmap((struct page*)(data->sg[i].page_link & ~0x3)) + data->sg[i].offset;
+					if (!vaddr) {
+						MMC_PRINTK("mmc-%d: kmap failed\n", host->id);
+						return;
+					}
+					memcpy((void *)host->dma_backup[i], vaddr, sg_dma_len(&data->sg[i]));
+					kunmap((struct page*)(data->sg[i].page_link & ~0x3));
 				}
 				host->page_link_backup[i] = data->sg[i].page_link;
 				data->sg[i].page_link = (unsigned long)phys_to_page(virt_to_phys((void *)(host->dma_backup[i])));
@@ -743,6 +728,7 @@ static int comip_mmc_data_done(struct comip_mmc_host *host,
 	struct mmc_data *data = host->data;
 #ifdef CONFIG_ARCH_PHYS_ADDR_T_64BIT
 	unsigned int i;
+	void *vaddr;
 #endif
 
 	if (host->pdata->flags & MMCF_MONITOR_TIMER)
@@ -759,31 +745,13 @@ static int comip_mmc_data_done(struct comip_mmc_host *host,
 			if (host->page_link_backup[i] &&
 					(page_to_pfn((struct page *)(host->page_link_backup[i] & ~0x3)) >= MMC_IDMAC_PFN_MAX)) {
 				if (data->flags & MMC_DATA_READ) {
-					struct page *page = (struct page *)(host->page_link_backup[i] & ~0x3);
-					void *backup_vaddr = (void *)host->dma_backup[i] +
-						data->sg[i].offset;
-					unsigned long pfn = page_to_pfn(page) +
-						data->sg[i].offset / PAGE_SIZE;
-					unsigned int offset = data->sg[i].offset % PAGE_SIZE;
-					unsigned int left = sg_dma_len(&data->sg[i]);
-					do {
-						unsigned int len = left;
-						void *vaddr = NULL;
-						page = pfn_to_page(pfn);
-						if (len + offset > PAGE_SIZE)
-							len = PAGE_SIZE - offset;
-						vaddr = kmap_atomic(page);
-						if (!vaddr) {
-							MMC_PRINTK("mmc-%d: kmap atomic failed\n", host->id);
-							return 0;
-						}
-						memcpy(vaddr + offset, backup_vaddr, len);
-						kunmap_atomic(vaddr);
-						offset = 0;
-						pfn++;
-						left -= len;
-						backup_vaddr += len;
-					} while (left);
+					vaddr = kmap_atomic((struct page*)(host->page_link_backup[i] & ~0x3));
+					if (!vaddr) {
+						MMC_PRINTK("mmc-%d: kmap atomic failed\n", host->id);
+						return 0;
+					}
+					memcpy(vaddr, (void *)host->dma_backup[i], sg_dma_len(&data->sg[i]));
+					kunmap_atomic(vaddr);
 				}
 			}
 			data->sg[i].page_link = host->page_link_backup[i];
@@ -2026,7 +1994,7 @@ static int comip_mmc_probe(struct platform_device *pdev)
 
 	for (i = 0; i < mmc->max_segs; i++) {
 		host->dma_backup[i] = __get_free_pages(GFP_KERNEL,
-				__get_order(mmc->max_seg_size * 2));
+				__get_order(mmc->max_seg_size));
 		if (!host->dma_backup[i]) {
 			ret = -ENOMEM;
 			goto out;

@@ -12,7 +12,6 @@
 #include <plat/camera.h>
 #include "ov8865_sunny.h"
 #include "ov8865_oflim.h"
-#include "ov8865_qtech.h"
 
 
 #define  GRPMODE
@@ -42,11 +41,9 @@
 
 #define MODULE_ID_OFLIM		0x02
 #define MODULE_ID_SUNNY		0x01
-#define MODULE_ID_QTECH		0x0b
 
 static char* factory_ofilm = "oflim";
 static char* factory_sunny = "sunny";
-static char* factory_qtech = "qtech";
 static char* factory_unknown = "unknown";
 
 struct ov8865_win_size *ov8865_win_sizes;
@@ -457,8 +454,8 @@ static struct regval_list ov8865_win_8m[] = {
 	{0x030f, 0x04},
 	{0x3612, 0x86},
 	{0x3636, 0x10},
-//	{0x3501, 0x90},
-//	{0x3502, 0x20},
+	{0x3501, 0x90},
+	{0x3502, 0x20},
 	{0x3700, 0x48},
 	{0x3701, 0x18},
 	{0x3702, 0x50},
@@ -779,8 +776,6 @@ static unsigned int rg_ratio_typical_oflim = 0x14b;
 static unsigned int bg_ratio_typical_oflim = 0x140;
 static unsigned int rg_ratio_typical_sunny = 0x128;
 static unsigned int bg_ratio_typical_sunny = 0x123;
-static unsigned int rg_ratio_typical_qtech = 0x11a;
-static unsigned int bg_ratio_typical_qtech = 0x11a;
 
 static int ov8865_otp_read(struct v4l2_subdev *sd, unsigned short reg)
 {
@@ -940,9 +935,6 @@ static int apply_otp(struct v4l2_subdev *sd)
 	}else if (info->module_id == MODULE_ID_SUNNY){
 		rg_ratio_typical = rg_ratio_typical_sunny;
 		bg_ratio_typical = bg_ratio_typical_sunny;
-	}else if (info->module_id == MODULE_ID_QTECH){
-		rg_ratio_typical = rg_ratio_typical_qtech;
-		bg_ratio_typical = bg_ratio_typical_qtech;
 	}else{
 		rg_ratio_typical = rg_ratio_typical_oflim;
 		bg_ratio_typical = bg_ratio_typical_oflim;
@@ -1573,288 +1565,6 @@ static struct isp_effect_ops sensor_effect_ops_sunny = {
 	.get_aecgc_win_setting = sensor_get_aecgc_win_setting,
 };
 
-static int sensor_get_vcm_range_qtech(void **vals, int val)
-{
-	printk(KERN_DEBUG"*sensor_get_vcm_range\n");
-	switch (val) {
-	case FOCUS_MODE_AUTO:
-		*vals = focus_mode_normal_qtech;
-		return ARRAY_SIZE(focus_mode_normal_qtech);
-	case FOCUS_MODE_INFINITY:
-		*vals = focus_mode_infinity_qtech;
-		return ARRAY_SIZE(focus_mode_infinity_qtech);
-	case FOCUS_MODE_MACRO:
-		*vals = focus_mode_macro_qtech;
-		return ARRAY_SIZE(focus_mode_macro_qtech);
-	case FOCUS_MODE_FIXED:
-	case FOCUS_MODE_EDOF:
-	case FOCUS_MODE_CONTINUOUS_VIDEO:
-	case FOCUS_MODE_CONTINUOUS_PICTURE:
-	case FOCUS_MODE_CONTINUOUS_AUTO:
-		*vals = focus_mode_normal_qtech;
-		return ARRAY_SIZE(focus_mode_normal_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-static int sensor_get_exposure_qtech(void **vals, int val)
-{
-	switch (val) {
-	case EXPOSURE_L6:
-		*vals = isp_exposure_l6_qtech;
-		return ARRAY_SIZE(isp_exposure_l6_qtech);
-	case EXPOSURE_L5:
-		*vals = isp_exposure_l5_qtech;
-		return ARRAY_SIZE(isp_exposure_l5_qtech);
-	case EXPOSURE_L4:
-		*vals = isp_exposure_l4_qtech;
-		return ARRAY_SIZE(isp_exposure_l4_qtech);
-	case EXPOSURE_L3:
-		*vals = isp_exposure_l3_qtech;
-		return ARRAY_SIZE(isp_exposure_l3_qtech);
-	case EXPOSURE_L2:
-		*vals = isp_exposure_l2_qtech;
-		return ARRAY_SIZE(isp_exposure_l2_qtech);
-	case EXPOSURE_L1:
-		*vals = isp_exposure_l1_qtech;
-		return ARRAY_SIZE(isp_exposure_l1_qtech);
-	case EXPOSURE_H0:
-		*vals = isp_exposure_h0_qtech;
-		return ARRAY_SIZE(isp_exposure_h0_qtech);
-	case EXPOSURE_H1:
-		*vals = isp_exposure_h1_qtech;
-		return ARRAY_SIZE(isp_exposure_h1_qtech);
-	case EXPOSURE_H2:
-		*vals = isp_exposure_h2_qtech;
-		return ARRAY_SIZE(isp_exposure_h2_qtech);
-	case EXPOSURE_H3:
-		*vals = isp_exposure_h3_qtech;
-		return ARRAY_SIZE(isp_exposure_h3_qtech);
-	case EXPOSURE_H4:
-		*vals = isp_exposure_h4_qtech;
-		return ARRAY_SIZE(isp_exposure_h4_qtech);
-	case EXPOSURE_H5:
-		*vals = isp_exposure_h5_qtech;
-		return ARRAY_SIZE(isp_exposure_h5_qtech);
-	case EXPOSURE_H6:
-		*vals = isp_exposure_h6_qtech;
-		return ARRAY_SIZE(isp_exposure_h6_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static int sensor_get_iso_qtech(void **vals, int val)
-{
-	switch(val) {
-	case ISO_100:
-		*vals = isp_iso_100_qtech;
-		return ARRAY_SIZE(isp_iso_100_qtech);
-	case ISO_200:
-		*vals = isp_iso_200_qtech;
-		return ARRAY_SIZE(isp_iso_200_qtech);
-	case ISO_400:
-		*vals = isp_iso_400_qtech;
-		return ARRAY_SIZE(isp_iso_400_qtech);
-	case ISO_800:
-		*vals = isp_iso_800_qtech;
-		return ARRAY_SIZE(isp_iso_800_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static int sensor_get_contrast_qtech(void **vals, int val)
-{
-	switch (val) {
-	case CONTRAST_L3:
-		*vals = isp_contrast_l3_qtech;
-		return ARRAY_SIZE(isp_contrast_l3_qtech);
-	case CONTRAST_L2:
-		*vals = isp_contrast_l2_qtech;
-		return ARRAY_SIZE(isp_contrast_l2_qtech);
-	case CONTRAST_L1:
-		*vals = isp_contrast_l1_qtech;
-		return ARRAY_SIZE(isp_contrast_l1_qtech);
-	case CONTRAST_H0:
-		*vals = isp_contrast_h0_qtech;
-		return ARRAY_SIZE(isp_contrast_h0_qtech);
-	case CONTRAST_H1:
-		*vals = isp_contrast_h1_qtech;
-		return ARRAY_SIZE(isp_contrast_h1_qtech);
-	case CONTRAST_H2:
-		*vals = isp_contrast_h2_qtech;
-		return ARRAY_SIZE(isp_contrast_h2_qtech);
-	case CONTRAST_H3:
-		*vals = isp_contrast_h3_qtech;
-		return ARRAY_SIZE(isp_contrast_h3_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static int sensor_get_saturation_hdr_qtech(void **vals, int val)
-{
-	switch (val) {
-	case SATURATION_L2:
-		*vals = isp_saturation_hdr_l2_qtech;
-		return ARRAY_SIZE(isp_saturation_hdr_l2_qtech);
-	case SATURATION_L1:
-		*vals = isp_saturation_hdr_l1_qtech;
-		return ARRAY_SIZE(isp_saturation_hdr_l1_qtech);
-	case SATURATION_H0:
-		*vals = isp_saturation_hdr_h0_qtech;
-		return ARRAY_SIZE(isp_saturation_hdr_h0_qtech);
-	case SATURATION_H1:
-		*vals = isp_saturation_hdr_h1_qtech;
-		return ARRAY_SIZE(isp_saturation_hdr_h1_qtech);
-	case SATURATION_H2:
-		*vals = isp_saturation_hdr_h2_qtech;
-		return ARRAY_SIZE(isp_saturation_hdr_h2_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static int sensor_get_saturation_qtech(void **vals, int val)
-{
-	switch (val) {
-	case SATURATION_L2:
-		*vals = isp_saturation_l2_qtech;
-		return ARRAY_SIZE(isp_saturation_l2_qtech);
-	case SATURATION_L1:
-		*vals = isp_saturation_l1_qtech;
-		return ARRAY_SIZE(isp_saturation_l1_qtech);
-	case SATURATION_H0:
-		*vals = isp_saturation_h0_qtech;
-		return ARRAY_SIZE(isp_saturation_h0_qtech);
-	case SATURATION_H1:
-		*vals = isp_saturation_h1_qtech;
-		return ARRAY_SIZE(isp_saturation_h1_qtech);
-	case SATURATION_H2:
-		*vals = isp_saturation_h2_qtech;
-		return ARRAY_SIZE(isp_saturation_h2_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static int sensor_get_white_balance_qtech(void **vals, int val)
-{
-	switch (val) {
-	case WHITE_BALANCE_AUTO:
-		*vals = isp_white_balance_auto_qtech;
-		return ARRAY_SIZE(isp_white_balance_auto_qtech);
-	case WHITE_BALANCE_INCANDESCENT:
-		*vals = isp_white_balance_incandescent_qtech;
-		return ARRAY_SIZE(isp_white_balance_incandescent_qtech);
-	case WHITE_BALANCE_FLUORESCENT:
-		*vals = isp_white_balance_fluorescent_qtech;
-		return ARRAY_SIZE(isp_white_balance_fluorescent_qtech);
-	case WHITE_BALANCE_WARM_FLUORESCENT:
-		*vals = isp_white_balance_warm_fluorescent_qtech;
-		return ARRAY_SIZE(isp_white_balance_warm_fluorescent_qtech);
-	case WHITE_BALANCE_DAYLIGHT:
-		*vals = isp_white_balance_daylight_qtech;
-		return ARRAY_SIZE(isp_white_balance_daylight_qtech);
-	case WHITE_BALANCE_CLOUDY_DAYLIGHT:
-		*vals = isp_white_balance_cloudy_daylight_qtech;
-		return ARRAY_SIZE(isp_white_balance_cloudy_daylight_qtech);
-	case WHITE_BALANCE_TWILIGHT:
-		*vals = isp_white_balance_twilight_qtech;
-		return ARRAY_SIZE(isp_white_balance_twilight_qtech);
-	case WHITE_BALANCE_SHADE:
-		*vals = isp_white_balance_shade_qtech;
-		return ARRAY_SIZE(isp_white_balance_shade_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static int sensor_get_brightness_qtech(void **vals, int val)
-{
-	switch (val) {
-	case BRIGHTNESS_L3:
-		*vals = isp_brightness_l3_qtech;
-		return ARRAY_SIZE(isp_brightness_l3_qtech);
-	case BRIGHTNESS_L2:
-		*vals = isp_brightness_l2_qtech;
-		return ARRAY_SIZE(isp_brightness_l2_qtech);
-	case BRIGHTNESS_L1:
-		*vals = isp_brightness_l1_qtech;
-		return ARRAY_SIZE(isp_brightness_l1_qtech);
-	case BRIGHTNESS_H0:
-		*vals = isp_brightness_h0_qtech;
-		return ARRAY_SIZE(isp_brightness_h0_qtech);
-	case BRIGHTNESS_H1:
-		*vals = isp_brightness_h1_qtech;
-		return ARRAY_SIZE(isp_brightness_h1_qtech);
-	case BRIGHTNESS_H2:
-		*vals = isp_brightness_h2_qtech;
-		return ARRAY_SIZE(isp_brightness_h2_qtech);
-	case BRIGHTNESS_H3:
-		*vals = isp_brightness_h3_qtech;
-		return ARRAY_SIZE(isp_brightness_h3_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static int sensor_get_sharpness_qtech(void **vals, int val)
-{
-	switch (val) {
-	case SHARPNESS_L2:
-		*vals = isp_sharpness_l2_qtech;
-		return ARRAY_SIZE(isp_sharpness_l2_qtech);
-	case SHARPNESS_L1:
-		*vals = isp_sharpness_l1_qtech;
-		return ARRAY_SIZE(isp_sharpness_l1_qtech);
-	case SHARPNESS_H0:
-		*vals = isp_sharpness_h0_qtech;
-		return ARRAY_SIZE(isp_sharpness_h0_qtech);
-	case SHARPNESS_H1:
-		*vals = isp_sharpness_h1_qtech;
-		return ARRAY_SIZE(isp_sharpness_h1_qtech);
-	case SHARPNESS_H2:
-		*vals = isp_sharpness_h2_qtech;
-		return ARRAY_SIZE(isp_sharpness_h2_qtech);
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-
-static struct isp_effect_ops sensor_effect_ops_qtech = {
-	.get_exposure = sensor_get_exposure_qtech,
-	.get_iso = sensor_get_iso_qtech,
-	.get_contrast = sensor_get_contrast_qtech,
-	.get_saturation = sensor_get_saturation_qtech,
-	.get_saturation_hdr = sensor_get_saturation_hdr_qtech,
-	.get_white_balance = sensor_get_white_balance_qtech,
-	.get_brightness = sensor_get_brightness_qtech,
-	.get_sharpness = sensor_get_sharpness_qtech,
-	.get_vcm_range = sensor_get_vcm_range_qtech,
-	.get_aecgc_win_setting = sensor_get_aecgc_win_setting,
-};
-
 
 static int ov8865_reset(struct v4l2_subdev *sd, u32 val)
 {
@@ -2051,56 +1761,6 @@ static struct ov8865_win_size ov8865_win_sizes_sunny[] = {
 		.regs_aecgc_win_central_weight  = isp_aecgc_win_8M_central_weight_sunny,
 	},
 };
-static struct ov8865_win_size ov8865_win_sizes_qtech[] = {
-#ifndef BUILD_MASS_PRODUCTION
-	//ov8865_win_hd
-	{
-		.width		= HD_WIDTH,
-		.height		= HD_HEIGHT,
-		.vts		= 0x660,
-		.framerate	= 32,
-		.max_gain_dyn_frm = 0xff,
-		.min_gain_dyn_frm = 0x10,
-		.max_gain_fix_frm = 0xff,//0x100,
-		.min_gain_fix_frm = 0x10,
-		.vts_gain_ctrl_1  = 0x41,
-		.vts_gain_ctrl_2  = 0x61,
-		.vts_gain_ctrl_3  = 0x61,
-		.gain_ctrl_1	  = 0x30,
-		.gain_ctrl_2	  = 0xf0,
-		.gain_ctrl_3	  = 0xff,
-		.regs 			  = ov8865_win_hd,
-		.regs_aecgc_win_matrix	  		= isp_aecgc_win_hd_matrix_qtech,
-		.regs_aecgc_win_center    		= isp_aecgc_win_hd_center_qtech,
-		.regs_aecgc_win_central_weight  = isp_aecgc_win_hd_central_weight_qtech,
-	},
-#endif
-	/* 3264*2448 */
-	{
-		.width		= MAX_WIDTH,
-		.height		= MAX_HEIGHT,
-		.vts		= 0x9e8,//0x7b6
-		.framerate	= 305,//10,
-		.framerate_div 	  = 10,
-		.max_gain_dyn_frm = 0xff,
-		.min_gain_dyn_frm = 0x10,
-		.max_gain_fix_frm = 0xff,//0x100,
-		.min_gain_fix_frm = 0x10,
-		.vts_gain_ctrl_1  = 0x41,
-		.vts_gain_ctrl_2  = 0x61,
-		.vts_gain_ctrl_3  = 0x81,
-		.gain_ctrl_1	  = 0x30,
-		.gain_ctrl_2	  = 0x50,
-		.gain_ctrl_3	  = 0xff,
-		.spot_meter_win_width  = 800,
-		.spot_meter_win_height = 600,
-		.regs 			  = ov8865_win_8m,
-		.regs_aecgc_win_matrix	  		= isp_aecgc_win_8M_matrix_qtech,
-		.regs_aecgc_win_center    		= isp_aecgc_win_8M_center_qtech,
-		.regs_aecgc_win_central_weight  = isp_aecgc_win_8M_central_weight_qtech,
-	},
-};
-
 //#define N_WIN_SIZES (ARRAY_SIZE(ov8865_win_sizes))
 
 static int ov8865_enum_mbus_fmt(struct v4l2_subdev *sd, unsigned index,
@@ -2452,8 +2112,6 @@ static int ov8865_get_module_factory(struct v4l2_subdev *sd, char **module_facto
 		*module_factory = factory_ofilm;
 	else if (info->module_id == MODULE_ID_SUNNY)
 		*module_factory = factory_sunny;
-	else if (info->module_id == MODULE_ID_QTECH)
-		*module_factory = factory_qtech;
 	else
 		*module_factory = factory_unknown;
 
@@ -2628,51 +2286,6 @@ static ssize_t ov8865_bg_ratio_typical_sunny_store(struct device *dev,
 static DEVICE_ATTR(ov8865_rg_ratio_typical_sunny, 0664, ov8865_rg_ratio_typical_sunny_show, ov8865_rg_ratio_typical_sunny_store);
 static DEVICE_ATTR(ov8865_bg_ratio_typical_sunny, 0664, ov8865_bg_ratio_typical_sunny_show, ov8865_bg_ratio_typical_sunny_store);
 
-static ssize_t ov8865_rg_ratio_typical_qtech_show(struct device *dev,
-		struct device_attribute *attr, char *buf)
-{
-	return sprintf(buf, "%d\n", rg_ratio_typical_qtech);
-}
-
-static ssize_t ov8865_rg_ratio_typical_qtech_store(struct device *dev,
-		struct device_attribute *attr, const char *buf, size_t size)
-{
-	char *endp;
-	int value;
-
-	value = simple_strtoul(buf, &endp, 0);
-	if (buf == endp)
-		return -EINVAL;
-
-	rg_ratio_typical_qtech = (unsigned int)value;
-
-	return size;
-}
-
-static ssize_t ov8865_bg_ratio_typical_qtech_show(struct device *dev,
-		struct device_attribute *attr, char *buf)
-{
-	return sprintf(buf, "%d\n", bg_ratio_typical_qtech);
-}
-
-static ssize_t ov8865_bg_ratio_typical_qtech_store(struct device *dev,
-		struct device_attribute *attr, const char *buf, size_t size)
-{
-	char *endp;
-	int value;
-
-	value = simple_strtoul(buf, &endp, 0);
-	if (buf == endp)
-		return -EINVAL;
-
-	bg_ratio_typical_qtech = (unsigned int)value;
-
-	return size;
-}
-
-static DEVICE_ATTR(ov8865_rg_ratio_typical_qtech, 0664, ov8865_rg_ratio_typical_qtech_show, ov8865_rg_ratio_typical_qtech_store);
-static DEVICE_ATTR(ov8865_bg_ratio_typical_qtech, 0664, ov8865_bg_ratio_typical_qtech_show, ov8865_bg_ratio_typical_qtech_store);
-
 
 static int ov8865_probe(struct i2c_client *client,
 			const struct i2c_device_id *id)
@@ -2733,15 +2346,6 @@ static int ov8865_probe(struct i2c_client *client,
 		sensor_effect_ops = &sensor_effect_ops_sunny;
 		info->n_win_sizes = ARRAY_SIZE(ov8865_win_sizes_sunny);
 		info->isp_setting_size = ARRAY_SIZE(ov8865_isp_setting_sunny);
-	}
-	else if(info->module_id == MODULE_ID_QTECH) {
-		printk(KERN_DEBUG"ov8865 modue id is qtech!\n");
-		ov8865_win_sizes = ov8865_win_sizes_qtech;
-		ov8865_isp_parm = &ov8865_isp_parm_qtech;
-		ov8865_isp_setting = ov8865_isp_setting_qtech;
-		sensor_effect_ops = &sensor_effect_ops_qtech;
-		info->n_win_sizes = ARRAY_SIZE(ov8865_win_sizes_qtech);
-		info->isp_setting_size = ARRAY_SIZE(ov8865_isp_setting_qtech);
 	}else{
 		printk(KERN_DEBUG"ov8865 modue id can't be recognized! module id = 0x%x\n",info->module_id);
 		ov8865_win_sizes = ov8865_win_sizes_oflim;
@@ -2789,28 +2393,12 @@ static int ov8865_probe(struct i2c_client *client,
 		goto err_create_dev_attr_ov8865_bg_ratio_typical_sunny;
 	}
 
-	ret = device_create_file(&client->dev, &dev_attr_ov8865_rg_ratio_typical_qtech);
-	if(ret){
-		v4l_err(client, "create dev_attr_ov8865_rg_ratio_typical_qtech failed!\n");
-		goto err_create_dev_attr_ov8865_rg_ratio_typical_qtech;
-	}
-
-	ret = device_create_file(&client->dev, &dev_attr_ov8865_bg_ratio_typical_qtech);
-	if(ret){
-		v4l_err(client, "create dev_attr_ov8865_bg_ratio_typical_qtech failed!\n");
-		goto err_create_dev_attr_ov8865_bg_ratio_typical_qtech;
-	}
-
 	return 0;
 
 err_create_dev_attr_ov8865_bg_ratio_typical_oflim:
 	device_remove_file(&client->dev, &dev_attr_ov8865_bg_ratio_typical_oflim);
 err_create_dev_attr_ov8865_rg_ratio_typical_oflim:
 	device_remove_file(&client->dev, &dev_attr_ov8865_rg_ratio_typical_oflim);
-err_create_dev_attr_ov8865_bg_ratio_typical_qtech:
-	device_remove_file(&client->dev, &dev_attr_ov8865_bg_ratio_typical_qtech);
-err_create_dev_attr_ov8865_rg_ratio_typical_qtech:
-	device_remove_file(&client->dev, &dev_attr_ov8865_rg_ratio_typical_qtech);
 err_create_dev_attr_ov8865_bg_ratio_typical_sunny:
 	device_remove_file(&client->dev, &dev_attr_ov8865_bg_ratio_typical_sunny);
 err_create_dev_attr_ov8865_rg_ratio_typical_sunny:
@@ -2827,8 +2415,6 @@ static int ov8865_remove(struct i2c_client *client)
 	device_remove_file(&client->dev, &dev_attr_ov8865_bg_ratio_typical_oflim);
 	device_remove_file(&client->dev, &dev_attr_ov8865_rg_ratio_typical_sunny);
 	device_remove_file(&client->dev, &dev_attr_ov8865_bg_ratio_typical_sunny);
-	device_remove_file(&client->dev, &dev_attr_ov8865_rg_ratio_typical_qtech);
-	device_remove_file(&client->dev, &dev_attr_ov8865_bg_ratio_typical_qtech);
 
 	v4l2_device_unregister_subdev(sd);
 	kfree(info);

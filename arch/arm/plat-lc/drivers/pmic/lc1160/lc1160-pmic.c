@@ -431,14 +431,6 @@ int lc1160_int_status_get(void)
 }
 EXPORT_SYMBOL(lc1160_int_status_get);
 
-int lc1160_power_type_get(void)
-{
-     struct lc1160_pmic_data *data = g_lc1160_pmic_data;
-     unsigned int power_on_type = PU_REASON_PWR_KEY_PRESS;
-       power_on_type = data->power_on_type;
-       return  power_on_type;
-}
-EXPORT_SYMBOL(lc1160_power_type_get);
 static int lc1160_pmic_reg_read(u16 reg, u16 *value)
 {
 	u8 val;
@@ -1138,8 +1130,6 @@ static void lc1160_rtc_alarm_disable(u8 id)
 
 		lc1160_int_mask(LC1160_IRQ_RTC2_MASK);
 	}
-	/* Update 32k CLK RTC alarm. */
-	lc1160_reg_write(LC1160_REG_RTC_AL_UPDATE, 0x3a);
 }
 
 static int lc1160_rtc_alarm_get(u8 id, struct rtc_wkalrm *alrm)
@@ -1729,6 +1719,7 @@ static int lc1160_hw_init(struct lc1160_pmic_data *data)
 
 	/* Initialize LC1160 reboot. */
 	lc1160_reboot_init(data);
+
 	/* Initialize LC1160 RTC. */
 	lc1160_rtc_init(data);
 
@@ -1737,7 +1728,6 @@ static int lc1160_hw_init(struct lc1160_pmic_data *data)
 
 	/* Initialize LC1160 irq. */
 	ret = lc1160_irq_init(data);
-	printk("%s %d\r\n",__func__,__LINE__);
 	if (ret)
 		goto exit;
 

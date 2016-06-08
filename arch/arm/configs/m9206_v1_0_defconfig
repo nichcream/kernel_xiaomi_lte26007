@@ -357,7 +357,6 @@ CONFIG_RESET_COMIP=y
 # CONFIG_SPI_COMIP is not set
 # CONFIG_TPZ_COMIP is not set
 CONFIG_COMIP_MODEM=y
-CONFIG_COMIP_MODEM_WCDMA=y
 
 #
 # Device Driver Selections

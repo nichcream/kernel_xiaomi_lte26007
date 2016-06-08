@@ -9,7 +9,7 @@ static u8 lcd_cmds_init[][ROW_LINE] = {
 	{0x00, GEN_CMD, LW_PACK, 0x08, 0x06, 0x00, 0xB3, 0x1C, 0x00, 0x00, 0x00, 0x00},
 	{0x00, GEN_CMD, SW_PACK2, 0x02, 0xD6, 0x01},
 	{0x00, GEN_CMD, SW_PACK2, 0x02, 0xB0, 0x03},
-	{0x32, DCS_CMD, SW_PACK1, 0x01, 0x29},
+	{0x00, DCS_CMD, SW_PACK1, 0x01, 0x29},
 	{0x8C, DCS_CMD, SW_PACK1, 0x01, 0x11},
 };
 
@@ -22,7 +22,7 @@ static u8 lcd_cmds_suspend[][ROW_LINE] = {
 	{0x14, DCS_CMD, SW_PACK1, 0x01, 0x28},
 	{0xDC, DCS_CMD, SW_PACK1, 0x01, 0x10},
 	//{0x14, GEN_CMD, SW_PACK2, 0x02, 0xB0, 0x00},	//B0->00h  Protect Off
-	//{0x14, GEN_CMD, SW_PACK2, 0x02, 0xB1, 0x01},	//B1->01h  Deep Standby
+	{0x14, GEN_CMD, SW_PACK2, 0x02, 0xB1, 0x01},	//B1->01h  Deep Standby
 };
 
 static u8 lcd_cmds_resume[][ROW_LINE] = {
@@ -124,7 +124,7 @@ static int lcd_sharp_eR69431_power(struct comipfb_info *fbi, int onoff)
 	if (onoff) {
 		gpio_direction_output(gpio_rst, 0);
 		pmic_voltage_set(PMIC_POWER_LCD_IO, 0, PMIC_POWER_VOLTAGE_ENABLE);
-		mdelay(20);
+		mdelay(1);
 		pmic_voltage_set(PMIC_POWER_LCD_CORE, 0, PMIC_POWER_VOLTAGE_ENABLE);
 		mdelay(50);
 		gpio_direction_output(gpio_rst, 1);
@@ -168,9 +168,9 @@ static int lcd_sharp_eR69431_suspend(struct comipfb_info *fbi)
 
 	mipi = &(fbi->cdev->timing.mipi);
 
-	//if (mipi->display_mode == MIPI_VIDEO_MODE) {
-	//	mipi_dsih_hal_mode_config(fbi, 1);
-	//}
+	if (mipi->display_mode == MIPI_VIDEO_MODE) {
+		mipi_dsih_hal_mode_config(fbi, 1);
+	}
 #if 0
 	comipfb_if_mipi_dev_cmds(fbi, &fbi->cdev->cmds_pre_suspend);
 

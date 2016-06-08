@@ -1880,7 +1880,7 @@ static int inv_detect_6xxx(struct inv_mpu_iio_s *st)
 	result = inv_i2c_read(st, REG_WHOAMI, 1, &d);
 	if (result)
 		return result;
-	if (d == MPU6500_ID || d == MPU6515_ID || d== MPU6880_ID || d == ICM20608_ID) {
+	if (d == MPU6500_ID || d == MPU6515_ID || d== MPU6880_ID) {
 		st->chip_type = INV_MPU6500;
 		strcpy(st->name, "mpu6500");
 	} else {

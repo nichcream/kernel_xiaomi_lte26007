@@ -152,10 +152,13 @@ static inline struct usb_hcd *comip_hcd_to_hcd(comip_hcd_t * comip_hcd)
 /** Gets the usb_host_endpoint associated with an URB. */
 inline struct usb_host_endpoint *comip_urb_to_endpoint(struct urb *urb)
 {
-	if (!urb->ep)
-		return NULL;
-	else
-		return urb->ep;
+    struct usb_device *dev = urb->dev;
+    int ep_num = usb_pipeendpoint(urb->pipe);
+
+    if (usb_pipein(urb->pipe))
+        return dev->ep_in[ep_num];
+    else
+        return dev->ep_out[ep_num];
 }
 
 static int _disconnect(comip_hcd_t * hcd)
@@ -1009,18 +1012,14 @@ static int comip_hcd_driver_probe(struct platform_device *_dev)
     if(comip_is_device_mode(comip_hcd_dev->core_if)){
         COMIP_DEBUGPL(DBG_ANY, "%s device mode\n", __func__);
         comip_cil_uninit(comip_hcd_dev->core_if);
-#ifndef CONFIG_USB_COMIP_HSIC
         comip_usb_power_set(0);
-#endif
     }
     mutex_unlock(&comip_hcd_dev->muxlock);
     return 0;
 
 fail:
     comip_hcd_driver_remove(_dev);
-#ifndef CONFIG_USB_COMIP_HSIC
     comip_usb_power_set(0);
-#endif
     mutex_unlock(&comip_hcd_dev->muxlock);
     return retval;
 }
@@ -1048,9 +1047,7 @@ printk("LZS %s: %d, enter\n", __func__, __LINE__);
 
 	COMIP_SPINUNLOCK_IRQRESTORE(comip_hcd->lock, flags);
 	mdelay(100);
-#ifndef CONFIG_USB_COMIP_HSIC
 	comip_usb_power_set(0);
-#endif
 	wake_unlock(&hcd_dev->wakelock);
 	INFO( "%s end\n", __func__);
 out:

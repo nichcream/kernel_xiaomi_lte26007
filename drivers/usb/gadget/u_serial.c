@@ -101,9 +101,6 @@ struct gs_port {
 
 	struct gserial		*port_usb;
 
-	bool enable_printk;
-	struct device_attribute **attributes;
-
 	bool			openclose;	/* open/close in progress */
 	u8			port_num;
 
@@ -369,8 +366,6 @@ __acquires(&port->port_lock)
 	int			status = 0;
 	bool			do_tty_wake = false;
 
-	if (port->enable_printk)
-		printk(KERN_DEBUG"%s\n", __func__);
 	while (!list_empty(pool)) {
 		struct usb_request	*req;
 		int			len;
@@ -390,12 +385,7 @@ __acquires(&port->port_lock)
 		list_del(&req->list);
 		req->zero = (gs_buf_data_avail(&port->port_write_buf) == 0);
 
-		if (port->enable_printk)
-			printk(KERN_DEBUG"%d: tx len=%d, 0x%02x 0x%02x 0x%02x ...\n",
-				port->port_num, len, *((u8 *)req->buf),
-				*((u8 *)req->buf+1), *((u8 *)req->buf+2));
-		else
-			pr_vdebug(PREFIX "%d: tx len=%d, 0x%02x 0x%02x 0x%02x ...\n",
+		pr_vdebug(PREFIX "%d: tx len=%d, 0x%02x 0x%02x 0x%02x ...\n",
 				port->port_num, len, *((u8 *)req->buf),
 				*((u8 *)req->buf+1), *((u8 *)req->buf+2));
 
@@ -440,9 +430,6 @@ __acquires(&port->port_lock)
 {
 	struct list_head	*pool = &port->read_pool;
 	struct usb_ep		*out = port->port_usb->out;
-
-	if (port->enable_printk)
-		printk(KERN_DEBUG"%s\n", __func__);
 
 	while (!list_empty(pool)) {
 		struct usb_request	*req;
@@ -550,12 +537,7 @@ static void gs_rx_push(unsigned long _port)
 			if (count != size) {
 				/* stop pushing; TTY layer can't handle more */
 				port->n_read += count;
-				if (port->enable_printk)
-					printk(KERN_DEBUG"%d: rx block %d/%d\n",
-						port->port_num,
-						count, req->actual);
-				else
-					pr_vdebug(PREFIX "%d: rx block %d/%d\n",
+				pr_vdebug(PREFIX "%d: rx block %d/%d\n",
 						port->port_num,
 						count, req->actual);
 				break;
@@ -603,8 +585,6 @@ static void gs_read_complete(struct usb_ep *ep, struct usb_request *req)
 {
 	struct gs_port	*port = ep->driver_data;
 
-	if (port->enable_printk)
-		printk(KERN_DEBUG"%s\n", __func__);
 	/* Queue all received data until the tty layer is ready for it. */
 	spin_lock(&port->port_lock);
 	list_add_tail(&req->list, &port->read_queue);
@@ -615,9 +595,6 @@ static void gs_read_complete(struct usb_ep *ep, struct usb_request *req)
 static void gs_write_complete(struct usb_ep *ep, struct usb_request *req)
 {
 	struct gs_port	*port = ep->driver_data;
-
-	if (port->enable_printk)
-		printk(KERN_DEBUG"%s\n", __func__);
 
 	spin_lock(&port->port_lock);
 	list_add(&req->list, &port->write_pool);
@@ -919,11 +896,7 @@ static int gs_write(struct tty_struct *tty, const unsigned char *buf, int count)
 	unsigned long	flags;
 	int		status;
 
-	if (port->enable_printk)
-		printk(KERN_DEBUG"gs_write: ttyGS%d (%p) writing %d bytes\n",
-			port->port_num, tty, count);
-	else
-		pr_vdebug("gs_write: ttyGS%d (%p) writing %d bytes\n",
+	pr_vdebug("gs_write: ttyGS%d (%p) writing %d bytes\n",
 			port->port_num, tty, count);
 
 	spin_lock_irqsave(&port->port_lock, flags);
@@ -1051,79 +1024,6 @@ static const struct tty_operations gs_tty_ops = {
 
 static struct tty_driver *gs_tty_driver;
 
-static ssize_t write_allocated_show(struct device *dev,
-				struct device_attribute *attr, char *buf)
-{
-	struct gs_port *port = dev_get_drvdata(dev);
-	return sprintf(buf, "%d\n", port->write_allocated);
-}
-static DEVICE_ATTR(write_allocated, S_IRUGO ,write_allocated_show, NULL);
-
-static ssize_t write_started_show(struct device *dev,
-				struct device_attribute *attr, char *buf)
-{
-	struct gs_port *port = dev_get_drvdata(dev);
-	return sprintf(buf, "%d\n", port->write_started);
-}
-static DEVICE_ATTR(write_started, S_IRUGO ,write_started_show, NULL);
-
-
-static ssize_t read_allocated_show(struct device *dev,
-				struct device_attribute *attr, char *buf)
-{
-	struct gs_port *port = dev_get_drvdata(dev);
-	return sprintf(buf, "%d\n", port->read_allocated);
-}
-static DEVICE_ATTR(read_allocated, S_IRUGO ,read_allocated_show, NULL);
-
-static ssize_t read_started_show(struct device *dev,
-				struct device_attribute *attr, char *buf)
-{
-	struct gs_port *port = dev_get_drvdata(dev);
-	return sprintf(buf, "%d\n", port->read_started);
-}
-static DEVICE_ATTR(read_started, S_IRUGO ,read_started_show, NULL);
-
-static ssize_t printk_enable_show(struct device *dev,
-				struct device_attribute *attr, char *buf)
-{
-	struct gs_port *port = dev_get_drvdata(dev);
-	return sprintf(buf, "%d\n", port->enable_printk);
-}
-
-static ssize_t printk_enable_store(struct device *dev,
-		struct device_attribute *attr, const char *buf, size_t size)
-{
-	int temp = 0x0;
-	struct gs_port *port = dev_get_drvdata(dev);
-
-	if (size > 2)
-		return -EINVAL;
-
-	if (sscanf(buf, "%d", &temp) != 1)
-		return -EINVAL;
-
-	if (temp)
-		port->enable_printk = 1;
-	else
-		port->enable_printk = 0;
-
-	return size;
-}
-
-static DEVICE_ATTR(printk_enable, S_IRUGO | S_IWUSR,
-					printk_enable_show,
-					printk_enable_store);
-
-static struct device_attribute *u_serial_attributes[] = {
-	&dev_attr_printk_enable,
-	&dev_attr_read_started,
-	&dev_attr_read_allocated,
-	&dev_attr_write_started,
-	&dev_attr_write_allocated,
-	NULL
-};
-
 static int
 gs_port_alloc(unsigned port_num, struct usb_cdc_line_coding *coding)
 {
@@ -1154,8 +1054,7 @@ gs_port_alloc(unsigned port_num, struct usb_cdc_line_coding *coding)
 
 	port->port_num = port_num;
 	port->port_line_coding = *coding;
-	port->enable_printk = 0;
-	port->attributes = u_serial_attributes;
+
 	ports[port_num].port = port;
 out:
 	mutex_unlock(&ports[port_num].lock);
@@ -1203,8 +1102,6 @@ EXPORT_SYMBOL_GPL(gserial_free_line);
 int gserial_alloc_line(unsigned char *line_num)
 {
 	struct usb_cdc_line_coding	coding;
-	struct device_attribute **attrs_array;
-	struct device_attribute *attr;
 	struct device			*tty_dev;
 	int				ret;
 	int				port_num;
@@ -1241,15 +1138,6 @@ int gserial_alloc_line(unsigned char *line_num)
 		gserial_free_port(port);
 		goto err;
 	}
-
-	dev_set_drvdata(tty_dev, ports[port_num].port);
-	ret = 0;
-	attrs_array = ports[port_num].port->attributes;
-	if (attrs_array) {
-			while ((attr = *attrs_array++) && !ret)
-				ret = device_create_file(tty_dev, attr);
-	}
-
 	*line_num = port_num;
 err:
 	return ret;

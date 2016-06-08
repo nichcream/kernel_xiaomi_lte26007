@@ -51,10 +51,6 @@ static const struct platform_suspend_ops *suspend_ops;
 #define SUSPEND_PREPARE_DURATION		(540)
 static struct hrtimer *suspend_monitor_hrtimer;
 
-#ifdef CONFIG_CPU_LC1860
-extern void lc_sys_sync_queue(void);
-#endif
-
 static int __init suspend_monitor_timer_init(void)
 {
 	suspend_monitor_hrtimer = monitor_timer_register("suspend");
@@ -365,23 +361,11 @@ static int enter_state(suspend_state_t state)
 	if (state == PM_SUSPEND_FREEZE)
 		freeze_begin();
 
-#ifdef CONFIG_CPU_LC1860
-	if(snd_state) {
-		printk(KERN_DEBUG "PM: Syncing filesystems ... ");
-		monitor_timer_start(suspend_monitor_hrtimer, SUSPEND_SYS_SYNC_DURATION);
-		sys_sync();
-		monitor_timer_stop(suspend_monitor_hrtimer);
-		printk(KERN_DEBUG "done.\n");
-	} else {
-		lc_sys_sync_queue();
-	}
-#else
 	printk(KERN_DEBUG "PM: Syncing filesystems ... ");
 	monitor_timer_start(suspend_monitor_hrtimer, SUSPEND_SYS_SYNC_DURATION);
 	sys_sync();
 	monitor_timer_stop(suspend_monitor_hrtimer);
 	printk(KERN_DEBUG "done.\n");
-#endif
 
 	pr_debug("PM: Preparing system for %s sleep\n", pm_states[state]);
 	monitor_timer_start(suspend_monitor_hrtimer, SUSPEND_PREPARE_DURATION);

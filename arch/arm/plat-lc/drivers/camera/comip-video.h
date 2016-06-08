@@ -24,7 +24,7 @@
 //#define COMIP_CAMERA_BUFFER_THUMBNAIL	(640 * 480 * 2)
 #define COMIP_CAMERA_BUFFER_THUMBNAIL	(7990272 + 15 * 1024)
 
-#define COMIP_CAMERA_ESD_RESET_ENABLE	(0)
+#define COMIP_CAMERA_ESD_RESET_ENABLE	(1)
 
 enum {
 	FRM_TRANS_BEFORE_SOF = 0,
@@ -136,12 +136,8 @@ struct comip_camera_dev {
 	int input;
 	int save_yuv;
 	int save_raw;
-	int load_preview_raw;
 	int load_raw;
 	int vaddr_valid;
-	void				*preview_vaddr;
-	unsigned long			preview_paddr;
-	
 };
 
 #endif /*__COMIP_VIDEO_H__*/

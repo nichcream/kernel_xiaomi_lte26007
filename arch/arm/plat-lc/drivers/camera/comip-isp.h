@@ -65,7 +65,6 @@ struct isp_capture {
 	int process;
 	int save_raw;
 	int load_raw;
-	int load_preview_raw;
 	int vts;
 	struct isp_buffer buf;
 	struct comip_camera_client *client;
@@ -316,7 +315,6 @@ struct isp_device {
 	int process;
 	int save_raw;
 	int load_raw;
-	int load_preview_raw;
 	int sna_exp_mode;
 	atomic_t isp_mac_disable;
 	unsigned int shutter_speed;
@@ -327,9 +325,6 @@ struct isp_device {
 	int hdr_snashot;
 	int exp_table_enable;
 	int hdr_bracket_exposure_state;
-	void *vraw_addr;
-	unsigned int praw_addr;
-	struct file * raw_file;
 };
 
 #define isp_dev_call(isp, f, args...)				\

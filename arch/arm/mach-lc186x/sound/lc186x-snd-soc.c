@@ -139,17 +139,6 @@ static struct snd_soc_dai_link comip_snd_soc_dai_link[] = {
 		.ops = &comip_snd_soc_ops,
 		.ignore_suspend = 1,
 		.dai_fmt = SND_SOC_DAIFMT_CBM_CFM,
-	},
-	{
-		.name = "voice_link",
-		.stream_name = "voice_loop",
-		.codec_name = "comip_codec",
-		.codec_dai_name = "comip_voice",
-		.cpu_dai_name = "comip-pcm.0",
-		.platform_name = "comip-pcm.0",
-		.ops = &comip_snd_soc_ops,
-		.ignore_suspend = 1,
-		.dai_fmt = SND_SOC_DAIFMT_CBM_CFM,
 	}
 #endif
 };

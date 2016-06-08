@@ -1373,11 +1373,6 @@ static int bq2415x_set_charging_temp_stage(int temp_status,int volt,bool enable)
         if(di->voltagemV == di->max_voltagemV){
             if((((read_reg[2] & 0xFC)>>2)*20 + 3500) > 3900){
                 di->charge_status = POWER_SUPPLY_STATUS_FULL;
-				if(di->bat_capacity > 97){
-					di->charge_status = POWER_SUPPLY_STATUS_FULL;
-				}else{
-					di->charge_status = POWER_SUPPLY_STATUS_CHARGING;
-				}
             }
             dev_info(di->dev, "CHARGE DONE\n");
         }else{

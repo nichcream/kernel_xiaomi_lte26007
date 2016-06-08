@@ -163,7 +163,6 @@ enum {
 	GC_2145,
 	GC_5004,
 	GC_0310,
-	GC_2755,
 };
 
 /*for samsung sensors */

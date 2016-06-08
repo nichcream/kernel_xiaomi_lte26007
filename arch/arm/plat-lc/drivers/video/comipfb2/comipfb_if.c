@@ -208,13 +208,9 @@ static int comipfb_if_mipi_init(struct comipfb_info *fbi)
 			fbi->cdev->reset(fbi);
 	}
 
-	if (!fbi->cdev->init_last) {
-#ifdef CONFIG_MIPI_LVDS_ICN6201
-		icn6201_chip_init(fbi->cdev->lvds_reg, fbi->cdev->reg_num);
-#else
+	if (!fbi->cdev->init_last)
 		ret = comipfb_if_mipi_dev_cmds(fbi, &fbi->cdev->cmds_init);
-#endif
-	}
+
 	dev_flags = fbi->cdev->flags;
 	if ((fbi->display_prefer != 0) && (dev_flags & RESUME_WITH_PREFER)) {
 		ret = comipfb_display_prefer_set(fbi, fbi->display_prefer);
@@ -244,15 +240,10 @@ static int comipfb_if_mipi_init(struct comipfb_info *fbi)
 static int comipfb_if_mipi_exit(struct comipfb_info *fbi)
 {
 	int gpio_im = fbi->pdata->gpio_im;
-	int ret = 0;
-
-	if(fbi->cdev->suspend)
-		ret = fbi->cdev->suspend(fbi);
-
 	if (gpio_im >= 0)
 		gpio_free(gpio_im);
 
-	return ret;
+	return 0;
 }
 
 static int comipfb_if_mipi_suspend(struct comipfb_info *fbi)
@@ -329,19 +320,6 @@ static int comipfb_if_mipi_read_lcm_id(struct comipfb_info *fbi , struct comipfb
 			ret = mipi_dsih_dcs_rd_cmd(fbi, 0, cmd, rd_cnt, lcm_id);
 		} else if (cur_id_info->id_info[lp_cnt].pack_type == GEN_CMD) {
 			ret = mipi_dsih_gen_rd_cmd(fbi, 0, &cmd, 1, rd_cnt, lcm_id);
-		}
-		if (!ret) {
-			dev_err(fbi->dev, "failed to read lcm id\n");
-			mipi_dsih_hal_power(fbi, 0);
-			mdelay(2);
-			mipi_dsih_hal_power(fbi, 1);
-			mdelay(2);
-			mipi_dsih_dphy_reset(fbi, 0);
-			mipi_dsih_dphy_shutdown(fbi, 0);
-			mdelay(10);
-			mipi_dsih_dphy_shutdown(fbi, 1);
-			mipi_dsih_dphy_reset(fbi, 1);
-			mdelay(10);
 		}
 		ret = strncmp(lcm_id, id_val, rd_cnt);
 		if (ret) {

@@ -19,8 +19,6 @@
 #include <linux/wakelock.h>
 #include <plat/comip-timer.h>
 
-bool snd_state = false;
-
 #define SND_LOWPOWER_DEV_NAME "comip-snd-lowpower"
 #define TIMER_RATE  (32768)
 #define TIMER_ID (0)
@@ -394,12 +392,9 @@ static int audio_active_notifier(struct notifier_block *blk,
 	switch (code){
 		case AUDIO_START:
 			lowpower->snd_is_active = true;
-			snd_state = true;
 			break;
 		case AUDIO_STOP:
 			lowpower->snd_is_active = false;
-			snd_state = false;
-
 			snd_timer_shutdown();
 			if(lowpower->snd_wake_lock) {
 				lowpower->snd_wake_lock = false;

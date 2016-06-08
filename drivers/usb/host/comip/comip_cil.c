@@ -106,7 +106,7 @@ void set_usb_init_reg(comip_core_if_t *core_if)
     int val;
     int timeout= 10;
 
-#ifndef CONFIG_USB_COMIP_HSIC
+
     comip_otg_clk_enable(core_if);
     mdelay(1);
 
@@ -127,7 +127,6 @@ void set_usb_init_reg(comip_core_if_t *core_if)
     mdelay(1);
 	/*set USB PHY no suspend */
     writel(0x01, (void __iomem *)io_p2v(CTL_OTGPHY_SUSPENDM_CTRL));
-#endif
     mdelay(10);
 	/*set USB CORE no reset */
     writel(0x01, (void __iomem *)io_p2v(CTL_OTG_CORE_RST_CTRL));
@@ -184,7 +183,6 @@ void comip_cil_uninit(comip_core_if_t *core_if)
     gusbcfg.b.force_host_mode = 0;
 	COMIP_WRITE_REG32(&core_if->core_global_regs->gusbcfg, gusbcfg.d32);
 	mdelay(20);
-#ifndef CONFIG_USB_COMIP_HSIC
 	/*enter suspend*/
 	writel(0x00, (void __iomem *)io_p2v(CTL_OTGPHY_SUSPENDM_CTRL));
 	mdelay(10);
@@ -196,7 +194,7 @@ void comip_cil_uninit(comip_core_if_t *core_if)
 	/*disable usb12_clk*/
 	if(core_if->clk)
 	comip_otg_clk_disable(core_if);
-#endif	
+	
 	mdelay(10);
 }
 void w_wakeup_detected(void *p)

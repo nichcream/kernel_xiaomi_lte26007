@@ -558,6 +558,14 @@ error_spinlock_unlock:
 	return status;
 }
 
+static inline bool check_snd_len(u32 len, struct bridge_drvdata *drvdata)
+{
+	if (drvdata->property.pro_b.packet)
+		return (len > (drvdata->txinfo.pkt_size * drvdata->txinfo.pkt_num));
+	else
+		return (len > drvdata->txinfo.length);
+}
+
 static bool comip_test_rcvbusy(struct bridge_drvdata *drvdata)
 {
 	Bridge_Pro *pro = &drvdata->property;
@@ -721,15 +729,11 @@ static ssize_t comip_bridge_send(struct bridge_drvdata *drvdata, const char __us
 	if (0 != check_para(drvdata))
 		goto out;
 
-	if (drvdata->property.pro_b.packet) {
-		if (count > (drvdata->txinfo.pkt_size * drvdata->txinfo.pkt_num)) {
-			BRIDGE_ERR("%s:too many send data count:%d\n", drvdata->name, count);
-			goto out;
-		}
-	} else {
-		if (count > drvdata->txinfo.length)
-			count = drvdata->txinfo.length - 1;
+	if (check_snd_len(count, drvdata)) {
+		BRIDGE_ERR("%s:too many send data count:%d\n", drvdata->name, count);
+		goto out;
 	}
+
 	if (count == 0) {
 		BRIDGE_INFO("%s:count = 0 \n",drvdata->name);
 		status = count;

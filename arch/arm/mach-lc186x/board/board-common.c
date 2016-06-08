@@ -929,26 +929,13 @@ static inline void comip_init_nand(void)
 #endif
 
 #if defined(CONFIG_USB_COMIP) || defined(CONFIG_USB_COMIP_MODULE)
-int usb_power_set(int onoff)
-{
-	return 0;
-}
 static struct comip_usb_platform_data comip_usb_info = {
 #ifdef CONFIG_USB_COMIP_OTG
 	.otg = {
 		.id_gpio = mfp_to_gpio(USB_OTG_ID_PIN),
 		.debounce_interval = 50,
-	},
-#endif
-	.hcd = {
-		.usb_power_set = usb_power_set,
-#ifdef CONFIG_COMIP_HSIC_USBHUB
-		.hub_power = mfp_to_gpio(USB_HUB_POWER),
-		.hub_reset = mfp_to_gpio(USB_HUB_RESET),
-		.eth_power = mfp_to_gpio(USB_ETH_POWER),
-		.eth_reset = mfp_to_gpio(USB_ETH_RESET),
-#endif
 	}
+#endif
 };
 
 static void __init comip_init_usb(void)

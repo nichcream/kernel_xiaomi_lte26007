@@ -359,14 +359,14 @@ static struct isp_regb_vals isp_saturation_h0_sunny[] = {
 };
 
 static struct isp_regb_vals isp_saturation_h1_sunny[] = {
-	{0x1c4eb, 0xb0},
-	{0x1c4ec, 0xa0},
+	{0x1c4eb, 0x90},
+	{0x1c4ec, 0x80},
 	{ISP_REG_END, 0x00},
 };
 
 static struct isp_regb_vals isp_saturation_h2_sunny[] = {
-	{0x1c4eb, 0xc0},
-	{0x1c4ec, 0xb0},
+	{0x1c4eb, 0xa0},
+	{0x1c4ec, 0x90},
 	{ISP_REG_END, 0x00},
 };
 

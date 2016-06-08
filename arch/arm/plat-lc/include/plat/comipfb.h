@@ -64,8 +64,6 @@ enum lcd_id {
 	LCD_ID_AUO_OTM1285A_OTP,
 	LCD_ID_HT_H8394D,
 	LCD_ID_HS_EK79007,
-	LCD_ID_LVDS_1280X800,
-	LCD_ID_FL10802,
 };
 
 struct comipfb_spi_info {

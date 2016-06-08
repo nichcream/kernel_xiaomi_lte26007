@@ -472,7 +472,6 @@ static ssize_t yas_self_test_show(struct device *dev,
 #if YAS_MAG_DRIVER == YAS_MAG_DRIVER_YAS530
 	struct yas530_self_test_result r;
 #endif
-	char result[8] = {0};
 #if YAS_MAG_DRIVER == YAS_MAG_DRIVER_YAS532 \
 	|| YAS_MAG_DRIVER == YAS_MAG_DRIVER_YAS533
 	struct yas532_self_test_result r;
@@ -497,24 +496,14 @@ static ssize_t yas_self_test_show(struct device *dev,
 #if YAS_MAG_DRIVER == YAS_MAG_DRIVER_YAS530 \
 	|| YAS_MAG_DRIVER == YAS_MAG_DRIVER_YAS532 \
 	|| YAS_MAG_DRIVER == YAS_MAG_DRIVER_YAS533
-	printk(buf, "%d %d %d %d %d %d %d %d %d %d %d\n",
+	return sprintf(buf, "%d %d %d %d %d %d %d %d %d %d %d\n",
 			ret, r.id, r.xy1y2[0], r.xy1y2[1], r.xy1y2[2],
 			r.dir, r.sx, r.sy, r.xyz[0], r.xyz[1], r.xyz[2]);
 #endif
 #if YAS_MAG_DRIVER == YAS_MAG_DRIVER_YAS537
-	printk(buf, "%d %d %d %d %d %d %d %d\n", ret, r.id, r.dir,
+	return sprintf(buf, "%d %d %d %d %d %d %d %d\n", ret, r.id, r.dir,
 			r.sx, r.sy, r.xyz[0], r.xyz[1], r.xyz[2]);
 #endif
-	if(ret != 0 || r.id != 7 || r.sx < 24 || r.sy < 31) {
-		printk("yas537 selftest fail\n");
-		strcpy(result,"n");
-		return sprintf(buf, "%s\n", result);
-	} else {
-		printk("yas537 selftest pass\n");
-		strcpy(result,"y");
-		return sprintf(buf, "%s\n", result);
-	}
-
 }
 
 static ssize_t yas_self_test_noise_show(struct device *dev,

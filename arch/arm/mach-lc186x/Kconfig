@@ -59,13 +59,7 @@ config COMIP_PROJECT_K706_V1_0
 	depends on ARCH_LC186X && CPU_LC1860
 	help
 	  Select this option if you want to use project k706.
-	  
-config COMIP_PROJECT_YONGDA
-	bool "Project YONGDA"
-	depends on ARCH_LC186X && CPU_LC1860
-	help
-	  Select this option if you want to use project yongda.
-	  
+
 config COMIP_PROJECT_SMARTMODULE
 	bool "Project SMARTMODULE"
 	depends on ARCH_LC186X && CPU_LC1860
@@ -77,17 +71,6 @@ config COMIP_PROJECT_LC1860_PHONE
         depends on ARCH_LC186X && CPU_LC1860
         help
           Select this option if you want to use project lc1860 phone.
-
-config COMIP_PROJECT_FOURMODE
-        bool "Project FOURMODE"
-        depends on ARCH_LC186X && CPU_LC1860
-        help
-          Select this option if you want to use project fourmode.
-config COMIP_PROJECT_FIVEMODE
-        bool "Project FIVEMODE"
-        depends on ARCH_LC186X && CPU_LC1860
-        help
-          Select this option if you want to use project fivemode.
 
 endchoice
 
@@ -121,11 +104,6 @@ config COMIP_BOARD_LC1860_EVB3
 	depends on ARCH_LC186X && COMIP_PROJECT_LC1860
 	help
 	 Select this option if you want to use lc1860 evb3 board.
-config COMIP_BOARD_LC1860_ZEUS
-	bool "LC1860_ZEUS"
-	depends on ARCH_LC186X && COMIP_PROJECT_LC1860
-	help
-	 Select this option if you want to use lc1860 ZEUS board.
 
 config COMIP_BOARD_USL90_PHONE_V1_0
 	bool "USL90_PHONE V1.0"
@@ -144,6 +122,12 @@ config COMIP_BOARD_LTE26007_PHONE_V1_1
 	depends on ARCH_LC186X && COMIP_PROJECT_LTE26007
 	help
 	 Select this option if you want to use lte26007 v1.1 board.
+
+config COMIP_BOARD_LTE26007_PHONE_V1_2
+	bool "LTE26007_PHONE V1.2"
+	depends on ARCH_LC186X && COMIP_PROJECT_LTE26007
+	help
+	 Select this option if you want to use lte26007 v1.2 board.
 
 config COMIP_BOARD_A310T_PHONE_V1_0
 	bool "A310T_PHONE V1.0"
@@ -178,23 +162,6 @@ config COMIP_BOARD_SMARTMODULE_V1_0
         depends on ARCH_LC186X && CONFIG_COMIP_PROJECT_SMARTMODULE
         help
          Select this option if you want to use smartmodule phone board.
-
-config COMIP_BOARD_YONGDA_V1_0
-        bool "YONGDA_V1_0"
-        depends on ARCH_LC186X && CONFIG_COMIP_PROJECT_YONGDA
-        help
-         Select this option if you want to use yongda phone board.
-
-config COMIP_BOARD_FOURMODE_V1_0
-        bool "FOURMODE_V1_0"
-        depends on ARCH_LC186X && COMIP_PROJECT_FOURMODE
-        help
-         Select this option if you want to use fourmode board.
-config COMIP_BOARD_FIVEMODE_V1_0
-        bool "FIVEMODE_V1_0"
-        depends on ARCH_LC186X && COMIP_PROJECT_FIVEMODE
-        help
-         Select this option if you want to use fivemode board.
 endchoice
 
 comment "LC186X Feature Selections"
@@ -284,12 +251,6 @@ config BRIDGE_DEBUG_LOOP_TEST
 	bool "Leadcore bridge loopback test debug"
 	depends on COMIP_MODEM
 	default n
-
-config COMIP_MODEM_WCDMA
-	bool "Leadcore COMIP modem wcdma support"
-	default n
-	help
-	  support leadcore modem wcdma
 
 #SMMU
 config COMIP_IOMMU

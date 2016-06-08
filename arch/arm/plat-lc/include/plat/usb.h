@@ -19,11 +19,6 @@ struct comip_udc_platform_data {
 };
 
 struct comip_hcd_platform_data {
-	int (*usb_power_set)(int onoff);
-	unsigned int hub_power;
-	unsigned int hub_reset;
-	unsigned int eth_power;
-	unsigned int eth_reset;
 	unsigned int reserved;
 };
 

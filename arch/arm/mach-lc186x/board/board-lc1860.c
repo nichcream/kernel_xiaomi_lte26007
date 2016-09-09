@@ -288,7 +288,7 @@ static void comip_key_bl_control(int onoff)
 
 static struct comip_backlight_platform_data comip_backlight_data = {
 	.ctrl_type = CTRL_PWM,
-	.gpio_en = -1,
+	.gpio_en = LCD_BACKLIGHT_PIN,
 	.pwm_en = 1,
 	.pwm_id = 0,
 	.pwm_clk = 32500,  //32.5KhZ
@@ -399,6 +399,7 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 	{KEYPAD_LED_PIN, 		MFP_PIN_MODE_GPIO},
 	/* LCD. */
 	{LCD_RESET_PIN,			MFP_PIN_MODE_GPIO},
+	{LCD_BACKLIGHT_PIN,		MFP_PIN_MODE_GPIO}, // zhangchg 
 #if defined(CONFIG_LCD_TRULY_NT35595)||defined(CONFIG_LCD_JD_9161CPT5) ||\
 	defined(CONFIG_LCD_JD_9261AA)||defined(CONFIG_LCD_JD_9365HSD)
 	{LCD_AVDD_EN_PIN,		MFP_PIN_MODE_GPIO},
@@ -1614,6 +1615,21 @@ static int comip_lcd_detect_dev(void)
 	return LCD_ID_TRULY_H8394A;
 }
 */
+
+#elif defined(CONFIG_LCD_TM5P0_ICN9706)
+static int comip_lcd_power(int onoff)
+{
+	if (onoff) {
+		pmic_voltage_set(PMIC_POWER_LCD_CORE, 0, PMIC_POWER_VOLTAGE_ENABLE);
+		pmic_voltage_set(PMIC_POWER_LCD_IO, 0, PMIC_POWER_VOLTAGE_ENABLE);
+	} else {
+		pmic_voltage_set(PMIC_POWER_LCD_CORE, 0, PMIC_POWER_VOLTAGE_DISABLE);
+		pmic_voltage_set(PMIC_POWER_LCD_IO, 0, PMIC_POWER_VOLTAGE_DISABLE);
+	}
+
+	return 0;
+}
+
 #endif
 
 static struct comipfb_platform_data comip_lcd_info = {

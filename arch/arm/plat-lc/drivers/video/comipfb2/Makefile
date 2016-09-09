@@ -48,3 +48,4 @@ obj-$(CONFIG_LCD_LVDS_1280X800) += lcd_lvds_1280x800.o
 #obj-$(CONFIG_LCD_HS_EK79007) += lcd_hs_ek79007.o
 obj-$(CONFIG_LCD_FL10802) += lcd_fl10802.o
 
+obj-$(CONFIG_LCD_TM5P0_ICN9706) += lcd_tm5p0_icn9706.o

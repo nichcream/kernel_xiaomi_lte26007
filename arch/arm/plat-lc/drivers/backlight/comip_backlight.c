@@ -141,6 +141,11 @@ static void comip_lcd_backlight_set(struct comip_backlight_data *data,
 				duty_ns = duty_ns_min;
 			else if (duty_ns > duty_ns_max)
 				duty_ns = duty_ns_max;
+
+			//zhangchg
+			if (data->pdata->gpio_en >= 0)
+				gpio_direction_output(data->gpio_en, 1);
+
 			pwm_config(data->pwm, duty_ns, period_ns);
 			pwm_enable(data->pwm);
 			if (bl_flag == 1) {
@@ -150,6 +155,10 @@ static void comip_lcd_backlight_set(struct comip_backlight_data *data,
 				printk(KERN_DEBUG "%s, set brightness %d \n", __func__, brightness);
 			}
 		} else {
+			//zhangchg
+			if (data->pdata->gpio_en >= 0)
+				gpio_direction_output(data->gpio_en, 0);
+
 			period_ns = HZ_TO_NS(100);
 			duty_ns = 0;
 			pwm_config(data->pwm, duty_ns, period_ns);

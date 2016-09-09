@@ -297,6 +297,11 @@ menu "Select LCD Panel"
                 ---help---
                 BOE FL10802 It's resolution is 480 x 800.
                 This panel is connected with MIPI interface.
+	    config LCD_TM5P0_ICN9706
+                boolean "HT ICN9706 lcd panel"
+                ---help---
+                HT ICN9706 It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
 endmenu
 
 endif

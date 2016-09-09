@@ -205,6 +205,7 @@
 
 /* LCD. */
 #define LCD_RESET_PIN			MFP_PIN_GPIO(154)
+#define LCD_BACKLIGHT_PIN		MFP_PIN_GPIO(146) // zhangchg
 #define LCD_AVDD_EN_PIN			MFP_PIN_GPIO(158)
 #define LCD_AVEE_EN_PIN			MFP_PIN_GPIO(159)
 

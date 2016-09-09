@@ -71,6 +71,11 @@
 #if defined(CONFIG_TOUCHSCREEN_FT5X06)
 #include <plat/ft5x06_ts.h>
 #endif
+#if defined(CONFIG_TOUCHSCREEN_ICN8528F)
+//#include <plat/icn85xx.h>
+#include <../drivers/touchscreen/icn85xx.h>
+#endif
+
 
 #if defined(CONFIG_TOUCHSCREEN_MELFAS_MMS200)
 #include <plat/mms_ts.h>
@@ -413,6 +418,11 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 #if defined(CONFIG_TOUCHSCREEN_FT5X06)
 	{FT5X06_RST_PIN,                MFP_PIN_MODE_GPIO},
 	{FT5X06_INT_PIN,                MFP_PIN_MODE_GPIO},
+#endif
+
+#if defined(CONFIG_TOUCHSCREEN_ICN8528F)
+	{ICN85XX_RST_PIN,                MFP_PIN_MODE_GPIO},
+	{ICN85XX_INT_PIN,                MFP_PIN_MODE_GPIO},
 #endif
 
 #if defined(CONFIG_TOUCHSCREEN_MELFAS_MMS200)
@@ -1109,6 +1119,91 @@ static struct ft5x06_info comip_i2c_ft5x06_info = {
 };
 #endif
 
+//#if defined(CONFIG_TOUCHSCREEN_ICN8528F)
+#if 0
+static int icn85xx_rst = ICN85XX_RST_PIN;
+static int icn85xx_i2c_power(struct device *dev, unsigned int vdd)
+{
+	/* Set power. */
+	if (vdd) {
+		pmic_voltage_set(PMIC_POWER_TOUCHSCREEN_IO, 0, PMIC_POWER_VOLTAGE_ENABLE);
+	} else {
+		pmic_voltage_set(PMIC_POWER_TOUCHSCREEN_IO, 0, PMIC_POWER_VOLTAGE_DISABLE);
+	}
+
+	return 0;
+}
+
+static int icn85xx_ic_power(struct device *dev, unsigned int vdd)
+{
+	int retval = 0;
+	int gpio_rst = ICN85XX_RST_PIN;
+	/* Set power. */
+	if (vdd) {
+		/*add for power on sequence*/
+		retval = gpio_request(gpio_rst, "icn85xx_ts_rst");
+		if(retval) {
+			pr_err("icn85xx_ts request rst error\n");
+			return retval;
+		}
+		gpio_direction_output(gpio_rst, 0);
+		msleep(2);
+		pmic_voltage_set(PMIC_POWER_TOUCHSCREEN, 0, PMIC_POWER_VOLTAGE_ENABLE);
+		msleep(10);
+		gpio_direction_output(gpio_rst, 1);
+		gpio_free(gpio_rst);
+		comip_mfp_config_array(comip_mfp_cfg_i2c_2, ARRAY_SIZE(comip_mfp_cfg_i2c_2));
+	} else {
+		retval = gpio_request(gpio_rst, "icn85xx_ts_rst");
+		if(retval) {
+			pr_err("icn85xx_ts request rst error\n");
+			return retval;
+		}
+		gpio_direction_output(gpio_rst, 0);
+		msleep(2);
+		pmic_voltage_set(PMIC_POWER_TOUCHSCREEN, 0, PMIC_POWER_VOLTAGE_DISABLE);
+		gpio_direction_input(gpio_rst);
+		gpio_free(gpio_rst);
+
+		ts_set_i2c_to_gpio();
+	}
+	return 0;
+}
+
+static int icn85xx_reset(struct device *dev)
+{
+	gpio_request(icn85xx_rst, "icn85xx Reset");
+	gpio_direction_output(icn85xx_rst, 1);
+	msleep(2);
+	gpio_direction_output(icn85xx_rst, 0);
+	msleep(10);
+	gpio_direction_output(icn85xx_rst, 1);
+	msleep(200);
+	gpio_free(icn85xx_rst);
+
+	return 0;
+}
+
+static struct icn85xx_info comip_i2c_icn85xx_info = {
+	.reset = icn85xx_reset,
+	.power_i2c = icn85xx_i2c_power,
+	.power_ic = icn85xx_ic_power,
+      //  .reset_gpio = mfp_to_gpio(ICN85XX_RST_PIN),
+	.irq_gpio = mfp_to_gpio(ICN85XX_INT_PIN),
+	.power_i2c_flag = 1,
+	.power_ic_flag = 1,
+#if defined(CONFIG_COMIP_BOARD_LC1860_EVB)
+	.max_scrx = 1080,
+	.max_scry = 1920,
+#elif defined(CONFIG_COMIP_BOARD_LC1860_EVB2) || defined(CONFIG_COMIP_BOARD_LC1860_EVB3)
+	.max_scrx = 800,
+	.max_scry = 1280,
+#endif
+	.virtual_scry = 2200,
+	.max_points = 5,
+};
+#endif
+
 #if defined(CONFIG_TOUCHSCREEN_MELFAS_MMS200)
 static int mms200_rst = MMS200_RST_PIN;
 static int mms200_int = mfp_to_gpio(MMS200_INT_PIN);
@@ -1398,6 +1493,13 @@ static struct i2c_board_info comip_i2c2_board_info[] = {
 		.type = "ft5x06",
 		.addr = 0x38,
 		.platform_data = &comip_i2c_ft5x06_info,
+	},
+#endif
+#if defined(CONFIG_TOUCHSCREEN_ICN8528F)
+	{
+		.type = "icn85xx-ts",
+		//.addr = 0x48,
+		//.platform_data = &comip_i2c_icn85xx_info,
 	},
 #endif
 #if defined(CONFIG_TOUCHSCREEN_MELFAS_MMS200)

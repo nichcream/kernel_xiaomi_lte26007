@@ -838,8 +838,10 @@ static DRIVER_ATTR(debuglevel, S_IRUGO | S_IWUSR, dbg_level_show,
     dbg_level_store);
 static void chip_4604_reset(void)
 {
+#define CONFIG_COMIP_HSIC_USBHUB
 #ifdef CONFIG_COMIP_HSIC_USBHUB
-	int hub_reset = mfp_to_gpio(MFP_PIN_GPIO(123));
+	int hub_reset = mfp_to_gpio(MFP_PIN_GPIO(142));
+	int eth_reset = mfp_to_gpio(MFP_PIN_GPIO(204));
 
 	/*reset USB4604.*/
 	gpio_request(hub_reset, "hub_reset");
@@ -852,6 +854,18 @@ static void chip_4604_reset(void)
 	mdelay(1);
 
 	gpio_free(hub_reset);
+
+	/*reset LAN9500.*/
+	gpio_request(eth_reset, "eth_reset");
+
+	gpio_direction_output(eth_reset, 1);
+	mdelay(1);
+	gpio_direction_output(eth_reset, 0);
+	mdelay(1);
+	gpio_direction_output(eth_reset, 1);
+	mdelay(1);
+
+	gpio_free(eth_reset);
 #else
 
 	pmic_voltage_set(PMIC_POWER_USB_ETH, 0, PMIC_POWER_VOLTAGE_ENABLE);

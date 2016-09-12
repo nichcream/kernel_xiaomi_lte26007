@@ -115,6 +115,7 @@ extern int32_t comip_hsic_get_param_dma_enable(comip_hsic_core_if_t * core_if);
 extern int comip_hsic_set_param_dma_desc_enable(comip_hsic_core_if_t * core_if,
                          int32_t val);
 extern int32_t comip_hsic_get_param_dma_desc_enable(comip_hsic_core_if_t * core_if);
+#define CONFIG_COMIP_HSIC_USBHUB
 #ifdef CONFIG_COMIP_HSIC_USBHUB
 #define comip_hsic_param_dma_desc_enable_default 0
 #else

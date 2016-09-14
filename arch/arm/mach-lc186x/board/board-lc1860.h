@@ -328,13 +328,13 @@
 
 #ifdef CONFIG_BRCM_GPS
 #define BCM_GPS_RESET_PIN               MFP_PIN_GPIO(MFP_PIN_MAX)
-#define BCM_GPS_STANDBY_PIN             MFP_PIN_GPIO(206)
+#define BCM_GPS_STANDBY_PIN             MFP_PIN_GPIO(206) // ? 
 #endif
 #ifdef CONFIG_BRCM_BLUETOOTH
-#define BRCM_BT_ONOFF_PIN       MFP_PIN_GPIO(101)
-#define BRCM_BT_RESET_PIN		MFP_PIN_GPIO(198)
+#define BRCM_BT_ONOFF_PIN       MFP_PIN_GPIO(198) //zhangchg
+#define BRCM_BT_RESET_PIN		MFP_PIN_GPIO(101) //zhangchg
 #define BRCM_BT_WAKE_I_PIN		MFP_PIN_GPIO(200)
-#define BRCM_BT_WAKE_O_PIN		MFP_PIN_GPIO(220)
+#define BRCM_BT_WAKE_O_PIN		MFP_PIN_GPIO(202) //zhangchg
 #endif
 
 #ifdef CONFIG_BRCM_WIFI

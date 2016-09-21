@@ -451,6 +451,10 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 	{OV4689_POWERDOWN_PIN,		MFP_PIN_MODE_GPIO},
 	{OV4689_RESET_PIN,          MFP_PIN_MODE_GPIO},
 #endif
+#if defined(CONFIG_VIDEO_OV2680)
+	{OV2680_POWERDOWN_PIN,		MFP_PIN_MODE_GPIO},
+	{OV2680_RESET_PIN,          MFP_PIN_MODE_GPIO},
+#endif
 #if defined(CONFIG_VIDEO_OV13850)	/* OV13850. */
 	{OV13850_POWERDOWN_PIN,		MFP_PIN_MODE_GPIO},
 	{OV13850_RESET_PIN,		MFP_PIN_MODE_GPIO},
@@ -2020,6 +2024,63 @@ static struct i2c_board_info ov4689_board_info = {
 };
 #endif
 
+#if defined(CONFIG_VIDEO_OV2680)
+static int ov2680_pwdn = mfp_to_gpio(OV2680_POWERDOWN_PIN);
+static int ov2680_rst = mfp_to_gpio(OV2680_RESET_PIN);
+static int ov2680_mclk = mfp_to_gpio(OV2680_MCLK_PIN);
+static int ov2680_power(int onoff)
+{
+	printk("ov2680 power : %d\n", onoff);
+
+	gpio_request(ov2680_pwdn, "OV2680 Powerdown");
+	gpio_request(ov2680_rst, "OV2680 Reset");
+
+	if (onoff) {
+		gpio_direction_output(ov2680_pwdn, 0);
+		gpio_direction_output(ov2680_rst, 1);
+
+		pmic_voltage_set(PMIC_POWER_CAMERA_IO, 1, PMIC_POWER_VOLTAGE_ENABLE);
+		pmic_voltage_set(PMIC_POWER_CAMERA_ANALOG, 1, PMIC_POWER_VOLTAGE_ENABLE);
+		pmic_voltage_set(PMIC_POWER_CAMERA_CORE, 1, 1500);
+
+		mdelay(10);
+		gpio_direction_output(ov2680_pwdn, 1);
+		gpio_direction_output(ov2680_rst, 0);
+		mdelay(10);
+		gpio_direction_output(ov2680_rst, 1);
+		comip_mfp_config_ds(ov2680_mclk, MFP_DS_2MA);
+	} else {
+		pmic_voltage_set(PMIC_POWER_CAMERA_IO, 1, PMIC_POWER_VOLTAGE_DISABLE);
+		pmic_voltage_set(PMIC_POWER_CAMERA_ANALOG, 1, PMIC_POWER_VOLTAGE_DISABLE);
+		pmic_voltage_set(PMIC_POWER_CAMERA_CORE, 1, PMIC_POWER_VOLTAGE_DISABLE);
+
+		gpio_direction_output(ov2680_pwdn, 0);
+		gpio_direction_output(ov2680_rst, 0);
+	}
+
+	gpio_free(ov2680_pwdn);
+	gpio_free(ov2680_rst);
+
+	return 0;
+}
+
+static int ov2680_reset(void)
+{
+	printk("ov2680 reset\n");
+	return 0;
+}
+
+
+static struct i2c_board_info ov2680_board_info = {
+	.type = "ov2680-mipi-raw",
+	.addr = 0x20,
+};
+static struct i2c_board_info ov2680_board_info1 = {
+	.type = "ov2680-mipi-raw",
+	.addr = 0x36,
+};
+#endif
+
 #if defined(CONFIG_VIDEO_GC2355)
 static int gc2355_pwdn = mfp_to_gpio(GC2355_POWERDOWN_PIN);
 static int gc2355_rst = mfp_to_gpio(GC2355_RESET_PIN);
@@ -2603,6 +2664,54 @@ static struct comip_camera_client comip_camera_clients[] = {
 
 	},
 #endif
+
+#if defined(CONFIG_VIDEO_OV2680)
+//	{
+//		.board_info = &ov2680_board_info,
+//		.flags = CAMERA_CLIENT_IF_MIPI
+//			|CAMERA_CLIENT_FRAMERATE_DYN
+//			|CAMERA_CLIENT_ISP_CLK_MIDDLE
+//			|CAMERA_CLIENT_CLK_EXT,
+//		.caps = CAMERA_CAP_FOCUS_INFINITY
+//			| CAMERA_CAP_FOCUS_AUTO
+//			| CAMERA_CAP_FOCUS_CONTINUOUS_AUTO
+//			| CAMERA_CAP_METER_CENTER
+//			| CAMERA_CAP_METER_DOT
+//			| CAMERA_CAP_FACE_DETECT
+//			| CAMERA_CAP_ANTI_SHAKE_CAPTURE,
+//		.if_id = 0,
+//		.mipi_lane_num = 1,
+//		.camera_id = CAMERA_ID_BACK,
+//		.mclk_parent_name = "pll1_mclk",
+//		.mclk_name = "clkout1_clk",
+//		.mclk_rate = 26000000,
+//		.power = ov2680_power,
+//		.reset = ov2680_reset,
+//	},
+	{
+		.board_info = &ov2680_board_info1,
+		.flags = CAMERA_CLIENT_IF_MIPI
+			|CAMERA_CLIENT_FRAMERATE_DYN
+			|CAMERA_CLIENT_ISP_CLK_MIDDLE
+			|CAMERA_CLIENT_CLK_EXT,
+		.caps = CAMERA_CAP_FOCUS_INFINITY
+			| CAMERA_CAP_FOCUS_AUTO
+			| CAMERA_CAP_FOCUS_CONTINUOUS_AUTO
+			| CAMERA_CAP_METER_CENTER
+			| CAMERA_CAP_METER_DOT
+			| CAMERA_CAP_FACE_DETECT
+			| CAMERA_CAP_ANTI_SHAKE_CAPTURE,
+		.if_id = 0,
+		.mipi_lane_num = 1,
+		.camera_id = CAMERA_ID_BACK,
+		.mclk_parent_name = "pll1_mclk",
+		.mclk_name = "clkout1_clk",
+		.mclk_rate = 26000000,
+		.power = ov2680_power,
+		.reset = ov2680_reset,
+},
+#endif
+
 #if defined(CONFIG_VIDEO_OV5648_2LANE_19M)
 	{
 		.board_info = &ov5648_board_info,
@@ -2828,6 +2937,37 @@ static void comip_init_misc(void)
 {
 }
 
+static int ear_switch(int enable)
+{
+	int ear_switch_gpio = mfp_to_gpio(EAR_SWITCH_PIN);
+	gpio_request(ear_switch_gpio, "ear switch");
+	gpio_direction_output(ear_switch_gpio, enable);
+	gpio_free(ear_switch_gpio);
+
+	return 0;
+}
+
+//static int pa_boost_enable(int enable)
+//{
+//	int pa_extra_gpio = mfp_to_gpio(CODEC_PA_EXTRA_PIN);
+//	int pa_gpio=mfp_to_gpio(CODEC_PA_PIN);
+//	gpio_request(pa_extra_gpio, "codec_pa_extra_gpio");
+//	gpio_request(pa_gpio, "codec_pa_gpio");
+//	gpio_direction_output(pa_extra_gpio, enable);
+//	gpio_direction_output(pa_gpio, enable);
+//	gpio_free(pa_extra_gpio);
+//	gpio_free(pa_gpio);
+//
+//	return 0;
+//}
+
+static void comip_init_codec(void)
+{
+	lc1160_codec_platform_data.ear_switch = ear_switch;
+	//lc1160_codec_platform_data.pa_enable = pa_boost_enable;
+
+}
+
 static void __init comip_init_board_early(void)
 {
 	comip_muxpin_pvdd_config();
@@ -2835,6 +2975,7 @@ static void __init comip_init_board_early(void)
 	comip_init_gpio_lp();
 	comip_init_i2c();
 	comip_init_lcd();
+	comip_init_codec();
 }
 static void __init comip_init_board(void)
 {

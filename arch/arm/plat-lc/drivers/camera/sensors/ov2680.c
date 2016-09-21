@@ -812,13 +812,13 @@ static int ov2680_detect(struct v4l2_subdev *sd)
 	ret = ov2680_read(sd, 0x300a, &v);
 	if (ret < 0)
 		return ret;
-	printk(KERN_DEBUG"CHIP_ID_H=0x%x ", v);
+	printk("CHIP_ID_H=0x%x ", v);
 	if (v != OV2680_CHIP_ID_H)
 		return -ENODEV;
 	ret = ov2680_read(sd, 0x300b, &v);
 	if (ret < 0)
 		return ret;
-	printk(KERN_DEBUG"CHIP_ID_L=0x%x \n", v);
+	printk("CHIP_ID_L=0x%x \n", v);
 	if (v != OV2680_CHIP_ID_L)
 		return -ENODEV;
 

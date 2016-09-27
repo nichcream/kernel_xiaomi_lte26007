@@ -529,8 +529,13 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 	{MFP_PIN_GPIO(105), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(104), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(102), 	MFP_PIN_MODE_GPIO},
+
 	{MFP_PIN_GPIO(142), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(204), 	MFP_PIN_MODE_GPIO},
+	{MFP_PIN_GPIO(176), 	MFP_PIN_MODE_GPIO},
+	{MFP_PIN_GPIO(144), 	MFP_PIN_MODE_GPIO},
+	{MFP_PIN_GPIO(75), 	MFP_PIN_MODE_GPIO},
+	{MFP_PIN_GPIO(226), 	MFP_PIN_MODE_GPIO},
 };
 
 static struct mfp_pull_cfg comip_mfp_pull_cfg[] = {
@@ -1399,6 +1404,12 @@ static struct i2c_board_info comip_i2c0_board_info[] = {
 static struct i2c_board_info comip_i2c1_board_info[] = {
 	// TODO:  to be continue for device
 	/* als+ps */
+#if defined(CONFIG_SWITCH_FSA8108)
+	{
+		.type = "fsa8108",
+		.addr = 0x23,
+	},
+#endif
 #if defined(CONFIG_LIGHT_PROXIMITY_GP2AP030)
 	{
 		.type = "gp2ap030",
@@ -2937,37 +2948,6 @@ static void comip_init_misc(void)
 {
 }
 
-static int ear_switch(int enable)
-{
-	int ear_switch_gpio = mfp_to_gpio(EAR_SWITCH_PIN);
-	gpio_request(ear_switch_gpio, "ear switch");
-	gpio_direction_output(ear_switch_gpio, enable);
-	gpio_free(ear_switch_gpio);
-
-	return 0;
-}
-
-//static int pa_boost_enable(int enable)
-//{
-//	int pa_extra_gpio = mfp_to_gpio(CODEC_PA_EXTRA_PIN);
-//	int pa_gpio=mfp_to_gpio(CODEC_PA_PIN);
-//	gpio_request(pa_extra_gpio, "codec_pa_extra_gpio");
-//	gpio_request(pa_gpio, "codec_pa_gpio");
-//	gpio_direction_output(pa_extra_gpio, enable);
-//	gpio_direction_output(pa_gpio, enable);
-//	gpio_free(pa_extra_gpio);
-//	gpio_free(pa_gpio);
-//
-//	return 0;
-//}
-
-static void comip_init_codec(void)
-{
-	lc1160_codec_platform_data.ear_switch = ear_switch;
-	//lc1160_codec_platform_data.pa_enable = pa_boost_enable;
-
-}
-
 static void __init comip_init_board_early(void)
 {
 	comip_muxpin_pvdd_config();
@@ -2975,7 +2955,6 @@ static void __init comip_init_board_early(void)
 	comip_init_gpio_lp();
 	comip_init_i2c();
 	comip_init_lcd();
-	comip_init_codec();
 }
 static void __init comip_init_board(void)
 {

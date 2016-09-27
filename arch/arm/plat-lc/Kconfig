@@ -219,6 +219,13 @@ config SWITCH_COMIP_CODEC
 	help
 	  Select this option if you want to use codec switch.
 
+config SWITCH_FSA8108
+	tristate "Use fsa8108 audio switch"
+	select SWITCH_COMIP
+	help
+	  Select this option if you want to use fsa8108 audio switch.
+
+
 config THERMAL_COMIP
 	tristate "thermal"
 	help

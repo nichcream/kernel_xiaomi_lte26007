@@ -86,8 +86,8 @@ History :
      #define CTP_REPORT_PROTOCOL      1	//viqtes 1   //0: A protocol
                                           //1: B protocol
      
-     #define SCREEN_MAX_X             (600)
-     #define SCREEN_MAX_Y             (1024)
+     #define SCREEN_MAX_X             (800)
+     #define SCREEN_MAX_Y             (1280)
      //-----------------------------------------------------------------------------
      // Global CONSTANTS
      //-----------------------------------------------------------------------------
@@ -209,17 +209,17 @@ History :
      //-----------------------------------------------------------------------------
      // Macro DEFINITIONS
      //-----------------------------------------------------------------------------
-     #define DBG_ICN85XX_TRACE
-     #define DBG_ICN85XX_POINT
-     #define DBG_ICN85XX_INFO
+    // #define DBG_ICN85XX_TRACE
+    // #define DBG_ICN85XX_POINT
+    // #define DBG_ICN85XX_INFO
      #define DBG_ICN85XX_ERROR
-     #define DBG_FLASH_INFO
+    // #define DBG_FLASH_INFO
      #define DBG_FLASH_ERROR
-     #define DBG_OP_INFO
-     #define DBG_OP_ERROR
-     #define DBG_CALIB_INFO
+    // #define DBG_OP_INFO
+    // #define DBG_OP_ERROR
+    // #define DBG_CALIB_INFO
      #define DBG_CALIB_ERROR
-     #define DBG_PROC_INFO
+    // #define DBG_PROC_INFO
      #define DBG_PROC_ERROR
      
      

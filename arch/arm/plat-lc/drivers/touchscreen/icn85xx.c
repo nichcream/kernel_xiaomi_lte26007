@@ -396,6 +396,75 @@ int  DATA_LENGTH = 0;
 GESTURE_DATA structGestureData;
 STRUCT_PANEL_PARA_H g_structPanelPara;
 
+int icnt_pc_tool_i2c_rxdata(char dev_addr, char *rxdata, int length)
+{
+    int ret = -1;
+    int retries = 0;
+
+    struct i2c_msg msgs[] = {
+        {
+            .addr   = dev_addr,//ICN85XX_PROG_IIC_ADDR,//this_client->addr,
+            .flags  = I2C_M_RD,
+            .len    = length,
+            .buf    = rxdata,            
+        },
+    };
+
+    while(retries < IIC_RETRY_NUM)
+    {
+        ret = i2c_transfer(this_client->adapter, msgs, 1);
+        if(ret == 1)break;
+        retries++;
+    }
+
+    if (retries >= IIC_RETRY_NUM)
+    {
+        icn85xx_error("%s i2c read error: %d\n", __func__, ret); 
+    }
+    
+    return ret;
+}
+
+int icnt_pc_tool_i2c_txdata(char dev_addr, char *txdata, int length)
+{
+    int ret = -1;
+    char buf[128];
+    int retries = 0; 
+    struct i2c_msg msg[] = {
+        {
+            .addr   = dev_addr,//this_client->addr,
+            .flags  = 0,
+            .len    = length,
+            .buf    = buf,           
+        },
+    };
+    
+    if (length > 125)
+    {
+        icn85xx_error("%s too big datalen = %d!\n", __func__, length);
+        return -1;
+    }
+
+
+    if (length != 0 && txdata != NULL)
+    {
+        memcpy(&buf[0], txdata, length);
+    }   
+    
+    while(retries < IIC_RETRY_NUM)
+    {
+        ret = i2c_transfer(this_client->adapter, msg, 1);
+        if(ret == 1)break;
+        retries++;
+    }
+
+    if (retries >= IIC_RETRY_NUM)
+    {
+        icn85xx_error("%s i2c write error: %d\n", __func__, ret); 
+    }
+    return ret;
+}
+
 static ssize_t icn85xx_tool_write(struct file *file, const char __user * buffer, size_t count, loff_t * ppos)
 {
     int ret = 0;
@@ -625,6 +694,28 @@ static ssize_t icn85xx_tool_write(struct file *file, const char __user * buffer,
         }
 
     }
+	 else if (19 == cmd_head.wr)// write icnt iic by pc tool
+    {
+        proc_info("cmd_head_.wr == 19  \n");
+        ret = copy_from_user(&cmd_head.data[0], &buffer[CMD_HEAD_LENGTH], cmd_head.data_len);
+        if (ret)
+        {
+            proc_error("copy_from_user failed.\n");
+            goto write_out;
+        }
+        proc_info("dev_addr:0x%2x, length:%d\n", cmd_head.addr[0], cmd_head.data_len);
+        for (i = 0; i < cmd_head.data_len; i++)
+        {
+            proc_info("0x%2x,", cmd_head.data[i]);
+        }
+        proc_info("\n");
+        ret = icnt_pc_tool_i2c_txdata(cmd_head.addr[0], &cmd_head.data[0], cmd_head.data_len);
+        if (ret < 0) {
+            proc_error("write icnt iic by pc tool failed!\n");
+            goto write_out;
+        }
+    }
+
 
 write_out:
     up(&icn85xx_ts->sem); 
@@ -971,6 +1062,28 @@ static ssize_t icn85xx_tool_read(struct file *file, char __user * buffer, size_t
             goto read_out;
         }
     }
+	 else if (24 == cmd_head.wr)// read icnt iic by pc tool
+    {
+        proc_info("cmd_head_.wr == 24  \n");
+        proc_info("dev_addr:0x%2x, length:%d\n", cmd_head.addr[0], cmd_head.data_len);
+        ret = icnt_pc_tool_i2c_rxdata(cmd_head.addr[0], &cmd_head.data[0], cmd_head.data_len);
+        if (ret < 0) {
+            proc_error("read icnt iic by pc tool failed!\n");
+            goto read_out;
+        }
+        proc_info("i2c read data:\n");
+        for (i = 0; i < cmd_head.data_len; i++)
+        {
+            proc_info("0x%2x,", cmd_head.data[i]);
+        }
+        proc_info("\n");
+        ret = copy_to_user(&buffer[CMD_HEAD_LENGTH], &cmd_head.data[0], cmd_head.data_len);
+        if (ret)
+        {
+            proc_error("copy_to_user failed.\n");
+            goto read_out;
+        }
+	}
 read_out:
     up(&icn85xx_ts->sem);   
     proc_info("%s out: %d, cmd_head.data_len: %d\n\n",__func__, count, cmd_head.data_len); 

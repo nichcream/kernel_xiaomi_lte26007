@@ -1603,7 +1603,7 @@ static struct comip_i2c_platform_data comip_i2c1_info = {
 /* TouchScreen. */
 static struct comip_i2c_platform_data comip_i2c2_info = {
 	.use_pio = 1,
-	.flags = COMIP_I2C_FAST_MODE,
+	.flags = COMIP_I2C_STANDARD_MODE,
 };
 
 /* PMU&CODEC. */

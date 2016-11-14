@@ -26,6 +26,8 @@
 #include <linux/gpio.h>
 #include <linux/notifier.h>
 
+#include <linux/clk.h>
+
 #include <plat/comip-snd-notifier.h>
 
 #include <linux/kernel.h>
@@ -43,6 +45,7 @@
 #define	EARPHONE_GPIO	mfp_to_gpio(MFP_PIN_GPIO(144))
 #define	HANDPHONE_GPIO	mfp_to_gpio(MFP_PIN_GPIO(176))
 #define	SPEAKER_GPIO	mfp_to_gpio(MFP_PIN_GPIO(75))
+#define	FSA_MIC_EN_GPIO	mfp_to_gpio(MFP_PIN_GPIO(148))
 
 #define EAR_PHONE		0x01
 #define HAND_PHONE		0x02
@@ -64,7 +67,9 @@ struct gpio_keys_button {
 
 struct fsa8108_chip	{
 	struct input_dev *input;
-	struct gpio_keys_button button;
+	struct gpio_keys_button *hook_button;
+	struct gpio_keys_button *volup_button;
+	struct gpio_keys_button *voldown_button;
 	int irq_int;
 	int irq_hook;
 	int	handphone_gpio;
@@ -75,12 +80,28 @@ struct fsa8108_chip	{
 	struct mutex mutex;
 };
 
-static struct gpio_keys_button button = {
-	.code		= KEY_FN_F12,
-	.gpio		= COMIP_GPIO_KEY_HOOK,
-	.desc		= "Hook Button",
-	.active_low	= 1,
-	.debounce_interval = 30,
+static struct gpio_keys_button buttons[] = {
+	{
+		.code		= KEY_FN_F12,
+		.gpio		= COMIP_GPIO_KEY_HOOK,
+		.desc		= "Hook Button",
+		.active_low	= 1,
+		.debounce_interval = 30,
+	},
+	{
+		.code		= KEY_VOLUMEUP,
+		//.gpio		= COMIP_GPIO_KEY_HOOK,
+		.desc		= "volumeup button",
+		.active_low	= 1,
+		.debounce_interval = 30,
+	},
+	{
+		.code		= KEY_VOLUMEDOWN,
+		//.gpio		= COMIP_GPIO_KEY_HOOK,
+		.desc		= "volumedown button",
+		.active_low	= 1,
+		.debounce_interval = 30,
+	},
 };
 
 static	struct i2c_client *fsa8108_client;
@@ -174,22 +195,64 @@ static void fsa8108_irq_hook_work_handle(struct work_struct *work)
 {
 	struct fsa8108_chip *fsa8108 = container_of(work,
 				struct fsa8108_chip, irq_hook_work.work);
-	int state = (gpio_get_value_cansleep(fsa8108->button.gpio) ? 1 : 0) ^ fsa8108->button.active_low;
+	int state = (gpio_get_value_cansleep(fsa8108->hook_button->gpio) ? 1 : 0) ^ fsa8108->hook_button->active_low;
+	int i;
 	
 	if(state)	
 	{
-		audio_channel_switch(fsa8108, SPEAKER_PHONE);
-		input_event(fsa8108->input, EV_KEY, fsa8108->button.code, state);
+		audio_channel_switch(fsa8108, HAND_PHONE);
+		input_event(fsa8108->input, EV_KEY, fsa8108->hook_button->code, state);
 	}
 	else
 	{
-		audio_channel_switch(fsa8108, HAND_PHONE);
-		input_event(fsa8108->input, EV_KEY, fsa8108->button.code, state);
+		audio_channel_switch(fsa8108, SPEAKER_PHONE);
+		input_event(fsa8108->input, EV_KEY, fsa8108->hook_button->code, state);
 	}
 	
 	input_sync(fsa8108->input);
 	dev_info(&fsa8108_client->dev, " %s: hook state %d .\n",__func__,state);
 	enable_irq(fsa8108->irq_hook);
+	for(i=1; i<17; i++)
+		printk(KERN_INFO"%s: value[%d]=0x%02x\n",__func__,i,fsa8108_read(i));
+/*	
+#define LC1160_MCLK_RATE				8192
+//#define LC1160_MCLK_RATE				11289600
+#define LC1160_ECLK_RATE				2048000
+#define LC1160_GPIO_ECLK		MFP_PIN_GPIO(91)
+#define LC1160_GPIO_MCLK		MFP_PIN_GPIO(90)
+	struct clk *eclk = clk_get(NULL, "clkout4_clk");
+	struct clk *mclk = clk_get(NULL, "clkout0_clk");
+			comip_mfp_config(LC1160_GPIO_ECLK, MFP_PIN_MODE_0);
+			comip_mfp_config(LC1160_GPIO_MCLK, MFP_PIN_MODE_0);
+	clk_set_rate(eclk, LC1160_ECLK_RATE);
+	clk_set_rate(mclk, LC1160_MCLK_RATE);
+	clk_enable(eclk);
+	clk_enable(mclk);
+	*/
+
+}
+
+static irqreturn_t fsa8108_irq_int_handle(int irq, void* dev)
+{
+	struct fsa8108_chip *fsa8108 = dev;
+
+	disable_irq_nosync(fsa8108->irq_int);
+	schedule_delayed_work(&fsa8108->irq_int_work, FSA8108_IRQ_DEBOUNCE_TIME);
+
+	return IRQ_HANDLED;
+}
+
+static void fsa8108_irq_int_work_handle(struct work_struct *work)
+{
+	struct fsa8108_chip *fsa8108 = container_of(work,
+				struct fsa8108_chip, irq_int_work.work);
+	int i;
+	
+	//printk(KERN_INFO"%s: J_DET=%d\n",__func__,i,gpio_get_value());
+	for(i=1; i<4; i++)
+		printk(KERN_INFO"%s: value[%d]=0x%02x\n",__func__,i,fsa8108_read(i));
+	dev_info(&fsa8108_client->dev, " %s:  .\n",__func__);
+	enable_irq(fsa8108->irq_int);
 }
 
 /*
@@ -233,6 +296,7 @@ static int fsa8108_probe(struct i2c_client *client, const struct i2c_device_id *
 	struct input_dev *input;
 	int chip_version;
 	int ret;
+	int i;
 
 	fsa8108 = kzalloc(sizeof(struct fsa8108_chip), GFP_KERNEL);
 	input = input_allocate_device();
@@ -251,10 +315,16 @@ static int fsa8108_probe(struct i2c_client *client, const struct i2c_device_id *
 	fsa8108->handphone_gpio = HANDPHONE_GPIO;
 	fsa8108->earphone_gpio = EARPHONE_GPIO;
 	fsa8108->speaker_gpio = SPEAKER_GPIO;
-	fsa8108->button = button;
+	fsa8108->hook_button = &buttons[0];
+	fsa8108->volup_button = &buttons[1];
+	fsa8108->voldown_button =& buttons[2];
 	input->name = "hook-key";
 
-	input_set_capability(input, EV_KEY, button.code);
+	for(i = 0; i < ARRAY_SIZE(buttons); i++)
+	{
+		struct gpio_keys_button *button = &buttons[i];
+		input_set_capability(input, EV_KEY, button->code);
+	}
 	ret = input_register_device(input);
 	if (ret) {
 		dev_err(&fsa8108_client->dev, "Unable to register input device, error: %d\n",ret);
@@ -267,8 +337,12 @@ static int fsa8108_probe(struct i2c_client *client, const struct i2c_device_id *
 
 	chip_version = fsa8108_chip_version_get();
 	printk(KERN_INFO"%s: chip version 0x%x\n",__func__,chip_version);
+	printk(KERN_INFO"%s: irq_int=%d irq_hook=%d\n",__func__,fsa8108->irq_int, fsa8108->irq_hook);
 	
-	//zhangchg
+	for(i=1; i<17; i++)
+		printk(KERN_INFO"%s: value[%d]=0x%02x\n",__func__,i,fsa8108_read(i));
+
+	/* hook */
 	ret = gpio_request(HOOK_GPIO, " Hook Irq");
 	if (ret < 0) {
 		dev_err(&fsa8108_client->dev, " Failed to request Hook GPIO.\n");
@@ -296,6 +370,34 @@ static int fsa8108_probe(struct i2c_client *client, const struct i2c_device_id *
 	/* audio default set */
 	audio_channel_switch(fsa8108, SPEAKER_PHONE);
 
+	/* jack */
+	ret = gpio_request(FSA8108_INT_GPIO, " Jack Irq");
+	if (ret < 0) {
+		dev_err(&fsa8108_client->dev, " Failed to request Jack GPIO.\n");
+		return ret;
+	}
+	ret = gpio_direction_input(FSA8108_INT_GPIO);
+	if (ret) {
+		dev_err(&fsa8108_client->dev, " Failed to detect Jack GPIO input.\n");
+		goto error;
+	}
+	ret = gpio_request(FSA_MIC_EN_GPIO, " fsa mic en");
+	ret = gpio_direction_output(FSA_MIC_EN_GPIO, 0);
+
+	/* Request irq. */
+	ret = request_irq(fsa8108->irq_int, fsa8108_irq_int_handle,
+			  IRQF_TRIGGER_LOW, "Jack Irq", fsa8108);
+	if (ret) {
+		dev_err(&fsa8108_client->dev, " IRQ already in use.\n");
+		goto error;
+	}
+
+	disable_irq(fsa8108->irq_int);
+	INIT_DELAYED_WORK(&fsa8108->irq_int_work, fsa8108_irq_int_work_handle);
+	irq_set_irq_wake(fsa8108->irq_int, 1);
+	enable_irq(fsa8108->irq_int);
+
+	
 	return 0;
 error:
 	gpio_free(HOOK_GPIO);

@@ -388,7 +388,7 @@
 
 #ifdef CONFIG_COMIP_SDCARD_DETECT
 /* SDCARD DETECT PIN. */
-#define SDCARD_DETECT_PIN 			MFP_PIN_GPIO(243)
+#define SDCARD_DETECT_PIN 			MFP_PIN_GPIO(134) //zhangchg
 #endif
 
 #endif

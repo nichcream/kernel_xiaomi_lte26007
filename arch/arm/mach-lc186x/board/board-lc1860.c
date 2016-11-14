@@ -541,12 +541,21 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 	{MFP_PIN_GPIO(104), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(102), 	MFP_PIN_MODE_GPIO},
 
+	/* xindun P7 */
 	{MFP_PIN_GPIO(142), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(204), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(176), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(144), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(75), 	MFP_PIN_MODE_GPIO},
 	{MFP_PIN_GPIO(226), 	MFP_PIN_MODE_GPIO},
+	{MFP_PIN_GPIO(135), 	MFP_PIN_MODE_GPIO},
+	{MFP_PIN_GPIO(148), 	MFP_PIN_MODE_GPIO},
+	
+	{MFP_PIN_GPIO(134), 	MFP_PIN_MODE_GPIO},
+	{MFP_PIN_GPIO(133), 	MFP_PIN_MODE_GPIO},
+	
+	{MFP_PIN_GPIO(246), 	MFP_PIN_MODE_GPIO},
+	{MFP_PIN_GPIO(247), 	MFP_PIN_MODE_GPIO},
 };
 
 static struct mfp_pull_cfg comip_mfp_pull_cfg[] = {
@@ -612,12 +621,25 @@ static struct mfp_pull_cfg comip_mfp_pull_cfg[] = {
 #endif
 	{MFP_PIN_GPIO(142), 	MFP_PULL_DOWN},
 	{MFP_PIN_GPIO(204), 	MFP_PULL_DOWN},
+
+	{MFP_PIN_GPIO(134), 	MFP_PULL_UP},
+	{MFP_PIN_GPIO(133), 	MFP_PULL_UP},
+};
+
+static struct mfp_ds_cfg comip_ds_cfg[] = {
+	{MFP_PIN_CTRL_MMC0CLK,	MFP_DS_8MA},
+	{MFP_PIN_CTRL_MMC0CMD,	MFP_DS_6MA},
+	{MFP_PIN_CTRL_MMC0D0,	MFP_DS_6MA},
+	{MFP_PIN_CTRL_MMC0D1,	MFP_DS_6MA},
+	{MFP_PIN_CTRL_MMC0D2,	MFP_DS_6MA},
+	{MFP_PIN_CTRL_MMC0D3,	MFP_DS_6MA},
 };
 
 static void __init comip_init_mfp(void)
 {
 	comip_mfp_config_array(comip_mfp_cfg, ARRAY_SIZE(comip_mfp_cfg));
 	comip_mfp_config_pull_array(comip_mfp_pull_cfg, ARRAY_SIZE(comip_mfp_pull_cfg));
+	comip_mfp_config_ds_array(comip_ds_cfg, ARRAY_SIZE(comip_ds_cfg));
 }
 
 static struct mfp_gpio_cfg comip_init_mfp_lp_gpio_cfg[] = {
@@ -716,6 +738,7 @@ static struct lc1132_platform_data i2c_lc1132_info = {
 static struct pmic_power_module_map lc1160_power_module_map[] = {
 	{PMIC_DCDC9,	PMIC_POWER_WLAN_IO,		0,	1},
 	{PMIC_DLDO3,	PMIC_POWER_SDIO,		0,	0},
+	{PMIC_ALDO14,	PMIC_POWER_SDIO,		1,	0},
 #if defined(CONFIG_MMC_COMIP_IOPOWER)
 	{PMIC_ALDO8,	PMIC_POWER_SDIO,		1,	0},
 #endif
@@ -729,7 +752,6 @@ static struct pmic_power_module_map lc1160_power_module_map[] = {
 	{PMIC_DLDO11,	PMIC_POWER_CAMERA_AF_MOTOR,	0,	0},
 #elif defined(CONFIG_COMIP_BOARD_LC1860_EVB3)
 	{PMIC_ALDO13,    PMIC_POWER_USB_HSIC,         0,      0},
-	{PMIC_ALDO14,	PMIC_POWER_CAMERA_AF_MOTOR,	0,	0},
 #endif
 	{PMIC_DLDO9,	PMIC_POWER_CAMERA_CORE,		1,	0},
 	{PMIC_DLDO10,	PMIC_POWER_CAMERA_IO,		0,	0},
@@ -757,6 +779,7 @@ static struct pmic_power_ctrl_map lc1160_power_ctrl_map[] = {
 	{PMIC_ALDO4,	PMIC_POWER_CTRL_REG,	PMIC_POWER_CTRL_GPIO_ID_NONE,	1800},
 	{PMIC_ALDO8,	PMIC_POWER_CTRL_REG,	PMIC_POWER_CTRL_GPIO_ID_NONE,	2850},
 	{PMIC_ALDO12,	PMIC_POWER_CTRL_REG,	PMIC_POWER_CTRL_GPIO_ID_NONE,	1800},
+	{PMIC_ALDO14,	PMIC_POWER_CTRL_REG,	PMIC_POWER_CTRL_GPIO_ID_NONE,	2850},
 	{PMIC_ISINK1,	PMIC_POWER_CTRL_MAX,	PMIC_POWER_CTRL_GPIO_ID_NONE,	10},
 	{PMIC_ISINK2,	PMIC_POWER_CTRL_MAX,	PMIC_POWER_CTRL_GPIO_ID_NONE,	60},
 	{PMIC_ISINK3,	PMIC_POWER_CTRL_MAX,	PMIC_POWER_CTRL_GPIO_ID_NONE,	80},

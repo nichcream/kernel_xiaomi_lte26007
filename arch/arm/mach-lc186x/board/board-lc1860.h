@@ -171,7 +171,7 @@
 #endif
 
 #ifdef CONFIG_COMIP_SDCARD_DETECT
-/* SDCARD DETECT PIN. */
+/*SDCARD DETECT PIN.*/ 
 #define SDCARD_DETECT_PIN 			MFP_PIN_GPIO(243)
 #endif
 
@@ -210,8 +210,19 @@
 /* LCD. */
 #define LCD_RESET_PIN			MFP_PIN_GPIO(154)
 #define LCD_BACKLIGHT_PIN		MFP_PIN_GPIO(146) // zhangchg
+/* remove by jinmeng 
 #define LCD_AVDD_EN_PIN			MFP_PIN_GPIO(158)
 #define LCD_AVEE_EN_PIN			MFP_PIN_GPIO(159)
+end remove 2016/11/15*/
+
+//add by jinmeng 
+/* CSD01 */
+#define DBB2CSD_SPI0_CS         MFP_PIN_GPIO(160)
+#define DBB2CSD_SPI0_CLK		MFP_PIN_GPIO(159)
+#define CSD2DBB_SPI0_DI         MFP_PIN_GPIO(158)
+#define DBB2CSD_SPI0_DO         MFP_PIN_GPIO(157)
+//end add 2016/11/15
+
 
 /* KEYPAD LED*/
 #define KEYPAD_LED_PIN			MFP_PIN_GPIO(72)

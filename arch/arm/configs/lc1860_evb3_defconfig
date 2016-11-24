@@ -381,7 +381,8 @@ CONFIG_RESET_COMIP=y
 # CONFIG_SPI_COMIP is not set
 # CONFIG_TPZ_COMIP is not set
 # CONFIG_TPZ2_COMIP is not set
-
+#
+CONFIG_SPI_COMIP=y
 #
 # Device Driver Selections
 #

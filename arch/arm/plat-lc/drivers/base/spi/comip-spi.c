@@ -499,7 +499,7 @@ static int comip_spi_transfer_dma(struct comip_ssi *ssi,
 
 	return ret;
 }
-
+#if 1
 static int comip_spi_transfer_pio(struct comip_ssi *ssi,
 		struct spi_message *msg, struct spi_transfer *xfer)
 {
@@ -529,7 +529,7 @@ static int comip_spi_transfer_pio(struct comip_ssi *ssi,
 		} else {
 			val = ssi->tx_dummy_data;
 		}
-
+        if (tx != NULL) {
 		if (comip_spi_for_reg_bit(ssi, SSI_STS, SSI_TFNF) < 0) {
 			dev_err(&ssi->pdev->dev, "TXS timed out\n");
 			SSI_DUMP_REGS(ssi, 0, 0);
@@ -537,7 +537,9 @@ static int comip_spi_transfer_pio(struct comip_ssi *ssi,
 		}
 
 		comip_spi_write_reg(ssi, SSI_DATA, val);
+       	}
 
+               if (rx != NULL) {
 		if (comip_spi_for_reg_bit(ssi, SSI_STS, SSI_RFNE) < 0) {
 			dev_err(&ssi->pdev->dev, "RXS timed out\n");
 			SSI_DUMP_REGS(ssi, 0, 1);
@@ -545,6 +547,7 @@ static int comip_spi_transfer_pio(struct comip_ssi *ssi,
 		}
 
 		val = comip_spi_read_reg(ssi, SSI_DATA);
+              	}
 
 		if (rx != NULL) {
 			memcpy(rx, &val, step);
@@ -563,7 +566,69 @@ static int comip_spi_transfer_pio(struct comip_ssi *ssi,
 out:
 	return count - c;
 }
+#else
+static int comip_spi_transfer_pio(struct comip_ssi *ssi,
+		struct spi_message *msg, struct spi_transfer *xfer)
+{
+	unsigned int count;
+	unsigned int c;
+	unsigned int val;
+	unsigned int step;
+	u8 *rx;
+	const u8 *tx;
 
+	count = xfer->len;
+	rx = xfer->rx_buf;
+	tx = xfer->tx_buf;
+	c = count;
+	if (ssi->bits_per_word <= 8)
+		step = 1;
+	else if (ssi->bits_per_word <= 16)
+		step = 2;
+	else
+		return -EINVAL;
+	while (c) {
+		if (tx != NULL) {
+			memcpy(&val, tx, step);
+			tx += step;
+		} else {
+			val = ssi->tx_dummy_data;
+		}
+	if(xfer->rx_buf)		//read & write simultily
+	{
+			if (comip_spi_for_reg_bit(ssi, SSI_STS, SSI_TFNF) < 0) {
+				dev_err(&ssi->pdev->dev, "TXS timed out\n");
+				SSI_DUMP_REGS(ssi, 0, 0);
+				goto out;
+			}
+			comip_spi_write_reg(ssi, SSI_DATA, val);
+			if (comip_spi_for_reg_bit(ssi, SSI_STS, SSI_RFNE) < 0) {
+				dev_err(&ssi->pdev->dev, "RXS timed out\n");
+				SSI_DUMP_REGS(ssi, 0, 1);
+				goto out;
+			}
+			val = comip_spi_read_reg(ssi, SSI_DATA);
+			memcpy(rx, &val, step);
+			rx += step;
+	}
+	else{		//Only send 
+		if (comip_spi_for_reg_bit(ssi, SSI_STS, SSI_TFNF) < 0) {
+			dev_err(&ssi->pdev->dev, "TXS timed out\n");
+			SSI_DUMP_REGS(ssi, 0, 0);
+			goto out;
+		}
+		comip_spi_write_reg(ssi, SSI_DATA, val);
+	}
+		c -= step;
+	}
+	if (xfer->rx_buf == NULL) {
+		if (comip_spi_for_reg_bit(ssi, SSI_STS, SSI_TFE) < 0)
+			dev_err(&ssi->pdev->dev, "TXS timed out\n");
+	}
+out:
+	return count - c;
+}
+#endif
 static void comip_spi_msg_handle(struct comip_ssi *ssi,
 		struct spi_message *msg)
 {

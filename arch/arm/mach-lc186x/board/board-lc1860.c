@@ -21,8 +21,15 @@
 */
 #include <mach/timer.h>
 #include <mach/gpio.h>
+
 #include <plat/mfp.h>
 #include <plat/i2c.h>
+//add by jinmeng
+#include <mach/devices.h>
+#include <linux/spi/spi.h>
+#include <linux/spi/eeprom.h>
+#include <plat/spi.h>
+//end add 2016/11/15 
 #include <plat/cpu.h>
 #include <plat/comip-pmic.h>
 #include <plat/comip-backlight.h>
@@ -291,8 +298,8 @@ static void comip_lcd_bl_control(int onoff)
 
 static void comip_key_bl_control(int onoff)
 {
-	gpio_request(KEYPAD_LED_PIN, "key-pad led");
-
+	
+	 gpio_request(KEYPAD_LED_PIN, "key-pad led");
 	if(onoff){
 		gpio_direction_output(KEYPAD_LED_PIN, 1);
 	} else {
@@ -421,7 +428,6 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 	{LCD_AVDD_EN_PIN,		MFP_PIN_MODE_GPIO},
 	{LCD_AVEE_EN_PIN,		MFP_PIN_MODE_GPIO},
 #endif
-
 #if defined(CONFIG_LIGHT_PROXIMITY_GP2AP030)
 	{GP2AP030_INT_PIN,		MFP_PIN_MODE_GPIO},
 #endif
@@ -521,6 +527,16 @@ static struct mfp_pin_cfg comip_mfp_cfg[] = {
 #if defined(CONFIG_COMIP_BOARD_LC1860_EVB3)
 	{FLASHER_EN,			MFP_PIN_MODE_GPIO},
 	{FLASHER_ENM,			MFP_PIN_MODE_GPIO},
+//add by jinmeng
+/* CSD01 */
+#if defined(CONFIG_SPI_COMIP) || defined(CONFIG_SPI_COMIP_MODULE)  
+//	{MFP_PIN_GPIO(157),     MFP_PIN_MODE_0},  
+//	{MFP_PIN_GPIO(158),     MFP_PIN_MODE_0},  
+//	{MFP_PIN_GPIO(159),	    MFP_PIN_MODE_0},  
+//	{MFP_PIN_GPIO(160),     MFP_PIN_MODE_0},  
+//	{MFP_PIN_GPIO(160),     MFP_PIN_MODE_GPIO},  
+#endif
+//end add 2016/11/15
 #endif
 
 #if defined(CONFIG_SENSORS_AK09911)
@@ -618,6 +634,7 @@ static struct mfp_pull_cfg comip_mfp_pull_cfg[] = {
 	{MFP_PIN_GPIO(151), 	MFP_PULL_DOWN},
 	{MFP_PIN_GPIO(211), 	MFP_PULL_UP},
 	{MFP_PIN_GPIO(243), 	MFP_PULL_UP},
+
 #endif
 	{MFP_PIN_GPIO(142), 	MFP_PULL_DOWN},
 	{MFP_PIN_GPIO(204), 	MFP_PULL_DOWN},
@@ -655,6 +672,10 @@ static struct mfp_gpio_cfg comip_init_mfp_lp_gpio_cfg[] = {
 	{MFP_PIN_GPIO(102),		MFP_GPIO_INPUT},
 	{MFP_PIN_GPIO(197),		MFP_GPIO_OUTPUT,		MFP_GPIO_VALUE_LOW},
 	{MFP_PIN_GPIO(225),		MFP_GPIO_OUTPUT,		MFP_GPIO_VALUE_LOW},
+//	{MFP_PIN_GPIO(157),		MFP_GPIO_OUTPUT,		MFP_GPIO_VALUE_LOW},
+//	{MFP_PIN_GPIO(158),		MFP_GPIO_OUTPUT,		MFP_GPIO_VALUE_LOW},
+//	{MFP_PIN_GPIO(159),		MFP_GPIO_OUTPUT,		MFP_GPIO_VALUE_LOW},
+//	{MFP_PIN_GPIO(160),		MFP_GPIO_OUTPUT,		MFP_GPIO_VALUE_LOW},
 };
 
 static void __init comip_init_gpio_lp(void)
@@ -1116,6 +1137,7 @@ static int ft5x06_ic_power(struct device *dev, unsigned int vdd)
 		gpio_free(gpio_rst);
 		comip_mfp_config_array(comip_mfp_cfg_i2c_2, ARRAY_SIZE(comip_mfp_cfg_i2c_2));
 	} else {
+
 		retval = gpio_request(gpio_rst, "ft5x06_ts_rst");
 		if(retval) {
 			pr_err("ft5x06_ts request rst error\n");
@@ -1442,6 +1464,7 @@ static struct i2c_board_info comip_i2c0_board_info[] = {
 #endif
 };
 
+
 /* Sensors. */
 static struct i2c_board_info comip_i2c1_board_info[] = {
 	// TODO:  to be continue for device
@@ -1631,6 +1654,7 @@ static struct i2c_board_info comip_i2c4_board_info[] = {
 	},
 #endif
 };
+
 
 
 /* NFC. */
@@ -2075,9 +2099,12 @@ static int ov2680_rst = mfp_to_gpio(OV2680_RESET_PIN);
 static int ov2680_mclk = mfp_to_gpio(OV2680_MCLK_PIN);
 static int ov2680_power(int onoff)
 {
+	int ret;
 	printk("ov2680 power : %d\n", onoff);
+	ret = gpio_request(ov2680_pwdn, "OV2680 Powerdown");
 
-	gpio_request(ov2680_pwdn, "OV2680 Powerdown");
+	
+printk("test: ov2680_pwdn = %d ,ret = %d\n",ov2680_pwdn, ret);
 	gpio_request(ov2680_rst, "OV2680 Reset");
 
 	if (onoff) {
@@ -2103,7 +2130,7 @@ static int ov2680_power(int onoff)
 		gpio_direction_output(ov2680_rst, 0);
 	}
 
-	gpio_free(ov2680_pwdn);
+//	gpio_free(ov2680_pwdn);
 	gpio_free(ov2680_rst);
 
 	return 0;
@@ -2981,6 +3008,34 @@ static void comip_muxpin_pvdd_config(void)
 static void comip_init_misc(void)
 {
 }
+//add by jinmeng 
+#if defined(CONFIG_SPI_COMIP) || defined(CONFIG_SPI_COMIP_MODULE)
+static struct spi_board_info comip_spi0_board_info[] = {
+	{
+		.modalias	= "spidev",
+		.max_speed_hz	= 1000000,
+		.bus_num	= 0,
+		.chip_select	= 0,
+	//	.platform_data = NULL,
+	},
+};
+
+static struct comip_spi_platform_data comip_spi0_info = {
+	.num_chipselect = 1,
+};
+
+static void __init comip_init_spi(void)
+{
+	writel(1, io_p2v(CTL_SSI0_PROTOCOL_CTRL)); //config to sip mode
+	comip_set_spi0_info(&comip_spi0_info);
+	spi_register_board_info(comip_spi0_board_info, ARRAY_SIZE(comip_spi0_board_info));
+}
+#else
+static inline void comip_init_spi(void)
+{
+}
+#endif
+//end add 2016/11/15
 
 static void __init comip_init_board_early(void)
 {
@@ -2988,6 +3043,11 @@ static void __init comip_init_board_early(void)
 	comip_init_mfp();
 	comip_init_gpio_lp();
 	comip_init_i2c();
+//add by jinmeng
+#if defined(CONFIG_SPI_COMIP) || defined(CONFIG_SPI_COMIP_MODULE)  
+	comip_init_spi();  
+#endif  
+//end add 2016/11/15
 	comip_init_lcd();
 }
 static void __init comip_init_board(void)

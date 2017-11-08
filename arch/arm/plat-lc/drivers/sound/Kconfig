@@ -1,0 +1,49 @@
+config SND_COMIP_I2S
+	tristate "Leadcore COMIP I2S support"
+	select DMAS_COMIP
+
+config SND_COMIP_VIRTUAL
+	tristate "Leadcore COMIP Virtual PCM support"
+
+config SND_COMIP_PCM
+	tristate "Leadcore COMIP PCM support"
+	
+config SND_COMIP_LOWPOWER
+	tristate "Leadcore COMIP LowPower Audio support"	
+
+config COMIP_LC1120
+        bool "Leadcore LC1120 CODEC Support"
+        depends on I2C && I2C_COMIP
+        help
+          This driver supports the leadcore LC1120 driver. the LC1120 is a audio codec
+
+config SND_SOC_ALL_CODECS
+        tristate "Build all ASoC CODEC drivers"
+        select SND_COMIP_LC1120  if COMIP_LC1120
+        select SND_COMIP_LC1132  if COMIP_LC1132
+        select SND_COMIP_LC1160  if COMIP_LC1160
+        help
+          Normally ASoC codec drivers are only built if a machine driver which
+          uses them is also built since they are only usable with a machine
+          driver.  Selecting this option will allow these drivers to be built
+          without an explicit machine driver for test and development purposes.
+
+          Support for the bus types used to access the codecs to be built must
+          be selected separately.
+
+          If unsure select "N".
+
+config SND_COMIP_CODECS
+        tristate
+
+config SND_COMIP_LC1120
+        tristate
+        select SND_COMIP_CODECS
+
+config SND_COMIP_LC1132
+        tristate
+        select SND_COMIP_CODECS
+
+config SND_COMIP_LC1160
+        tristate
+

@@ -1,0 +1,54 @@
+#ifndef __ASM_ARCH_BOARD_UST802_H__
+#define __ASM_ARCH_BOARD_UST802_H__
+
+#include <plat/mfp.h>
+#include <plat/comipfb.h>
+
+#if defined(CONFIG_COMIP_PROJECT_TL920)
+
+/* PMIC&CODEC-LC1132. */
+#define LC1132_INT_PIN			MFP_PIN_GPIO(239)
+
+/* Sensors - CM36283 */
+#define CM36283_INT_PIN			MFP_PIN_GPIO(23)
+#define AKM8963_INT_PIN			MFP_PIN_GPIO(5)
+
+#define LTR55XALS_INT_PIN       	MFP_PIN_GPIO(23)
+#if defined(CONFIG_TOUCHSCREEN_FT5X06)
+/* Touchscreen-FT5X06. */
+#define FT5X06_INT_PIN			MFP_PIN_GPIO(163)
+#define FT5X06_RST_PIN			MFP_PIN_GPIO(12)
+#endif
+
+/* LCD GPIO. */
+#define LCD_RESET_PIN			MFP_PIN_GPIO(25)
+
+/* BL GPIO. */
+#define BL_CTRL_PIN			MFP_PIN_GPIO(149)
+
+/* Camera */
+#if defined(CONFIG_VIDEO_OV5648)
+#define OV5648_POWERDOWN_PIN		MFP_PIN_GPIO(15)
+#define OV5648_RESET_PIN		MFP_PIN_GPIO(26)
+#endif
+
+#if defined(CONFIG_VIDEO_GC2035_MIPI)
+#define GC2035_MIPI_POWERDOWN_PIN		MFP_PIN_GPIO(15)
+#define GC2035_MIPI_RESET_PIN		MFP_PIN_GPIO(26)
+#endif
+
+#if defined(CONFIG_VIDEO_SGM3141)
+#define SGM3141_ENF_PIN			MFP_PIN_GPIO(229)
+#define SGM3141_ENM_PIN			MFP_PIN_GPIO(230)
+#endif
+
+#define SND_PA_PIN	MFP_PIN_GPIO(232)
+
+/* GPIO keypad. */
+#define COMIP_GPIO_KEY_VOLUMEUP		MFP_PIN_GPIO(100)
+#define COMIP_GPIO_KEY_VOLUMEDOWN	MFP_PIN_GPIO(101)
+
+
+#endif
+
+#endif /* __ASM_ARCH_BOARD_UST802_H__ */

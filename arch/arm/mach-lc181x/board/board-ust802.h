@@ -1,0 +1,71 @@
+#ifndef __ASM_ARCH_BOARD_UST802_H__
+#define __ASM_ARCH_BOARD_UST802_H__
+
+#include <plat/mfp.h>
+#include <plat/comipfb.h>
+
+#if defined(CONFIG_COMIP_PROJECT_UST802)
+
+/* PMIC&CODEC-LC1132. */
+#define LC1132_INT_PIN			MFP_PIN_GPIO(239)
+
+/* Sensors - CM36283 */
+#define CM36283_INT_PIN			MFP_PIN_GPIO(23)
+#define AKM8963_INT_PIN			MFP_PIN_GPIO(5)
+
+/* Touchscreen-FT5X06. */
+#define FT5X06_INT_PIN			MFP_PIN_GPIO(163)
+#define FT5X06_RST_PIN			MFP_PIN_GPIO(12)
+
+/* LCD GPIO. */
+#define LCD_RESET_PIN			MFP_PIN_GPIO(25)
+
+/* Camera */
+#define OV5647_POWERDOWN_PIN		MFP_PIN_GPIO(15)
+#define OV5647_RESET_PIN		MFP_PIN_GPIO(26)
+#define GC0329_POWERDOWN_PIN		MFP_PIN_GPIO(14)
+#define GC0329_RESET_PIN		MFP_PIN_GPIO(27)
+
+#if defined(CONFIG_VIDEO_KTD262)
+#define KTD262_ENF_PIN			MFP_PIN_GPIO(229)
+#define KTD262_ENM_PIN			MFP_PIN_GPIO(71)
+#endif
+#if defined(CONFIG_VIDEO_DIODE_FLASH)
+#define DIODE_ENF_PIN			MFP_PIN_GPIO(229)
+#define DIODE_ENM_PIN			MFP_PIN_GPIO(71)
+#endif
+
+/* GPIO keypad. */
+#define COMIP_GPIO_KEY_VOLUMEUP		MFP_PIN_GPIO(100)
+#define COMIP_GPIO_KEY_VOLUMEDOWN	MFP_PIN_GPIO(101)
+
+/* Board flag. */
+#define BOARD_FLAG_PIN1			MFP_PIN_GPIO(119)
+#define BOARD_FLAG_PIN2			MFP_PIN_GPIO(120)
+
+/*rtk wifi*/
+#ifdef CONFIG_RTK_WLAN_SDIO
+#define RTK_WIFI_ONOFF_PIN		MFP_PIN_GPIO(6)
+#define RTK_WIFI_WAKE_I_PIN		MFP_PIN_GPIO(10)
+#endif
+
+/* BT-RTL8723BS. */
+#ifdef CONFIG_RTK_BLUETOOTH
+#define RTK_BT_ONOFF_PIN		MFP_PIN_GPIO(9)
+#define RTK_BT_RESET_PIN		MFP_PIN_GPIO(7)
+#define RTK_BT_WAKE_I_PIN		MFP_PIN_GPIO(10)
+#define RTK_BT_WAKE_O_PIN		MFP_PIN_GPIO(11)
+#endif
+
+#ifdef CONFIG_RADIO_RTK8723B
+#define RTK_FM_EN_PIN 			MFP_PIN_GPIO(7)
+#endif
+
+/**/
+#ifdef CONFIG_STE_WIFI
+#define STE_WIFI_ONOFF_PIN		MFP_PIN_GPIO(11)
+#define STE_WIFI_WAKE_I_PIN		MFP_PIN_GPIO(8)
+#endif
+#endif
+
+#endif /* __ASM_ARCH_BOARD_UST802_H__ */

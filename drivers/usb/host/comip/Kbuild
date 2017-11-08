@@ -1,0 +1,10 @@
+obj-$(CONFIG_USB_COMIP_HCD)	+= comip.o
+
+comip-y := \
+	comip_cil.o	\
+	comip_common_linux.o	\
+	comip_hcd.o	\
+	comip_hcd_ddma.o	\
+	comip_hcd_intr.o	\
+	comip_hcd_linux.o	\
+	comip_hcd_queue.o

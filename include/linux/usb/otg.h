@@ -38,6 +38,13 @@ struct usb_otg {
 
 extern const char *usb_otg_state_string(enum usb_otg_state state);
 
+/* for board-specific init logic */
+extern int usb_set_transceiver(struct usb_phy *);
+#ifdef CONFIG_USB_OTG_UTILS
+extern struct usb_phy *usb_get_transceiver(void);
+extern void usb_put_transceiver(struct usb_phy *);
+#endif
+
 /* Context: can sleep */
 static inline int
 otg_start_hnp(struct usb_otg *otg)

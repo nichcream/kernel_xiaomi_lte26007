@@ -1,0 +1,86 @@
+menuconfig ARM_GPU
+    tristate "Arm gpu support"
+    default y
+    ---help---
+    Driver for gpu.
+
+choice
+	prompt "mali driver version"
+	depends on ARM_GPU
+	default MALI_DRIVER_MIDGARD_R4
+	
+config MALI_DRIVER_400
+	bool "mali-400"
+	help
+	  Choose mali driver for mali-400.
+
+config MALI_DRIVER_MIDGARD_R4
+	bool "mali-midgard r4"
+	help
+	  Choose mali driver for mali-midgard r4.
+
+config MALI_DRIVER_MIDGARD_R5
+	bool "mali-midgard r5"
+	help
+	  Choose mali driver for mali-midgard r5.
+endchoice
+
+menu "ARM GPU Configuration"
+choice
+	prompt "mali performance level"
+	depends on MALI_DRIVER_MIDGARD_R4 || MALI_DRIVER_MIDGARD_R5
+	default MALI_DEFAULT_FREQ
+
+config MALI_HIGH_FREQ
+	bool "High Performance"
+	help
+	  Choose high frequency for better performance.
+
+config MALI_DEFAULT_FREQ
+	bool "Standard Performance"
+	help
+	  Choose standard frequency.
+
+config MALI_LOW_FREQ
+	bool "Low Performance"
+	help
+	  Choose low frequency for better consumption.
+endchoice
+
+choice
+	prompt "Platform configuration"
+	depends on MALI_DRIVER_MIDGARD_R4 || MALI_DRIVER_MIDGARD_R5
+	default MALI_PLATFORM_VEXPRESS
+	help
+	  Select the SOC platform that contains a Mali Midgard GPU
+
+config MALI_PLATFORM_VEXPRESS
+	depends on ARCH_VEXPRESS && (ARCH_VEXPRESS_CA9X4 || ARCH_VEXPRESS_CA15X4)
+	bool "Versatile Express"
+config MALI_PLATFORM_VEXPRESS_VIRTEX7_40MHZ
+	depends on ARCH_VEXPRESS && (ARCH_VEXPRESS_CA9X4 || ARCH_VEXPRESS_CA15X4)
+	bool "Versatile Express w/Virtex7 @ 40Mhz"
+config MALI_PLATFORM_GOLDFISH
+	depends on ARCH_GOLDFISH
+	bool "Android Goldfish virtual CPU"
+config MALI_PLATFORM_PBX
+	depends on ARCH_REALVIEW && REALVIEW_EB_A9MP && MACH_REALVIEW_PBX
+	bool "Realview PBX-A9"
+config MALI_PLATFORM_THIRDPARTY
+	bool "Third Party Platform"
+endchoice
+
+if MALI_DRIVER_400
+source "arch/arm/plat-lc/drivers/gpu/mali400/mali/Kconfig"
+source "arch/arm/plat-lc/drivers/gpu/mali400/ump/Kconfig"
+endif
+
+if MALI_DRIVER_MIDGARD_R4
+source "arch/arm/plat-lc/drivers/gpu/malit6xx_r4/gpu/arm/Kconfig"
+endif
+
+if MALI_DRIVER_MIDGARD_R5
+source "arch/arm/plat-lc/drivers/gpu/malit6xx_r5/gpu/arm/Kconfig"
+endif
+endmenu
+

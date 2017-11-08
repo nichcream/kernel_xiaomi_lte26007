@@ -1,0 +1,1 @@
+obj-$(CONFIG_SENSORS_MMC3416XPJ_MAG)	+= mmc3416x.o mecs.o

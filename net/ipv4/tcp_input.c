@@ -693,7 +693,7 @@ static void tcp_rtt_estimator(struct sock *sk, const __u32 mrtt)
 	} else {
 		/* no previous measure. */
 		tp->srtt = m << 3;	/* take the measured time to be rtt */
-		tp->mdev = m << 1;	/* make sure rto = 3*rtt */
+		tp->mdev = m >> 1;	/* make sure rto = 3*rtt */
 		tp->mdev_max = tp->rttvar = max(tp->mdev, tcp_rto_min(sk));
 		tp->rtt_seq = tp->snd_nxt;
 	}

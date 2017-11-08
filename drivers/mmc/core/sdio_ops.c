@@ -32,6 +32,10 @@ int mmc_send_io_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr)
 
 	for (i = 100; i; i--) {
 		err = mmc_wait_for_cmd(host, &cmd, MMC_CMD_RETRIES);
+
+	#if defined(CONFIG_RTK_WLAN_SDIO_3)
+		cmd.resp[0] = cmd.resp[0] | R4_18V_PRESENT;
+	#endif
 		if (err)
 			break;
 

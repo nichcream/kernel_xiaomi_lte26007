@@ -1,0 +1,269 @@
+if ARCH_LC181X
+
+menu "Leadcore LC181X Options"
+
+config MACH_LC181X
+	bool "LC181X Platform"
+	select CPU_V7
+
+config CPU_LC1810
+	bool "LC1810"
+	select CPU_V7
+	select ARM_GIC
+	select HAVE_ARM_SCU
+	help
+	  Leadcore CPU type LC1810
+	  
+config CPU_LC1813
+	bool "LC1813"
+	select CPU_V7
+	select ARM_GIC
+	select ARM_L1_CACHE_SHIFT_6
+	help
+	  Leadcore CPU type LC1813
+
+choice
+	prompt "LC181X Project"
+
+config COMIP_PROJECT_LC1810
+	bool "Project LC1810"
+	depends on ARCH_LC181X && CPU_LC1810
+	help
+	  Select this option if you want to use project lc1810.
+
+config COMIP_PROJECT_YL8150S
+	bool "Project YL8150S"
+	depends on ARCH_LC181X && CPU_LC1810
+	help
+	  Select this option if you want to use project yulong 8150s.
+
+config COMIP_PROJECT_YL8190
+	bool "Project YL8190"
+	depends on ARCH_LC181X && CPU_LC1810
+	help
+	  Select this option if you want to use project yulong 8190.
+
+config COMIP_PROJECT_ZYTN968
+	bool "Project ZYTN968"
+	depends on ARCH_LC181X && CPU_LC1810
+	help
+	  Select this option if you want to use project zhanyingtong N968.
+
+config COMIP_PROJECT_UST56P
+	bool "Project UST56P"
+	depends on ARCH_LC181X && CPU_LC1810
+	help
+	  Select this option if you want to use project uniscope T56P.
+
+config COMIP_PROJECT_LC1813
+	bool "Project LC1813"
+	depends on ARCH_LC181X && CPU_LC1813
+	help
+	  Select this option if you want to use project lc1813.
+
+config COMIP_PROJECT_UST56Q
+	bool "Project UST56Q"
+	depends on ARCH_LC181X && CPU_LC1813
+	help
+	  Select this option if you want to use project uniscope T56Q.
+
+config COMIP_PROJECT_UST802
+	bool "Project UST802"
+	depends on ARCH_LC181X && CPU_LC1813
+	help
+	  Select this option if you want to use project uniscope T802.
+
+config COMIP_PROJECT_YL8085Q
+	bool "Project YL8085Q"
+	depends on ARCH_LC181X && CPU_LC1813
+	help
+	  Select this option if you want to use project yulong 8085Q.
+
+config COMIP_PROJECT_ZTEU889
+	bool "Project ZTEU889"
+	depends on ARCH_LC181X && CPU_LC1813
+	help
+	  Select this option if you want to use project ZTE U889.
+
+config COMIP_PROJECT_TL920
+	bool "Project TL920"
+	depends on ARCH_LC181X && CPU_LC1813
+	help
+	  Select this option if you want to use project TL920.
+
+endchoice
+
+config MENTOR_DEBUG
+	bool
+
+choice
+	prompt "LC181X Board"
+
+config COMIP_BOARD_LC1810_EVB
+	bool "LC1810_EVB"
+	depends on ARCH_LC181X && COMIP_PROJECT_LC1810
+	help
+	 Select this option if you want to use lc1810 evb board.
+
+config COMIP_BOARD_YL8150S_EVB
+	bool "YL8150S_EVB"
+	depends on ARCH_LC181X && COMIP_PROJECT_YL8150S
+	help
+	 Select this option if you want to use yulong evb board.
+
+config COMIP_BOARD_YL8150S_PHONE_V1_1
+	bool "YL8150S_PHONE V1.1"
+	depends on ARCH_LC181X && COMIP_PROJECT_YL8150S
+	help
+	  Select this option if you want to use yulong v1.1 board.
+
+config COMIP_BOARD_YL8150S_PHONE_V1_2
+	bool "YL8150S_PHONE V1.2"
+	depends on ARCH_LC181X && COMIP_PROJECT_YL8150S
+	help
+	  Select this option if you want to use yulong v1.2 board.
+
+config COMIP_BOARD_YL8190_PHONE_V1_0
+	bool "YL8190_PHONE V1.0"
+	depends on ARCH_LC181X && COMIP_PROJECT_YL8190
+	help
+	  Select this option if you want to use yulong 8190 v1.0 board.
+
+config COMIP_BOARD_ZYTN968_PHONE_V1_0
+	bool "ZYTN968_PHONE V1.0"
+	depends on ARCH_LC181X && COMIP_PROJECT_ZYTN968
+	help
+	  Select this option if you want to use zhanyingtong n968 v1.0 board.
+
+config COMIP_BOARD_UST56P_PHONE_V1_0
+	bool "UST56P_PHONE V1.0"
+	depends on ARCH_LC181X && COMIP_PROJECT_UST56P
+	help
+	  Select this option if you want to use uniscope t56p v1.0 board.
+
+config COMIP_BOARD_LC1813_MENTOR
+	bool "LC1813_MENTOR"
+	select MENTOR_DEBUG
+	depends on ARCH_LC181X && COMIP_PROJECT_LC1813
+	help
+	 Select this option if you want to use lc1813 mentor board.
+
+config COMIP_BOARD_LC1813_EVB
+	bool "LC1813_EVB"
+	depends on ARCH_LC181X && COMIP_PROJECT_LC1813
+	help
+	 Select this option if you want to use lc1813 evb board.
+
+config COMIP_BOARD_LC1813_EVB2
+	bool "LC1813_EVB2"
+	depends on ARCH_LC181X && COMIP_PROJECT_LC1813
+	help
+	 Select this option if you want to use lc1813 evb2 board.
+
+config COMIP_BOARD_UST56Q_PHONE_V1_0
+	bool "UST56Q_PHONE V1.0"
+	depends on ARCH_LC181X && COMIP_PROJECT_UST56Q
+	help
+	  Select this option if you want to use uniscope t56q v1.0 board.
+
+config COMIP_BOARD_UST802_PHONE_V1_0
+	bool "UST802_PHONE V1.0"
+	depends on ARCH_LC181X && COMIP_PROJECT_UST802
+	help
+	  Select this option if you want to use uniscope t802 v1.0 board.
+
+config COMIP_BOARD_UST802_PHONE_V1_1
+	bool "UST802_PHONE V1.1"
+	depends on ARCH_LC181X && COMIP_PROJECT_UST802
+	help
+	  Select this option if you want to use uniscope t802 v1.1 board.
+
+config COMIP_BOARD_YL8085Q_PHONE_V1_0
+	bool "YL8085Q_PHONE V1.0"
+	depends on ARCH_LC181X && COMIP_PROJECT_YL8085Q
+	help
+	  Select this option if you want to use yulong 8085q v1.0 board.
+
+config COMIP_BOARD_ZTEU889_PHONE_V1_0
+	bool "ZTEU889_PHONE V1.0"
+	depends on ARCH_LC181X && COMIP_PROJECT_ZTEU889
+	help
+	  Select this option if you want to use zte u889 v1.0 board.
+
+config COMIP_BOARD_TL920_PHONE_V1_0
+	bool "TL920_PHONE V1.0"
+	depends on ARCH_LC181X && COMIP_PROJECT_TL920
+	help
+	  Select this option if you want to use huiye tl920 v1.0 board.
+
+endchoice
+
+comment "LC181X Feature Selections"
+
+config COMIP_32K_TIMER
+	bool "Use 32KHz timer"
+	depends on ARCH_LC181X
+	help
+	  Select this option if you want to enable the COMIP 32KHz timer.
+
+config COMIP_USE_WK_TIMER
+	bool "Use wake up timer"
+	depends on ARCH_LC181X
+	help
+	  Select this option if you want to use the wake up timer.
+
+config SLEEP_CODE_IN_RAM
+	bool "code about sleep are put into RAM"
+	default n
+
+config STAND_HOTPLUG
+	bool "standalone hotplug"
+	depends on HOTPLUG_CPU
+	default n
+
+config COMIP_HOTPLUG
+	bool "comip hotplug"
+	depends on HOTPLUG_CPU
+	default n
+
+config CPU_IDLE_LOWEST_FREQ
+	bool "cpu cluster is in lowest freq when idle"
+	default n
+
+config DDR_FREQ_ADJUST
+	bool "dynamicly adjust DDR frequence"
+	select SLEEP_CODE_IN_RAM
+	default n
+
+config IRQ_MON_DEBUG
+	bool "cpu0 irq handler is monitored by Timer"
+	default n
+
+config CPU_FREQ_DIV2
+	bool "cpu frequency div2"
+	depends on CPU_LC1813
+
+config USB_GADGET_COMIP
+	boolean "COMIP USB 2.0 controller"
+	help
+	   COMIP TD-SCDMA DBB processor(Leadcore Tech Co.,Ltd) include a high speed USB 2.0 device
+	   controller, which support high speed and full speed USB Peripheral.
+
+config USB_COMIP
+	tristate
+	depends on USB_GADGET_COMIP
+	default USB_GADGET
+	select USB_GADGET_SELECTED
+
+config COMIP_MODEM
+	bool "Leadcore COMIP modem support"
+	default y
+	help
+	   support leadcore modem rest&&start&bridge conmunication.
+
+comment "LC181X Driver Selections"
+
+source "arch/arm/mach-lc181x/sound/Kconfig"
+
+endmenu
+endif

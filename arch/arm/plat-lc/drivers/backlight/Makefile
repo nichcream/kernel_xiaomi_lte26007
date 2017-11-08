@@ -1,0 +1,1 @@
+obj-$(CONFIG_BACKLIGHT_COMIP)   += comip_backlight.o

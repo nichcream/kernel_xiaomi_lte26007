@@ -1,0 +1,304 @@
+config FB_COMIP
+	tristate "Leadcore framebuffer support"
+	depends on FB && PLAT_LC
+	select FB_CFB_FILLRECT
+	select FB_CFB_COPYAREA
+	select FB_CFB_IMAGEBLIT
+	help
+          Leadcore framebuffer driver 1.0 for LC1810.
+
+config FB_COMIP2
+	tristate "Leadcore framebuffer2 support"
+	depends on FB && PLAT_LC
+	select FB_CFB_FILLRECT
+	select FB_CFB_COPYAREA
+	select FB_CFB_IMAGEBLIT
+	help
+          Leadcore framebuffer driver 2.0 for LC1813, LC1860 ...
+
+if FB_COMIP2
+
+choice
+	prompt "Select LCDC Version"
+	config FB_COMIP_LCDC
+		boolean "LCDC Version1.0"
+		---help---
+		Leadcore display subsystem lcd controller version1.0
+		for LC1813/LC1813S.
+
+	config FB_COMIP_LCDC2
+		boolean "LCDC Version2.0"
+		---help---
+		Leadcore display subsystem lcd controller version2.0
+		for LC1860.
+endchoice
+
+choice
+	prompt "Select MIPI DSI Version"
+	config FB_COMIP_MIPI
+		boolean "MIPI DSI Version1.0"
+		---help---
+		Leadcore display subsystem MIPI controller version1.0
+		for LC1813/LC1813S/LC1860.
+endchoice
+
+endif
+
+if (FB_COMIP || FB_COMIP2)
+	config FB_COMIP_ESD
+		boolean "Enable LCD ESD protect"
+		---help---
+		LCD ESD protect
+
+menu "Select LCD Panel"
+	config LCD_BYD_8937S
+		boolean "BYD 8937S(BM397WV Driver IC) lcd panel"
+		---help---
+	  	BYD 8937S(BM397WV Driver IC) It`s resolution is 480 x 800.
+	  	This panel is connected with MIPI interface.
+
+	config LCD_YT_H8369A
+		boolean "YT H8369A(HIMAX Driver IC) lcd panel"
+		---help---
+	  	YT H8369A(HIMAX Driver IC) It`s resolution is 480 x 800.
+	  	This panel is connected with MIPI interface.
+	config LCD_YT_H8389B
+		boolean "YT H8389B(HIMAX Driver IC) lcd panel"
+		---help---
+	  	YT H8389B(HIMAX Driver IC) It`s resolution is 540 x 960.
+	  	This panel is connected with MIPI interface.
+	config LCD_YT_ILI9805E
+		boolean "YT ILI9805E(ILI Driver IC) lcd panel"
+		---help---
+		YT ILI9805E(ILI Driver IC) It's resolution is 480 x 800.
+		This panel is connected with MIPI interface.
+	config LCD_LEAD_LD35510S
+		boolean "LEAD LD35510S(NOVATEK Driver IC) lcd panel"
+		---help---
+		LEAD LD35510S(NOVATEK Driver IC) It's resolution is 480 x 800.
+		This panel is connected with MIPI interface.
+	config LCD_YT_OTM9608
+		boolean "YT OTM9608 lcd panel"
+		---help---
+		YT OTM9608  It's resolution is 540 x 960.
+		This panel is connected with MIPI interface.
+	config LCD_TM_NT35516
+		boolean "TM NT35516(NOVATEK Driver IC) lcd panel"
+		---help---
+		TM NT35516(NOVATEK Driver IC) It's resolution is 540 x 960.
+		This panel is connected with MIPI interface.
+	config LCD_AUO_ER61308
+		boolean "AUO ER61308 (RENESAS SP Driver IC) lcd panel"
+		---help---
+		AUO ER61308  It's resolution is 720 x 1280.
+		This panel is connetced with MIPI interface.
+	config LCD_ZET_OTM8009A
+		boolean "ZET OTM8009A lcd panel"
+		---help---
+		BLJ OTM8009A It's resolution is 480 x 854.
+		This panel is connected with MIPI interface.
+	config LCD_BY_OTM8018B
+		boolean "BY OTM8018B lcd panel"
+		---help---
+		BY OTM8018B It's resolution is 480 x 854.
+		This panel is connected with MIPI interface.
+	config LCD_ZET_SSD2075
+		boolean "ZET SSD2075 lcd panel"
+		---help---
+		BLJ SSD2075 It's resolution is 720 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_HS_RM68190
+		boolean "HS RM68190 lcd panel"
+		---help---
+		HS RM68190 It's resolution is 540 x 960.
+		This panel is connected with MIPI interface.
+	config LCD_HS_NT35517
+		boolean "HS NT35517 lcd panel"
+		---help---
+		HS NT35517 It's resolution is 540 x 960.
+		This panel is connected with MIPI interface.
+	config LCD_LEAD_OTM8018B
+		boolean "LEAD OTM8018B lcd panel"
+		---help---
+		LEAD OTM8018B It's resolution is 480 x 854.
+		This panel is connected with MIPI interface.
+	config LCD_BOE_H8394A
+		boolean "BOE H8394A lcd panel"
+		---help---
+		BOE H8394A It's resolution is 720 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_BOE_H8394A01
+		boolean "BOE H8394A01 lcd panel"
+		---help---
+		BOE H8394A01 It's resolution is 720 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_LEAD_LD35512S
+		boolean "LEAD LD35512S lcd panel"
+		---help---
+		LEAD LD35512S It's resolution is 480 x 800.
+		This panel is connected with MIPI interface.
+	config LCD_LG_H8379A
+		boolean "LG H8379A lcd panel"
+		---help---
+		LG H8379A It's resolution is 480 x 800.
+		This panel is connected with MIPI interface.
+	config LCD_SHP_H8392A
+		boolean "SHP H8392A lcd panel"
+		---help---
+		SHP H8392A It's resolution is 720 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_TM_NT35520
+		boolean "TM NT35520 lcd panel"
+		---help---
+		TM NT35520 It's resolution is 768 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_TM_NT35521
+		boolean "TM NT35521 lcd panel"
+		---help---
+		TM NT35521 It's resolution is 720 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_AUO_NT35590
+		boolean "AUO NT35590 lcd panel"
+		---help---
+		AUO NT35590 It's resolution is 720 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_TRULY_NT35595
+		boolean "Truly NT35595 lcd panel"
+		---help---
+		Truly NT35595 It's resolution is 1080 x 1920.
+		This panel is connected with MIPI interface.
+	config LCD_BT_ILI9806E
+		boolean "Bitland ILI9806E lcd panel"
+		---help---
+		Bitland ILI9806E It's resolution is 480 x 800.
+		This panel is connected with MIPI interface.
+	config LCD_DJN_ILI9806E
+		boolean "DJN ILI9806E lcd panel"
+		---help---
+		DJN ILI9806E It's resolution is 480 x 800.
+		This panel is connected with MIPI interface.
+        config LCD_SHARP_R69431
+                boolean "SHARP R69431 lcd panel"
+                ---help---
+                SHARP R69431 It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
+        config LCD_AUO_NT35521
+                boolean "AUO NT35521 lcd panel"
+                ---help---
+                AUO NT35521 It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
+        config LCD_INX_H8394D
+                boolean "INX H8394D lcd panel"
+                ---help---
+                INX H8394D It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
+        config LCD_INX_H8392B
+                boolean "INX H8392B lcd panel"
+                ---help---
+                INX H8392B It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
+        config LCD_AUO_H8399A
+                boolean "AUO H8399A lcd panel"
+                ---help---
+                AUO H8399A It's resolution is 1080 x 1920.
+                This panel is connected with MIPI interface.
+	config LCD_IVO_OTM1283A
+		boolean "IVO OTM1283A lcd panel"
+		---help---
+		AUO OTM1283A It's resolution is 720 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_TRULY_H8394A
+		boolean "TRULY H8394A lcd panel"
+		---help---
+		TRULY H8394A It's resolution is 720 x 1280.
+		This panel is connected with MIPI interface.
+	config LCD_STARRY_S6D7A
+		boolean "STARRY S6D7A lcd panel"
+		---help---
+		STARRY S6D7A It's resolution is 800 x 1280,type is KR070IB4S
+		This panel is connected with MIPI interface.
+	config RGB_LVDS_ZA7783
+		boolean "LVDS_ZA7783(Driver IC) Bridge Chip"
+		default n
+		---help---
+	  	LVDS_ZA7783(Driver IC)is a bridge between MIPI and LVDS Pad.
+	  	LVDS_ZA7783 is connected with MIPI interface.
+	config MIPI_LVDS_ICN6201
+		boolean "MIPI_LVDS_ICN6201(Driver IC) Bridge Chip"
+		default n
+		---help---
+		ICN6201(Driver IC)is a bridge between MIPI and LVDS.
+		ICN6201 is connected with MIPI interface.
+	config LCD_AUO_B079XAN01
+		boolean "auo lcd panel"
+		---help---
+		It's resolution is 768 x 1024.
+		This panel is connected with MIPI interface.
+
+        config LCD_IVO_OTM1283A
+                boolean "IVO OTM1283A lcd panel"
+                ---help---
+                AUO OTM1283A It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
+        config LCD_TRULY_H8394A
+                boolean "TRULY H8394A lcd panel"
+                ---help---
+                TRULY H8394A It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
+        config LCD_JD_9161CPT5
+                boolean "JD 9161CPT5 lcd panel"
+                ---help---
+                JD_9161CPT5 It's resolution is 480 X 854.
+                This panel is connected with MIPI interface.
+        config LCD_JD_9261AA
+                boolean "JD 9261AA lcd panel"
+                ---help---
+                JD_9261AA It's resolution is 540 X 960.
+                This panel is connected with MIPI interface.
+        config LCD_JD_9365HSD
+                boolean "JD 9365HSD lcd panel"
+                ---help---
+                JD_9365HSD It's resolution is 720 X 1280.
+                This panel is connected with MIPI interface.
+        config LCD_AUO_R61308OTP
+                boolean "AUO r61308 lcd panel"
+                ---help---
+                AUO_R61308 It's resolution is 720 X 1280.
+                This panel is connected with MIPI interface.
+        config LCD_AUO_OTM1285A_OTP
+                boolean "AUO otm1285a with otp lcd panel"
+                ---help---
+                AUO_OTM1285A It's resolution is 720 X 1280.
+                This panel is connected with MIPI interface.
+        config LCD_HT_H8394D
+                boolean "HT H8394D lcd panel"
+                ---help---
+                HT H8394D It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
+        config LCD_BOE_NT35521S
+                boolean "BOE NT35521S lcd panel"
+                ---help---
+                BOE NT35521S It's resolution is 720 x 1280.
+                This panel is connected with MIPI interface.
+        config LCD_HS_EK79007
+                boolean "HS EK79007 lcd panel"
+                ---help---
+                HS EK79007 It's resolution is 1024 x 600.
+                This panel is connected with MIPI interface.
+	config LCD_LVDS_1280X800
+		depends on MIPI_LVDS_ICN6201
+		boolean "lvds lcd panel"
+		---help---
+		It is resolution is 1280 x 800.
+		This panel is connected with LVDS interface.
+
+        config LCD_FL10802
+                boolean "BOE NT35521S lcd panel"
+                ---help---
+                BOE FL10802 It's resolution is 480 x 800.
+                This panel is connected with MIPI interface.
+endmenu
+
+endif
+
+

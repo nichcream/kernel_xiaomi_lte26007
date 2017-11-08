@@ -79,6 +79,8 @@
 #include <linux/spinlock.h>
 #include <linux/types.h>
 
+#include <mach/memory.h>
+
 #include "zsmalloc.h"
 
 /*

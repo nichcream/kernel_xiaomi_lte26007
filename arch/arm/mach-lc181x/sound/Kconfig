@@ -1,0 +1,4 @@
+config SND_LC181X_SOC
+	tristate "SoC Audio for the leadcore lc181x chip"
+	depends on ARCH_LC181X
+

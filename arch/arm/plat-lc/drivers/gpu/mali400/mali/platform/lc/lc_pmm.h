@@ -1,0 +1,132 @@
+/*
+ * This confidential and proprietary software may be used only as
+ * authorised by a licensing agreement from ARM Limited
+ * (C) COPYRIGHT 2009-2012 ARM Limited
+ * ALL RIGHTS RESERVED
+ * The entire notice above must be reproduced on all authorised
+ * copies and copies may only be made to the extent permitted
+ * by a licensing agreement from ARM Limited.
+ */
+
+/**
+ * @file mali_platform.h
+ * Platform specific Mali driver functions
+ */
+
+#ifndef __LC1810_PMM_H__
+#define __LC1810_PMM_H__
+
+#include "mali_osk.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+#ifndef CONFIG_THERMAL_COMIP
+#define CONFIG_THERMAL_COMIP 0
+#endif
+/** @brief description of power change reasons
+ */
+typedef enum mali_power_mode_tag
+{
+	MALI_POWER_MODE_ON,           /**< Power Mali on */
+	MALI_POWER_MODE_LIGHT_SLEEP,  /**< Mali has been idle for a short time, or runtime PM suspend */
+	MALI_POWER_MODE_DEEP_SLEEP,   /**< Mali has been idle for a long time, or OS suspend */
+} mali_power_mode;
+
+/** @brief Platform specific setup and initialisation of MALI
+ *
+ * This is called from the entrypoint of the driver to initialize the platform
+ *
+ * @return _MALI_OSK_ERR_OK on success otherwise, a suitable _mali_osk_errcode_t error.
+ */
+_mali_osk_errcode_t mali_platform_init(void);
+
+/** @brief Platform specific deinitialisation of MALI
+ *
+ * This is called on the exit of the driver to terminate the platform
+ *
+ * @return _MALI_OSK_ERR_OK on success otherwise, a suitable _mali_osk_errcode_t error.
+ */
+_mali_osk_errcode_t mali_platform_deinit(void);
+
+/** @brief Platform specific powerdown sequence of MALI
+ *
+ * Call as part of platform init if there is no PMM support, else the
+ * PMM will call it. 
+ * There are three power modes defined:
+ *  1) MALI_POWER_MODE_ON
+ *  2) MALI_POWER_MODE_LIGHT_SLEEP
+ *  3) MALI_POWER_MODE_DEEP_SLEEP
+ * MALI power management module transitions to MALI_POWER_MODE_LIGHT_SLEEP mode when MALI is idle
+ * for idle timer (software timer defined in mali_pmm_policy_jobcontrol.h) duration, MALI transitions
+ * to MALI_POWER_MODE_LIGHT_SLEEP mode during timeout if there are no more jobs queued.
+ * MALI power management module transitions to MALI_POWER_MODE_DEEP_SLEEP mode when OS does system power
+ * off. 
+ * Customer has to add power down code when MALI transitions to MALI_POWER_MODE_LIGHT_SLEEP or MALI_POWER_MODE_DEEP_SLEEP
+ * mode.
+ * MALI_POWER_MODE_ON mode is entered when the MALI is to powered up. Some customers want to control voltage regulators during
+ * the whole system powers on/off. Customer can track in this function whether the MALI is powered up from
+ * MALI_POWER_MODE_LIGHT_SLEEP or MALI_POWER_MODE_DEEP_SLEEP mode and manage the voltage regulators as well.
+ * @param power_mode defines the power modes
+ * @return _MALI_OSK_ERR_OK on success otherwise, a suitable _mali_osk_errcode_t error.
+ */
+_mali_osk_errcode_t mali_platform_power_mode_change(mali_power_mode power_mode);
+
+
+struct mali_gpu_utilization_data;
+
+/**
+ * Initialize core scaling policy.
+ *
+ * @note The core scaling policy will assume that all PP cores are on initially.
+ *
+ * @param num_pp_cores Total number of PP cores.
+ */
+void mali_core_scaling_init(int num_pp_cores);
+
+/**
+ * Terminate core scaling policy.
+ */
+void mali_core_scaling_term(void);
+
+/** @brief Platform specific handling of GPU utilization data
+ *
+ * When GPU utilization data is enabled, this function will be
+ * periodically called.
+ *
+ * @param utilization The workload utilization of the Mali GPU. 0 = no utilization, 256 = full utilization.
+ */
+void mali_gpu_utilization_callback(struct mali_gpu_utilization_data *data);
+
+/* FIX L1810_Enh00000367 BEGIN DATE:2012-10-26 AUTHOR NAME ZHUXIAOPING */
+void mali_gpu_clk_set(u32 gpu_freq);
+/* FIX L1810_Enh00000367 END DATE:2012-10-26 AUTHOR NAME ZHUXIAOPING */
+/* FIX L1810_Enh00000738 BEGIN DATE:2013-1-18 AUTHOR NAME ZHUXIAOPING */
+void mali_gpu_dvfs_set(u32 enable, u32 maxfreq);
+void mali_gpu_dvfs_get(u32 *enable, u32 *maxfreq);
+
+typedef struct mali_gpu_config
+{
+    u32 utilization_timeout;
+    u32 sleep_timeout;
+    u32 upthreshold;
+    u32 downthreshold;
+}mali_gpu_config;
+
+void mali_gpu_configuration_get(mali_gpu_config *gpu_config);
+void mali_gpu_configuration_set(mali_gpu_config gpu_config);
+void mali_gpu_dvfs_debuglevel_set(u32 debug_level);
+void mali_gpu_set_clk_index(u32 clk_index);
+void mali_gpu_get_clk_index(u32 *clk_index);
+/* FIX L1810_Enh00000738 END DATE:2013-1-18 AUTHOR NAME ZHUXIAOPING */
+
+u32 get_clkfreq_index(u32 freq);
+
+void mali_on2_status_set(u32 enable);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

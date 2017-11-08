@@ -1,0 +1,551 @@
+#ifndef __ASM_ARCH_REGS_AP_PWR_H
+#define __ASM_ARCH_REGS_AP_PWR_H
+
+#define AP_PWR_SLPCTL0				(AP_PWR_BASE + (0x000))
+#define AP_PWR_SLPCTL1				(AP_PWR_BASE + (0x004))
+#define AP_PWR_SLPCNT_LIMIT 			(AP_PWR_BASE + (0x008))
+#define AP_PWR_SLPST				(AP_PWR_BASE + (0x00C))
+#define AP_PWR_PLLCR				(AP_PWR_BASE + (0x010))
+#define AP_PWR_SLPFSM_ST			(AP_PWR_BASE + (0x014))
+#define AP_PWR_PLL0CFG_CTL			(AP_PWR_BASE + (0x030))	/* L1810 & L1813 */
+#define AP_PWR_PLL1CFG_CTL			(AP_PWR_BASE + (0x034))	/* L1810 & L1813 */
+#define AP_PWR_PLL0CFG_CTL0			(AP_PWR_BASE + (0x030))	/* L1813S */
+#define AP_PWR_PLL0CFG_CTL1			(AP_PWR_BASE + (0x034))	/* L1813S */
+#define AP_PWR_PLL1CFG_CTL0			(AP_PWR_BASE + (0x038))	/* L1813S */
+#define AP_PWR_PLL1CFG_CTL1			(AP_PWR_BASE + (0x03C))	/* L1813S */
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_PLL2CFG_CTL			(AP_PWR_BASE + (0x038))
+#define AP_PWR_PLL2_CTL 			(AP_PWR_BASE + (0x03C))
+#else
+#define AP_PWR_A7_SYNC_CTL			(AP_PWR_BASE + (0x040))
+#endif
+#define AP_PWR_A9_CLK_CTL			(AP_PWR_BASE + (0x044))
+#define AP_PWR_A7_CLK_CTL			(AP_PWR_BASE + (0x044))
+#define AP_PWR_ADB_CLK_CTL			(AP_PWR_BASE + (0x048))
+#define AP_PWR_A7AXI_MAINCLK_CTL		(AP_PWR_BASE + (0x04C))
+#define AP_PWR_SYSCLK_CTL			(AP_PWR_BASE + (0x050))
+#define AP_PWR_SYSCLK_EN0			(AP_PWR_BASE + (0x054))
+#define AP_PWR_SYSCLK_EN1			(AP_PWR_BASE + (0x058))
+#define AP_PWR_SYSCLK_EN2			(AP_PWR_BASE + (0x05C))
+#define AP_PWR_CTLPCLK_CTL			(AP_PWR_BASE + (0x064))
+#define AP_PWR_DATAPCLK_CTL 			(AP_PWR_BASE + (0x068))
+#define AP_PWR_SECPCLK_CTL			(AP_PWR_BASE + (0x06C))
+#define AP_PWR_GPU_CLK_CTL			(AP_PWR_BASE + (0x074))
+#define AP_PWR_ON2CLK_CTL			(AP_PWR_BASE + (0x078))
+#define AP_PWR_ON2_CLK_EN			(AP_PWR_BASE + (0x07C))
+#define AP_PWR_DDRAXICLK_CTL			(AP_PWR_BASE + (0x080))
+#define AP_PWR_NFCCLK_CTL			(AP_PWR_BASE + (0x088))
+#define AP_PWR_NFCCLK_EN			(AP_PWR_BASE + (0x08C))
+#define AP_PWR_USBCLKDIV_CTL			(AP_PWR_BASE + (0x090))
+#define AP_PWR_USBCLK_EN			(AP_PWR_BASE + (0x094))
+#define AP_PWR_LCDCAXICLK_CTL			(AP_PWR_BASE + (0x09C))
+#define AP_PWR_LCDC0CLK_CTL 			(AP_PWR_BASE + (0x0A0))
+
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_HDMIPIXCLK_CTL			(AP_PWR_BASE + (0x0A4))
+#endif
+
+#define AP_PWR_DISPCLK_EN			(AP_PWR_BASE + (0x0A8))
+#define AP_PWR_ISPCLK_CTL0			(AP_PWR_BASE + (0x0AC))
+#define AP_PWR_ISPCLK_CTL1			(AP_PWR_BASE + (0x0B0))
+#define AP_PWR_CTLPCLK_EN			(AP_PWR_BASE + (0x0B4))
+#define AP_PWR_DATAPCLK_EN			(AP_PWR_BASE + (0x0B8))
+#define AP_PWR_SECPCLK_EN			(AP_PWR_BASE + (0x0BC))
+#define AP_PWR_CTLAPBMCLK_EN			(AP_PWR_BASE + (0x0C4))
+#define AP_PWR_TIMER0CLKCTL 			(AP_PWR_BASE + (0x0C8))
+#define AP_PWR_TIMER1CLKCTL 			(AP_PWR_BASE + (0x0CC))
+#define AP_PWR_TIMER2CLKCTL 			(AP_PWR_BASE + (0x0D0))
+#define AP_PWR_TIMER3CLKCTL 			(AP_PWR_BASE + (0x0D4))
+#define AP_PWR_PWMCLKDIV_CTL			(AP_PWR_BASE + (0x0D8))
+#define AP_PWR_I2SCLKGR_CTL 			(AP_PWR_BASE + (0x0DC))
+#define AP_PWR_I2S0CLK_CTL			(AP_PWR_BASE + (0x0E0))
+#define AP_PWR_I2S1CLK_CTL			(AP_PWR_BASE + (0x0E4))
+#define AP_PWR_SSICLKGR_CTL 			(AP_PWR_BASE + (0x0E8))
+#define AP_PWR_SSICLKDIV_CTL			(AP_PWR_BASE + (0x0EC))
+#define AP_PWR_UARTCLKGR_CTL			(AP_PWR_BASE + (0x0F0))
+#define AP_PWR_UART0CLK_CTL 			(AP_PWR_BASE + (0x0F4))
+#define AP_PWR_UART1CLK_CTL 			(AP_PWR_BASE + (0x0F8))
+#define AP_PWR_UART2CLK_CTL 			(AP_PWR_BASE + (0x0FC))
+#define AP_PWR_I2CCLK_CTL			(AP_PWR_BASE + (0x100))
+#define AP_PWR_SECAPBMCLK_EN			(AP_PWR_BASE + (0x108))
+#define AP_PWR_SDMMCCLKGR_CTL			(AP_PWR_BASE + (0x10C))
+#define AP_PWR_SDMMC0CLKCTL 			(AP_PWR_BASE + (0x110))
+#define AP_PWR_SDMMC1CLKCTL 			(AP_PWR_BASE + (0x114))
+#define AP_PWR_SDMMC2CLKCTL 			(AP_PWR_BASE + (0x118))
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_SDMMC3CLKCTL 			(AP_PWR_BASE + (0x11C))
+#endif
+#if defined(CONFIG_CPU_LC1813)
+#define AP_PWR_2DACCMCLK_CTL			(AP_PWR_BASE + (0x120))	/* L1813S */
+#endif
+#define AP_PWR_ATBCLK_CTL			(AP_PWR_BASE + (0x128))
+#define AP_PWR_A9DBGPCLK_CTL			(AP_PWR_BASE + (0x12C))
+#define AP_PWR_A7DBGPCLK_CTL			(AP_PWR_BASE + (0x12C))
+#define AP_PWR_CSCFGCLK_CTL 			(AP_PWR_BASE + (0x130))
+#define AP_PWR_CSCTMCLK_CTL 			(AP_PWR_BASE + (0x134))
+#define AP_PWR_CSARM0CTICLK_CTL 		(AP_PWR_BASE + (0x138))
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_CSM0CTICLK_CTL			(AP_PWR_BASE + (0x13C))
+#endif
+#define AP_PWR_CLKOUTSEL			(AP_PWR_BASE + (0x148))
+#define AP_PWR_CLKOUT0CLKCTL			(AP_PWR_BASE + (0x14C))
+#define AP_PWR_CLKOUT1CLKCTL			(AP_PWR_BASE + (0x150))
+#define AP_PWR_CLKOUT2CLKCTL			(AP_PWR_BASE + (0x154))
+#if defined(CONFIG_CPU_LC1813)
+#define AP_PWR_TIMER4CLKCTL 			(AP_PWR_BASE + (0x158))
+#define AP_PWR_TIMER5CLKCTL 			(AP_PWR_BASE + (0x15C))
+#define AP_PWR_TIMER6CLKCTL 			(AP_PWR_BASE + (0x160))
+#endif
+#define AP_PWR_CPCLK_CTL			(AP_PWR_BASE + (0x178))
+#define AP_PWR_SFRST_CTL			(AP_PWR_BASE + (0x180))
+
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_A9_RSTCTL			(AP_PWR_BASE + (0x184))
+#endif
+#define AP_PWR_M0_RSTCTL			(AP_PWR_BASE + (0x188))
+#if defined(CONFIG_CPU_LC1813)
+#define AP_PWR_A7_RSTCTL0			(AP_PWR_BASE + (0x184))
+#endif
+#define AP_PWR_GPU_RSTCTL			(AP_PWR_BASE + (0x18C))
+#define AP_PWR_ON2_RSTCTL			(AP_PWR_BASE + (0x190))
+#define AP_PWR_ISP_RSTCTL			(AP_PWR_BASE + (0x194))
+#define AP_PWR_DISPLAY_RSTCTL			(AP_PWR_BASE + (0x198))
+#define AP_PWR_COM_RSTCTL			(AP_PWR_BASE + (0x19C))
+#define AP_PWR_CP_RSTCTL			(AP_PWR_BASE + (0x1A0))
+#define AP_PWR_MOD_RSTCTL0			(AP_PWR_BASE + (0x1A4))
+#define AP_PWR_MOD_RSTCTL1			(AP_PWR_BASE + (0x1A8))
+#define AP_PWR_MOD_RSTCTL2			(AP_PWR_BASE + (0x1AC))
+#define AP_PWR_MOD_RSTCTL3			(AP_PWR_BASE + (0x1B0))
+#define AP_PWR_MOD_RSTCTL4			(AP_PWR_BASE + (0x1B4))
+#define AP_PWR_CS_RSTCTL			(AP_PWR_BASE + (0x1B8))
+#define AP_PWR_CHIPRSTN_CTL 			(AP_PWR_BASE + (0x1BC))
+
+#if defined(CONFIG_CPU_LC1813)
+#define AP_PWR_A7_RSTCTL1			(AP_PWR_BASE + (0x1c0))
+#define AP_PWR_A7_RSTCTL2			(AP_PWR_BASE + (0x1c4))
+#define AP_PWR_WDTRST_CTL			(AP_PWR_BASE + (0x1c8))
+#define AP_PWR_2DACCRST_CTL			(AP_PWR_BASE + (0x1CC))	/* L1813S */
+#endif
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_A9INTIN_MK0			(AP_PWR_BASE + (0x1E0))
+#define AP_PWR_A9INTIN_MK1			(AP_PWR_BASE + (0x1E4))
+#else
+#define AP_PWR_A7INTIN_MK0			(AP_PWR_BASE + (0x1E0))
+#define AP_PWR_A7INTIN_MK1			(AP_PWR_BASE + (0x1E4))
+#endif
+#define AP_PWR_M0INTIN_MK			(AP_PWR_BASE + (0x1E8))	/* L1810 & L1813S */
+#define AP_PWR_INT_RAW				(AP_PWR_BASE + (0x1F0))
+
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_INTST_A9 			(AP_PWR_BASE + (0x1F4))
+#define AP_PWR_INTEN_A9 			(AP_PWR_BASE + (0x1F8))
+#define AP_PWR_INTST_ARM			AP_PWR_INTST_A9
+#define AP_PWR_INTEN_ARM			AP_PWR_INTEN_A9
+#else
+#define AP_PWR_INTST_A7 			(AP_PWR_BASE + (0x1F4))
+#define AP_PWR_INTEN_A7 			(AP_PWR_BASE + (0x1F8))
+#define AP_PWR_INTST_ARM			AP_PWR_INTST_A7
+#define AP_PWR_INTEN_ARM			AP_PWR_INTEN_A7
+#endif
+#define AP_PWR_INTST_M0 			(AP_PWR_BASE + (0x200))	/* L1810 & L1813S */
+#define AP_PWR_INTEN_M0 			(AP_PWR_BASE + (0x204))	/* L1810 & L1813S */
+
+#define AP_PWR_INT_CTL				(AP_PWR_BASE + (0x20C))
+
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_A9_PD_CTL			(AP_PWR_BASE + (0x220))
+#define AP_PWR_A9_PD_CNT1			(AP_PWR_BASE + (0x224))
+#define AP_PWR_A9_PD_CNT2			(AP_PWR_BASE + (0x228))
+#define AP_PWR_A9_PD_CNT3			(AP_PWR_BASE + (0x22C))
+#else
+#define AP_PWR_A7_PD_CTL			(AP_PWR_BASE + (0x220))
+#define AP_PWR_A7_PD_CNT1			(AP_PWR_BASE + (0x224))
+#define AP_PWR_A7_PD_CNT2			(AP_PWR_BASE + (0x228))
+#define AP_PWR_A7_PD_CNT3			(AP_PWR_BASE + (0x22C))
+#endif
+
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_NEON0_PD_CTL 			(AP_PWR_BASE + (0x230))
+#define AP_PWR_NEON0_PD_CNT1			(AP_PWR_BASE + (0x234))
+#define AP_PWR_NEON0_PD_CNT2			(AP_PWR_BASE + (0x238))
+#define AP_PWR_NEON0_PD_CNT3			(AP_PWR_BASE + (0x23C))
+#define AP_PWR_NEON1_PD_CTL 			(AP_PWR_BASE + (0x240))
+#define AP_PWR_NEON1_PD_CNT1			(AP_PWR_BASE + (0x244))
+#define AP_PWR_NEON1_PD_CNT2			(AP_PWR_BASE + (0x248))
+#define AP_PWR_NEON1_PD_CNT3			(AP_PWR_BASE + (0x24C))
+#define AP_PWR_PTM_PD_CTL			(AP_PWR_BASE + (0x250))
+#define AP_PWR_PTM_PD_CNT1			(AP_PWR_BASE + (0x254))
+#define AP_PWR_PTM_PD_CNT2			(AP_PWR_BASE + (0x258))
+#define AP_PWR_PTM_PD_CNT3			(AP_PWR_BASE + (0x25C))
+#else
+#define AP_PWR_PDFSM_ST      			(AP_PWR_BASE + (0x230))
+#define AP_PWR_A7C1_PD_CTL      		(AP_PWR_BASE + (0x234))
+#define AP_PWR_A7C2_PD_CTL      		(AP_PWR_BASE + (0x238))
+#define AP_PWR_A7C3_PD_CTL      		(AP_PWR_BASE + (0x23C))
+#define AP_PWR_A7C_PD_CNT1      		(AP_PWR_BASE + (0x240))
+#define AP_PWR_A7C_PD_CNT2      		(AP_PWR_BASE + (0x244))
+#define AP_PWR_A7C_PD_CNT3      		(AP_PWR_BASE + (0x248))
+#define AP_PWR_A7_BOOT_FLAG      		(AP_PWR_BASE + (0x24C))
+#define AP_PWR_A7DBG_PD_CTL      		(AP_PWR_BASE + (0x250))
+#define AP_PWR_A7DBG_PD_CNT1      		(AP_PWR_BASE + (0x254))
+#define AP_PWR_A7DBG_PD_CNT2      		(AP_PWR_BASE + (0x258))
+#define AP_PWR_A7DBG_PD_CNT3      		(AP_PWR_BASE + (0x25C))
+#endif
+
+#define AP_PWR_ON2_PD_CTL			(AP_PWR_BASE + (0x260))
+#define AP_PWR_ON2_PD_CNT1			(AP_PWR_BASE + (0x264))
+#define AP_PWR_ON2_PD_CNT2			(AP_PWR_BASE + (0x268))
+#define AP_PWR_ON2_PD_CNT3			(AP_PWR_BASE + (0x26C))
+#define AP_PWR_ISP_PD_CTL			(AP_PWR_BASE + (0x270))
+#define AP_PWR_ISP_PD_CNT1			(AP_PWR_BASE + (0x274))
+#define AP_PWR_ISP_PD_CNT2			(AP_PWR_BASE + (0x278))
+#define AP_PWR_ISP_PD_CNT3			(AP_PWR_BASE + (0x27C))
+#define AP_PWR_HDMI_PD_CTL			(AP_PWR_BASE + (0x280))
+#define AP_PWR_HDMI_PD_CNT1 			(AP_PWR_BASE + (0x284))
+#define AP_PWR_HDMI_PD_CNT2 			(AP_PWR_BASE + (0x288))
+#define AP_PWR_HDMI_PD_CNT3 			(AP_PWR_BASE + (0x28C))
+#define AP_PWR_RAMP_PDCTL			(AP_PWR_BASE + (0x290))
+
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_A9DV_CTL 			(AP_PWR_BASE + (0x2A0))
+#define AP_PWR_A9PWRCTI_CTL 			(AP_PWR_BASE + (0x2A4))
+#else
+#define AP_PWR_A7DV_CTL 			(AP_PWR_BASE + (0x2A0))
+#endif
+
+#define AP_PWR_PWEN_CTL 			(AP_PWR_BASE + (0x2A8))
+#define AP_PWR_A7PD_TMCTL			(AP_PWR_BASE + (0x2B0))
+#define AP_PWR_2DACC_PD_CTL			(AP_PWR_BASE + (0x2C0))	/* L1813S */
+#define AP_PWR_2DACC_PD_CNT1			(AP_PWR_BASE + (0x2C4))	/* L1813S */
+#define AP_PWR_2DACC_PD_CNT2			(AP_PWR_BASE + (0x2C8)) /* L1813S */
+#define AP_PWR_2DACC_PD_CNT3			(AP_PWR_BASE + (0x2CC)) /* L1813S */
+#define AP_PWR_RESERVED_REG 			(AP_PWR_BASE + (0x2D0))
+#define AP_PWR_BOOTCTL				(AP_PWR_BASE + (0x2E0))
+#define AP_PWR_LP_CTL				(AP_PWR_BASE + (0x2E4))
+#define AP_PWR_APB_DF_CTL			(AP_PWR_BASE + (0x2EC))
+#define AP_PWR_DDRAXI_DF_CTL			(AP_PWR_BASE + (0x2F0))
+
+#if defined(CONFIG_CPU_LC1810)
+#define AP_PWR_A9TSP_CTL			(AP_PWR_BASE + (0x2F4))
+#else
+#define AP_PWR_A7TSP_CTL			(AP_PWR_BASE + (0x2F4))
+#define AP_PWR_A7_GTM_CTL			(AP_PWR_BASE + (0x2F8))
+#endif
+
+#define AP_PWR_TM_CTL				(AP_PWR_BASE + (0x300))
+#define AP_PWR_TM_INIT_VAL			(AP_PWR_BASE + (0x304))
+#define AP_PWR_TM_CUR_VAL			(AP_PWR_BASE + (0x308))
+
+#if defined(CONFIG_CPU_LC1813)
+#define AP_PWR_BUS_LP_CTL0			(AP_PWR_BASE + (0x310))
+#define AP_PWR_BUS_LP_CTL1			(AP_PWR_BASE + (0x314))
+#define AP_PWR_BUS_LP_CTL2			(AP_PWR_BASE + (0x318))
+#define AP_PWR_BUS_LP_CTL3			(AP_PWR_BASE + (0x31C))
+#define AP_PWR_BUS_LP_CTL4			(AP_PWR_BASE + (0x320))
+#define AP_PWR_DEVICE_ST			(AP_PWR_BASE + (0x324))
+#define AP_PWR_BUS_LP_CTL5			(AP_PWR_BASE + (0x328))	/* L1813S */
+#endif
+
+#if defined(CONFIG_CPU_LC1810)
+/* AP_PWR_SLPCTL0. */
+#define	AP_PWR_L2C_SLP_MK_WE			25
+#define	AP_PWR_CS_SLP_MK_WE			24
+#define	AP_PWR_DDR_AXI_SLP_MK_WE		23
+#define	AP_PWR_PWR_SLP_MK_WE			22
+#define	AP_PWR_DMA_SLP_MK_WE			21
+#define	AP_PWR_A9C1_SLP_MK_WE			20
+#define	AP_PWR_M0_SLP_EN_WE			18
+#define	AP_PWR_A9C1_SLP_EN_WE			17
+#define	AP_PWR_A9C0_SLP_EN_WE			16
+#define	AP_PWR_L2C_SLP_MK			9
+#define	AP_PWR_CS_SLP_MK			8
+#define	AP_PWR_TOP_DDRAXI_SLP_MK		7
+#define	AP_PWR_PWR_SLP_MK			6
+#define	AP_PWR_DMA_SLP_MK			5
+#define	AP_PWR_A9C1_SLP_MK			4
+#define	AP_PWR_M0_SLP_EN			2
+#define	AP_PWR_A9C1_SLP_EN			1
+#define	AP_PWR_A9C0_SLP_EN			0
+
+#elif defined(CONFIG_CPU_LC1813)
+/* AP_PWR_SLPCTL0. cortex a7*/
+#define	AP_PWR_ADB_SLP_MK_WE			28
+#define	AP_PWR_A7C3_SLP_MK_WE			27
+#define	AP_PWR_A7C2_SLP_MK_WE			26
+#define	AP_PWR_L2C_SLP_MK_WE			25
+#define	AP_PWR_CS_SLP_MK_WE			    24
+#define	AP_PWR_DDR_AXI_SLP_MK_WE		23
+#define	AP_PWR_PWR_SLP_MK_WE			22
+#define	AP_PWR_DMA_SLP_MK_WE			21
+#define	AP_PWR_A7C1_SLP_MK_WE			20
+#define	AP_PWR_A7C0_SLP_EN_WE			16
+#define	AP_PWR_ADB_SLP_MK			12
+#define	AP_PWR_A7C3_SLP_MK			11
+#define	AP_PWR_A7C2_SLP_MK			10
+#define	AP_PWR_L2C_SLP_MK			9
+#define	AP_PWR_CS_SLP_MK			8
+#define	AP_PWR_TOP_DDRAXI_SLP_MK	7
+#define	AP_PWR_PWR_SLP_MK			6
+#define	AP_PWR_DMA_SLP_MK			5
+#define	AP_PWR_A7C1_SLP_MK			4
+#define	AP_PWR_A7C0_SLP_EN			0
+#endif
+
+/* AP_PWR_SLPCTL1. */
+#define AP_PWR_OSCEN_CTL			1
+#define AP_PWR_TIMER_SYSCLK_SEL			0
+
+/* AP_PWR_SLPCNT_LIMIT. */
+#define AP_PWR_SYS_INTR_MK_NUM      12
+#define AP_PWR_SLPCNT_CONFIG_NUM    0
+
+/* AP_PWR_PLLCR. */
+#define AP_PWR_PLL_ST_TIME			8
+#define AP_PWR_OSC_ST_TIME			0
+
+/* AP_PWR_SLPFSM_ST. */
+#define AP_PWR_CP_SLPFSM_ST			8
+#define AP_PWR_AP_SLPFSM_ST			0
+
+/* AP_PWR_A9_RSTCTL. */
+#define AP_PWR_A9_DBG_APB_RST			13
+#define AP_PWR_A9_ATB_RST			12
+#define AP_PWR_A9_PTM_RST			11
+#define AP_PWR_A9_L2C_RST			10
+#define AP_PWR_A9_WD1_RST			9
+#define AP_PWR_A9_WD0_RST			8
+#define AP_PWR_SCU_RST				7
+#define AP_PWR_A9_PERI_RST			6
+#define AP_PWR_A9_DBG1_RST			5
+#define AP_PWR_A9_DBG0_RST			4
+#define AP_PWR_NEON1_RST			3
+#define AP_PWR_NEON0_RST			2
+#define AP_PWR_A9C1_RST				1
+#define AP_PWR_A9C0_RST				0
+
+/* AP_PWR_M0_RSTCTL. */
+#define AP_PWR_M0_HRST				1
+#define AP_PWR_M0_DBG_RST			0	
+
+/* AP_PWR_ON2_RSTCTL. */
+#define AP_PWR_ON2_DBUS_RST			4	
+#define AP_PWR_ON2_EBUS_RST			3	
+#define AP_PWR_ON2_D_RST			2	
+#define AP_PWR_ON2_E1_RST			1	
+#define AP_PWR_ON2_E0_RST			0	
+
+/* AP_PWR_ISP_RSTCTL. */
+#define AP_PWR_ISP_P_RST			1
+#define AP_PWR_ISP_AHB_RST			0
+
+/* AP_PWR_DISPLAY_RSTCTL. */
+#define AP_PWR_HDMI_RST				1	
+#define AP_PWR_DISPLAY_RST			0
+
+/* AP_PWR_CP_RSTCTL. */
+#define AP_PWR_CP_ARM_RESET_REQ			1		
+#define AP_PWR_CP_RST				0	
+
+/* AP_PWR_MOD_RSTCTL0. */
+#define AP_PWR_AP_DMAG_RST			9
+#define AP_PWR_AP_DMA_BUS_RST			8
+#define AP_PWR_AXI_AHB_RST			7
+#define AP_PWR_AP_DMAC_RST			6
+#define AP_PWR_AP_DMAS_RST			5
+#define AP_PWR_AU_DMAS_RST			4
+#define AP_PWR_DDR_AXI_RST			3
+#define AP_PWR_DMA_AXI_RST			2
+#define AP_PWR_ACP_AXI_RST			1
+#define AP_PWR_PERI_AXI_RST			0
+
+/* AP_PWR_MOD_RSTCTL1. */
+#define AP_PWR_BOOTROM_RST			13
+#define AP_PWR_CIPHER_RST			12
+#define AP_PWR_AP_SEC_RAM_RST			11
+#define AP_PWR_USBHSIC_P_RST			10
+#define AP_PWR_USBHSIC_RST			9
+#define AP_PWR_USBHOST_P_RST			8
+#define AP_PWR_USBHOST_RST			7
+#define AP_PWR_USBOTG_P_RST			6
+#define AP_PWR_USBOTG_RST			5
+#define AP_PWR_NFC_HPI_ARB_RST			4
+#define AP_PWR_HPI_RST				3
+#define AP_PWR_NFC_RST				2
+#define AP_PWR_CTL_RST				1
+#define AP_PWR_M0_RAM_RST			0
+
+/* AP_PWR_MOD_RSTCTL2. */
+#define AP_PWR_PWM_RST				9
+#define AP_PWR_I2C3_RST				8
+#define AP_PWR_I2C1_RST				7
+#define AP_PWR_I2C0_RST				6
+#define AP_PWR_TIMER3_RST			5
+#define AP_PWR_TIMER2_RST			4
+#define AP_PWR_TIMER1_RST			3
+#define AP_PWR_TIMER0_RST			2
+#define AP_PWR_WDT_RST				1
+#define AP_PWR_TB_RST				0
+
+/* AP_PWR_MOD_RSTCTL3. */
+#define AP_PWR_UART2_RST			8
+#define AP_PWR_UART1_RST			7
+#define AP_PWR_UART0_RST			6
+#define AP_PWR_SSI3_RST				5
+#define AP_PWR_SSI1_RST				4
+#define AP_PWR_SSI0_RST				3
+#define AP_PWR_I2S1_RST				2
+#define AP_PWR_I2S0_RST				1
+#define AP_PWR_DATA_PBR_RST			0
+
+/* AP_PWR_MOD_RSTCTL4. */
+#define AP_PWR_SDIO3_RST			9
+#define AP_PWR_SDIO2_RST			8
+#define AP_PWR_SDIO1_RST			7
+#define AP_PWR_SDIO0_RST			6
+#define AP_PWR_TPZCTL_RST			5
+#define AP_PWR_BP147_RST			4
+#define AP_PWR_SSI2_RST				3
+#define AP_PWR_KBS_RST				2
+#define AP_PWR_I2C2_RST				1
+#define AP_PWR_SEC_PBR_RST			0
+
+/* AP_PWR_CS_RSTCTL. */
+#define AP_PWR_CS_M0CTI_RST			6
+#define AP_PWR_CS_ARM0CTI_RST			5
+#define AP_PWR_CS_CTM_RST			4
+#define AP_PWR_CS_AHB_RST			3
+#define AP_PWR_CS_DBG_PS_RST			2
+#define AP_PWR_CS_DBG_PM_RST			1
+#define AP_PWR_CS_ATB_RST			0
+
+/* AP_PWR_CHIPRSTN_CTL. */
+#define AP_PWR_CHIP_RSTN_MK			12
+#define AP_PWR_CHIP_RSTN_CNT			0
+
+/* AP_PWR_A9 & AP_PWR_INT_RAW. */
+#define AP_PWR_M0WDT_INTR			20
+#define AP_PWR_CSPWRREQ_INTR			18
+#define AP_PWR_PLL2_STB_INTR			17
+#define AP_PWR_AP_PWR_TM_INTR			16
+#define AP_PWR_HDMI_PD_INTR			14
+#define AP_PWR_ISP_PD_INTR			13
+#define AP_PWR_ON2_PD_INTR			12
+#define AP_PWR_A9_PD_INTR			11
+#define AP_PWR_PTM_PD_INTR			10
+#define AP_PWR_NONE1_PD_INTR			9
+#define AP_PWR_NONE0_PD_INTR			8
+#define AP_PWR_HDMI_PU_INTR			6
+#define AP_PWR_ISP_PU_INTR			5
+#define AP_PWR_ON2_PU_INTR			4
+#define AP_PWR_A9_PU_INTR			3
+#define AP_PWR_PTM_PU_INTR			2
+#define AP_PWR_NONE1_PU_INTR			1
+#define AP_PWR_NONE0_PU_INTR			0
+
+#if defined(CONFIG_CPU_LC1813)
+#define AP_PWR_A7_PD_INTR			11
+#define AP_PWR_A7_PU_INTR			3
+#endif
+
+/* AP_PWR_INTST_M0. */
+#define AP_PWR_M0_CSPWRREQ_INTR			18
+#define AP_PWR_M0_PLL2_ST_INTR			17
+#define AP_PWR_M0_AP_PWR_TM_INTR		16
+#define AP_PWR_M0_HDMI_PD_INTR			14
+#define AP_PWR_M0_ISP_PD_INTR			13
+#define AP_PWR_M0_ON2_PD_INTR			12
+#define AP_PWR_M0_A9_PD_INTR			11
+#define AP_PWR_M0_PTM_PD_INTR			10
+#define AP_PWR_M0_NONE1_PD_INTR			9
+#define AP_PWR_M0_NONE0_PD_INTR			8
+#define AP_PWR_M0_HDMI_PU_INTR			6
+#define AP_PWR_M0_ISP_PU_INTR			5
+#define AP_PWR_M0_ON2_PU_INTR			4
+#define AP_PWR_M0_A9_PU_INTR			3
+#define AP_PWR_M0_PTM_PU_INTR			2
+#define AP_PWR_M0_NONE1_PU_INTR			1
+#define AP_PWR_M0_NONE0_PU_INTR			0
+
+#if defined(CONFIG_CPU_LC1810)
+/* AP_PWR_A9_PD_CTL. */
+#define AP_PWR_L2C_A9PD_MK_WE			10
+#define AP_PWR_A9_PD_MK_WE			9
+#define AP_PWR_A9_WK_ACK_MK_WE			8
+#define AP_PWR_L2C_A9PD_MK			2
+#define AP_PWR_A9_PD_MK				1
+#define AP_PWR_A9_WK_ACK_MK			0
+
+#else
+/* AP_PWR_A7_PD_CTL. */
+#define AP_PWR_A7_INTR_MK_WE			20		
+#define AP_PWR_A7_PU_CDBGPWRUPREQ_MK_WE		19
+#define AP_PWR_L2C_A7PD_MK_WE			18
+#define AP_PWR_A7_PD_MK_WE			17
+#define AP_PWR_A7_WK_ACK_MK_WE			16
+#define AP_PWR_A7_INTR_MK			4
+#define AP_PWR_A7_PU_CDBGPWRUPREQ_MK		3
+#define AP_PWR_L2C_A7PD_MK			2
+#define AP_PWR_A7_PD_MK				1
+#define AP_PWR_A7_WK_ACK_MK			0
+#endif
+
+/* AP_PWR_XXXX_PD_CTL. */
+#define AP_PWR_PD_MK_WE				11
+#define AP_PWR_WK_ACK_MK_WE			10
+#define AP_PWR_WK_UP_WE				9
+#define AP_PWR_PD_EN_WE				8
+#define AP_PWR_PD_MK				3
+#define AP_PWR_WK_ACK_MK			2
+#define AP_PWR_WK_UP				1
+#define AP_PWR_PD_EN				0
+
+#define AP_PWR_VOL_TW			4
+#define AP_PWR_VOL_SW			0
+
+/* AP_PWR_A9PWRCTI_CTL. */
+#define AP_PWR_AA9C1_PWRCTI_WE			17
+#define AP_PWR_AA9C0_PWRCTI_WE			16
+#define AP_PWR_AA9C1_PWRCTI			4
+#define AP_PWR_AA9C0_PWRCTI			0
+
+/* AP_PWR_BOOTCTL. */
+#define AP_PWR_BOOT_CTL2			2
+#define AP_PWR_BOOT_CTL1			1
+#define AP_PWR_BOOT_CTL0			0
+
+/* AP_PWR_LP_CTL. */
+#define AP_PWR_L2C_MEM_LP_EN			18
+#define AP_PWR_SLP_RAM_LP_MODE			16
+#define AP_PWR_DDR_AXI_LP_EN			10
+#define AP_PWR_ICM_LP_EN			9
+#define AP_PWR_AHB_BUS_LP_EN			8
+#define AP_PWR_UART2_CLK_OFF_PROTECT_EN		4
+#define AP_PWR_UART1_CLK_OFF_PROTECT_EN		3
+#define AP_PWR_UART0_CLK_OFF_PROTECT_EN		2
+#define AP_PWR_DATA_PCLK_LP_EN			1
+#define AP_PWR_CTL_PCLK_LP_EN			0
+
+/* AP_PWR_APB_DF_CTL. */
+#define AP_PWR_DATA_DFSW_NUM_WE			17
+#define AP_PWR_CTL_DFSW_NUM_WE			16
+#define AP_PWR_DATA_DFSW_NUM			8
+#define AP_PWR_CTL_DFSW_NUM			0
+
+/* AP_PWR_A9TSP_CTL. */
+#define AP_PWR_A9TSP_ENABLE_WE			18
+#define AP_PWR_A9TSP_RST_WE			17
+#define AP_PWR_A9TSP_CLK_EN_WE			16
+#define AP_PWR_A9TSP_ENABLE			2
+#define AP_PWR_A9TSP_RST			1
+#define AP_PWR_A9TSP_CLK_EN			0
+
+/* AP_PWR_TM_CTL. */
+#define AP_PWR_TM_EN_WE				10
+#define AP_PWR_TM_LD_MODE_WE			9
+#define AP_PWR_TM_WK_MODE_WE			8
+#define AP_PWR_TM_ST				3
+#define AP_PWR_TM_EN				2
+#define AP_PWR_TM_LD_MODE			1
+#define AP_PWR_TM_WK_MODE			0
+
+#endif /* __ASM_ARCH_REGS_AP_PWR_H */

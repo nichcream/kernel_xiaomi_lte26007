@@ -1,0 +1,14 @@
+#
+# CG2900
+#
+
+config CG2900
+	tristate "Support ST-Ericsson CG2900 main structure"
+	depends on NET && HAS_IOMEM
+	select MFD_CORE
+	help
+	  ST-Ericsson CG2900 Connectivity Combo controller main
+	  structure.
+	  Supports multiple functionalities muxed over a Bluetooth HCI H:4
+	  interface.
+	  CG2900 support Bluetooth, FM radio, and GPS.

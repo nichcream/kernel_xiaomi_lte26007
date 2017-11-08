@@ -1,0 +1,6 @@
+config STE_WIFI_MAC_PATH
+	depends on COMPAT_WIRELESS
+	string "STE WIFI MAC path"
+	default "/amt/WIFI/WIFI_nvram.txt"
+	---help---
+	  Path to the wifi mac file.

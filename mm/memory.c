@@ -1477,6 +1477,7 @@ struct page *follow_page_mask(struct vm_area_struct *vma,
 	spinlock_t *ptl;
 	struct page *page;
 	struct mm_struct *mm = vma->vm_mm;
+	int i = 0;
 
 	*page_mask = 0;
 
@@ -1569,10 +1570,16 @@ split_fallthrough:
 		    !is_zero_pfn(pte_pfn(pte)))
 			goto bad_page;
 		page = pte_page(pte);
+		i = 1;
 	}
 
-	if (flags & FOLL_GET)
-		get_page_foll(page);
+	if (flags & FOLL_GET) {
+		if (unlikely(get_page_foll(page))) {
+			printk("PAGE info pte page is %d, _mapcount is %d, _count is %d\n",
+				i, atomic_read(&(page)->_mapcount), atomic_read(&page->_count));
+			goto bad_page;
+		}
+	}
 	if (flags & FOLL_TOUCH) {
 		if ((flags & FOLL_WRITE) &&
 		    !pte_dirty(pte) && !PageDirty(page))

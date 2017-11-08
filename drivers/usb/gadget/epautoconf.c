@@ -23,6 +23,7 @@
 
 #include "gadget_chips.h"
 
+extern struct usb_ep* comip_ep_config(struct usb_gadget *gadget,struct usb_endpoint_descriptor *desc);
 /*
  * This should work with endpoints from controller drivers sharing the
  * same endpoint naming convention.  By example:
@@ -301,6 +302,12 @@ struct usb_ep *usb_ep_autoconfig_ss(
 		if (ep && ep_matches(gadget, ep, desc, ep_comp))
 			goto found_ep;
 #endif
+	} else if (gadget_is_comip(gadget)) {
+		ep = comip_ep_config(gadget, desc);
+		if (ep) {
+			ep->address = desc->bEndpointAddress;
+			goto found_ep;
+		}
 	}
 
 	/* Second, look at endpoints until an unclaimed one looks usable */

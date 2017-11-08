@@ -2243,6 +2243,9 @@ struct cfg80211_ops {
 				    u16 duration);
 	void	(*crit_proto_stop)(struct wiphy *wiphy,
 				   struct wireless_dev *wdev);
+	int	(*set_hw_scan_disable)(struct wiphy *wiphy,
+				    struct wireless_dev *wdev,
+				    bool state);
 };
 
 /*

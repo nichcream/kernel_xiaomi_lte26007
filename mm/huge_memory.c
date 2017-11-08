@@ -1278,7 +1278,8 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
 	page += (addr & ~HPAGE_PMD_MASK) >> PAGE_SHIFT;
 	VM_BUG_ON(!PageCompound(page));
 	if (flags & FOLL_GET)
-		get_page_foll(page);
+		if (unlikely(get_page_foll(page)))
+			BUG();
 
 out:
 	return page;

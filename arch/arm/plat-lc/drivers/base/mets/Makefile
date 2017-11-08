@@ -1,0 +1,1 @@
+obj-$(CONFIG_METS_COMIP) += comip-mets.o

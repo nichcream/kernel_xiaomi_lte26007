@@ -1,0 +1,333 @@
+if VIDEO_COMIP
+menu "Camera sensors"
+        config VIDEO_OV3650
+                tristate "OmniVision OV3650 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV3650 3.0 Mpixel camera.
+
+        config VIDEO_S5K4E1
+                tristate "Samsung S5K4E1 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the Samsung
+                S5K4E1 5.0 Mpixel camera.
+
+        config VIDEO_S5K3H2
+                tristate "Samsung S5K3H2 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the Samsung
+                S5K3H2 8.0 Mpixel camera.
+
+        config VIDEO_OV2680
+                tristate "OmniVision OV2680 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV2680 2 Mpixel camera.
+
+        config VIDEO_OV9760
+                tristate "OmniVision OV9760 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV9760 1.5 Mpixel camera.
+				
+        config VIDEO_OV9724
+                tristate "OmniVision OV9724 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV9724 1.0 Mpixel camera.
+				
+        config VIDEO_OV5647
+                tristate "OmniVision OV5647 sensor support"
+                depends on I2C && VIDEO_V4L2
+                 ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV5647 5.0 Mpixel camera.
+
+        config VIDEO_OV5648_2LANE_19M
+                tristate "OmniVision OV5648 sensor(2 lane,19M mclk) support"
+                depends on I2C && VIDEO_V4L2
+                 ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV5648 5.0 Mpixel camera.
+
+	config VIDEO_OV4689
+                tristate "OmniVision OV4689 sensor support"
+                depends on I2C && VIDEO_V4L2
+                 ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV4689 5.0 Mpixel camera.
+
+         config VIDEO_OV5648_2LANE_26M
+                tristate "OmniVision OV5648 sensor(2 lane,26M mclk) support"
+                depends on I2C && VIDEO_V4L2
+                 ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV5648 5.0 Mpixel camera.
+
+	config VIDEO_OV8865
+                tristate "OmniVision OV8865 sensor support"
+                depends on I2C && VIDEO_V4L2
+                 ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV8865 8.0 Mpixel camera.
+
+	config VIDEO_OV5648_PIP
+		tristate "OmniVision OV5648_pip sensor support"
+		depends on I2C && VIDEO_V4L2
+		 ---help---
+		This is a Video4Linux2 sensor-level driver for the OmniVision
+		OV5648pip 5.0 Mpixel camera.
+
+       config VIDEO_OV5693
+                tristate "OmniVision OVOV5693 sensor support"
+                depends on I2C && VIDEO_V4L2
+                 ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OVOV5693 5.0 Mpixel camera.
+
+        config VIDEO_OV8825
+                tristate "OmniVision OV8825 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV8825 8.0 Mpixel camera.
+
+        config VIDEO_OV8850
+                tristate "OmniVision OV8850 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV8850 8.0 Mpixel camera.
+		
+        config VIDEO_OV12830
+                tristate "OmniVision OV12830 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the OmniVision
+                OV12830 12.8 Mpixel camera.
+
+        config VIDEO_OV13850
+               tristate "OmniVision OV13850 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the OmniVision
+               OV13850 13.2 Mpixel camera.
+
+        config VIDEO_HM5065
+                tristate "Himax HM5065 sensor with dvp interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the Himax
+                HM5065 5.0 Mpixel camera.
+
+	config VIDEO_HM5040
+               tristate "Himax HM5040 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the
+               Himax HM5040 13.2 Mpixel camera.
+
+	config VIDEO_HM2056
+               tristate "Himax HM2056 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the
+               Himax HM2056 2 Mpixel camera.
+
+       config VIDEO_HM2058
+                tristate "Himax HM2058 sensor with dvp interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the Himax
+                HM2058 2.0 Mpixel camera.
+
+        config VIDEO_GC2035
+                tristate "GalaxyCore GC2035 sensor with dvp interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2035 2.0 Mpixel camera.
+
+	config VIDEO_GC2145_2LANE_26M
+                tristate "GalaxyCore GC2145 sensor(2 lane,26M mclk) with mipi interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2145 2.0 Mpixel camera.
+
+	config VIDEO_GC2145_1LANE_19M
+                tristate "GalaxyCore GC2145 sensor(1 lane,19M mclk) with mipi interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2145 2.0 Mpixel camera.
+
+        config VIDEO_GC2035_MIPI
+                tristate "GalaxyCore GC2035 sensor with mipi interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2035 2.0 Mpixel camera.
+
+        config VIDEO_GC2235
+                tristate "GalaxyCore GC2235 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2235 2.0 Mpixel camera.
+
+	config VIDEO_GC2355
+                tristate "GalaxyCore GC2355 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2355 2.0 Mpixel camera.
+
+        config VIDEO_GC5004
+                tristate "GalaxyCore GC5004 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC5004 5.0 Mpixel camera.
+                
+        config VIDEO_GC0310
+                tristate "GalaxyCore GC0310 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC0310 VGA camera.
+
+        config VIDEO_GC0328
+                tristate "GalaxyCore GC0328 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC0328 VGA camera.
+
+        config VIDEO_GC0329
+                tristate "GalaxyCore GC0329 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC0329 VGA camera.
+
+        config VIDEO_BF3A50
+                tristate "BYD BF3A50 sensor with dvp interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the BYD
+                BF3A50 5.0 Mpixel camera.
+  
+        config VIDEO_BF3A20_MIPI
+                tristate "BYD BF3A20 sensor with mipi interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the BYD
+                BF3A20 2.0 Mpixel camera.
+
+	config VIDEO_BF3905
+		tristate "BYD BF3905 sensor with mipi interface support"
+		depends on I2C && VIDEO_V4L2
+		---help---
+		This is a Video4Linux2 sensor-level driver for the BYD
+		BF3905 0.3 Mpixel camera.
+
+       config VIDEO_BF3920
+                tristate "BYD BF3920 sensor with dvp interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the BYD
+                BF3920 2.0 Mpixel camera.
+
+       config VIDEO_BF3A03
+                tristate "BYD BF3A03 sensor with dvp interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the BYD
+                BF3A03 VGA camera.
+
+        config VIDEO_BF3703
+                tristate "BYD BF3703 sensor with dvp interface support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the BYD
+                BF3703 VGA camera.
+
+        config VIDEO_HI704
+                tristate "Hynix HI704 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the Hynix
+                HI704 VGA camera.
+
+        config VIDEO_SP5408
+               tristate "Superpix SP5408 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the Superpix
+               SP5408 5.0 Mpixel camera.
+
+        config VIDEO_SP5409
+               tristate "Superpix SP5409 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the Superpix
+               SP5409 5.0 Mpixel camera.
+
+        config VIDEO_SP2508
+               tristate "Superpix SP2508 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the Superpix
+               SP2508 2.0 Mpixel camera.
+               
+        config VIDEO_SP2529
+               tristate "Superpix SP2529 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the Superpix
+               SP2529 2.0 Mpixel camera.
+              
+              
+	config VIDEO_SP2529_26M
+               tristate "Superpix SP2529 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the Superpix
+               SP2529 2.0 Mpixel camera.
+              
+	config VIDEO_SP0A20
+               tristate "Superpix SP0A20 sensor support"
+               depends on I2C && VIDEO_V4L2
+               ---help---
+               This is a Video4Linux2 sensor-level driver for the Superpix
+               SP0A20 2.0 Mpixel camera.
+
+	config VIDEO_GC2155_FRONT
+                tristate "GalaxyCore GC2155 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2155 2.0 Mpixel camera.
+
+	config VIDEO_GC2155_BACK
+                tristate "GalaxyCore GC2155 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2155 2.0 Mpixel camera.
+	
+	config VIDEO_GC2755
+                tristate "GalaxyCore GC2755 sensor support"
+                depends on I2C && VIDEO_V4L2
+                ---help---
+                This is a Video4Linux2 sensor-level driver for the GalaxyCore
+                GC2755 2.0 Mpixel camera.
+endmenu
+endif

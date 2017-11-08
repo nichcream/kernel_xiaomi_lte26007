@@ -1,0 +1,31 @@
+#
+# led drivers configuration
+#
+
+comment "LED drivers"
+
+config LEDS_AW2013
+       tristate "LED driver for AW2013 RGB LED"
+       depends on LEDS_CLASS
+       depends on I2C
+       select LEDS_TRIGGERS
+       help
+       This option enables support for AW2013 RGB LED driver chips
+       accessed via the I2C bus.
+ config COMIP_LEDS_GPIO
+       tristate "LED Support for GPIO connected LEDs"
+       depends on LEDS_CLASS
+       depends on GPIOLIB
+       help
+       This option enables support for the LEDs connected to GPIO
+       outputs. To be useful the particular board must have LEDs
+       and they must be connected to the GPIO lines.  The LEDs must be
+       defined as platform devices and/or OpenFirmware platform devices.
+       The code to use these bindings can be selected below.
+       
+ config COMIP_LEDS_SINK
+       tristate "LED Support for SINK connected LEDs"
+       depends on LEDS_CLASS
+       depends on GPIOLIB
+       help
+       This option enables support for SINK 3COLOR RGB LED driver

@@ -63,7 +63,11 @@
  * let the USB host controller be busy for 5msec or more before an irq
  * is required, under load.  Jumbograms change the equation.
  */
+#ifdef CONFIG_USB_COMIP_HSIC
+#define RX_MAX_QUEUE_MEMORY ((dev)->rx_urb_size)
+#else
 #define RX_MAX_QUEUE_MEMORY (60 * 1518)
+#endif
 #define	RX_QLEN(dev) (((dev)->udev->speed == USB_SPEED_HIGH) ? \
 			(RX_MAX_QUEUE_MEMORY/(dev)->rx_urb_size) : 4)
 #define	TX_QLEN(dev) (((dev)->udev->speed == USB_SPEED_HIGH) ? \

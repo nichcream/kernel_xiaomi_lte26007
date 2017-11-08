@@ -1322,14 +1322,32 @@ skip_routeinfo:
 			rt6_mtu_change(skb->dev, mtu);
 		}
 	}
-
+	if (in6_dev->if_flags & IF_RA_OTHERCONF){
+		printk(KERN_INFO "[lc_net][ipv6]receive RA with o bit!\n");
+		in6_dev->cnf.ra_info_flag = 1;
+	}
+	if(in6_dev->if_flags & IF_RA_MANAGED){
+		printk(KERN_INFO "[lc_net][ipv6]receive RA with m bit!\n");
+		in6_dev->cnf.ra_info_flag = 2;
+	}
+	if(in6_dev->cnf.ra_info_flag == 0){
+		printk(KERN_INFO "[lc_net][ipv6]receive RA neither O nor M bit is set!\n");
+		in6_dev->cnf.ra_info_flag = 4;
+	}
 	if (ndopts.nd_useropts) {
 		struct nd_opt_hdr *p;
 		for (p = ndopts.nd_useropts;
 		     p;
 		     p = ndisc_next_useropt(p, ndopts.nd_useropts_end)) {
 			ndisc_ra_useropt(skb, p);
+			/* only clear ra_info_flag when O bit is set */
+			if (p->nd_opt_type == ND_OPT_RDNSS &&
+				in6_dev->if_flags & IF_RA_OTHERCONF) {
+				printk(KERN_INFO "[lc_net][ipv6]RDNSS, ignore RA with o bit!\n");
+				in6_dev->cnf.ra_info_flag = 0;
+			}
 		}
+
 	}
 
 	if (ndopts.nd_opts_tgt_lladdr || ndopts.nd_opts_rh) {

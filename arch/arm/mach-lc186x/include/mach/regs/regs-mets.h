@@ -1,0 +1,37 @@
+#ifndef __ASM_ARCH_REGS_METS_H
+#define __ASM_ARCH_REGS_METS_H
+
+#define METS_CTRL		(0x00)
+#define TEMP_THRES_CFG		(0x04)
+#define TEMP_MON_EN		(0x08)
+#define TEMP_MON_INTR_EN		(0x0c)
+#define TEMP_MON_INTR		(0x10)
+#define TEMP_MON_INTR_RAW		(0x14)
+#define TEMP_VALUE		(0x18)
+
+/* METS_CTRL. */
+#define METS_CTRL_INIT_CNT_VAL   		24
+#define METS_CTRL_POWER_DN_CNT_VAL   		16
+#define METS_CTRL_POWER_UP_CNT_VAL   		0
+
+/* TEMP_THRES_CFG */
+#define TEMP_THRES_CFG_LOW		16
+#define TEMP_THRES_CFG_HIGH		0
+
+/* TEMP_MON_EN */
+#define TEMP_MON_EN_METS_ENABLE		0
+
+/* TEMP_MON_INTR_EN */
+#define TEMP_MON_INTR_EN_DN		1
+#define TEMP_MON_INTR_EN_UP		0
+
+/* TEMP_MON_INTR */
+#define TEMP_MON_INTR_DN		1
+#define TEMP_MON_INTR_UP		0
+
+/* TEMP_MON_INTR_RAW */
+#define TEMP_MON_INTR_RAW_DN		1
+#define TEMP_MON_INTR_RAW_UP		0
+
+
+#endif /* __ASM_ARCH_REGS_METS_H */

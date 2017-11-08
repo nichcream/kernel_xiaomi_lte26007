@@ -25,17 +25,49 @@
 #include <linux/suspend.h>
 #include <linux/syscore_ops.h>
 #include <linux/ftrace.h>
+#include <linux/rtc.h>
 #include <trace/events/power.h>
+#include <plat/comip-monitor.h>
 
 #include "power.h"
 
 const char *const pm_states[PM_SUSPEND_MAX] = {
+#ifdef CONFIG_EARLYSUSPEND
+	[PM_SUSPEND_ON]		= "on",
+#endif
 	[PM_SUSPEND_FREEZE]	= "freeze",
 	[PM_SUSPEND_STANDBY]	= "standby",
 	[PM_SUSPEND_MEM]	= "mem",
 };
 
 static const struct platform_suspend_ops *suspend_ops;
+
+/*
+ *	suspend monitor timeout
+ *	unit: sec
+*/
+#define SUSPEND_DEVICES_AND_ENTER_DURATION	(60)
+#define SUSPEND_SYS_SYNC_DURATION		(600)
+#define SUSPEND_PREPARE_DURATION		(540)
+static struct hrtimer *suspend_monitor_hrtimer;
+
+#ifdef CONFIG_CPU_LC1860
+extern void lc_sys_sync_queue(void);
+#endif
+
+static int __init suspend_monitor_timer_init(void)
+{
+	suspend_monitor_hrtimer = monitor_timer_register("suspend");
+
+	if (IS_ERR(suspend_monitor_hrtimer)) {
+		pr_err("%s: register monitor timer failed \n", __func__);
+		return -EBUSY;
+	}
+
+	return 0;
+}
+
+late_initcall(suspend_monitor_timer_init);
 
 static bool need_suspend_ops(suspend_state_t state)
 {
@@ -333,12 +365,28 @@ static int enter_state(suspend_state_t state)
 	if (state == PM_SUSPEND_FREEZE)
 		freeze_begin();
 
-	printk(KERN_INFO "PM: Syncing filesystems ... ");
+#ifdef CONFIG_CPU_LC1860
+	if(snd_state) {
+		printk(KERN_DEBUG "PM: Syncing filesystems ... ");
+		monitor_timer_start(suspend_monitor_hrtimer, SUSPEND_SYS_SYNC_DURATION);
+		sys_sync();
+		monitor_timer_stop(suspend_monitor_hrtimer);
+		printk(KERN_DEBUG "done.\n");
+	} else {
+		lc_sys_sync_queue();
+	}
+#else
+	printk(KERN_DEBUG "PM: Syncing filesystems ... ");
+	monitor_timer_start(suspend_monitor_hrtimer, SUSPEND_SYS_SYNC_DURATION);
 	sys_sync();
-	printk("done.\n");
+	monitor_timer_stop(suspend_monitor_hrtimer);
+	printk(KERN_DEBUG "done.\n");
+#endif
 
 	pr_debug("PM: Preparing system for %s sleep\n", pm_states[state]);
+	monitor_timer_start(suspend_monitor_hrtimer, SUSPEND_PREPARE_DURATION);
 	error = suspend_prepare(state);
+	monitor_timer_stop(suspend_monitor_hrtimer);
 	if (error)
 		goto Unlock;
 
@@ -347,7 +395,11 @@ static int enter_state(suspend_state_t state)
 
 	pr_debug("PM: Entering %s sleep\n", pm_states[state]);
 	pm_restrict_gfp_mask();
+	monitor_timer_start(suspend_monitor_hrtimer,
+					SUSPEND_DEVICES_AND_ENTER_DURATION);
 	error = suspend_devices_and_enter(state);
+	monitor_timer_stop(suspend_monitor_hrtimer);
+
 	pm_restore_gfp_mask();
 
  Finish:
@@ -356,6 +408,18 @@ static int enter_state(suspend_state_t state)
  Unlock:
 	mutex_unlock(&pm_mutex);
 	return error;
+}
+
+static void pm_suspend_marker(char *annotation)
+{
+	struct timespec ts;
+	struct rtc_time tm;
+
+	getnstimeofday(&ts);
+	rtc_time_to_tm(ts.tv_sec, &tm);
+	printk(KERN_DEBUG "PM: suspend %s %d-%02d-%02d %02d:%02d:%02d.%09lu UTC\n",
+		annotation, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+		tm.tm_hour, tm.tm_min, tm.tm_sec, ts.tv_nsec);
 }
 
 /**
@@ -372,6 +436,7 @@ int pm_suspend(suspend_state_t state)
 	if (state <= PM_SUSPEND_ON || state >= PM_SUSPEND_MAX)
 		return -EINVAL;
 
+	pm_suspend_marker("entry");
 	error = enter_state(state);
 	if (error) {
 		suspend_stats.fail++;
@@ -379,6 +444,7 @@ int pm_suspend(suspend_state_t state)
 	} else {
 		suspend_stats.success++;
 	}
+	pm_suspend_marker("exit");
 	return error;
 }
 EXPORT_SYMBOL(pm_suspend);

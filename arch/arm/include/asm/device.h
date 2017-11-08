@@ -25,6 +25,10 @@ struct pdev_archdata {
 #ifdef CONFIG_ARCH_OMAP
 	struct omap_device *od;
 #endif
+#if defined(CONFIG_COMIP_IOMMU)
+	unsigned long dev_id; /*1: smmu0, 2:smmu1*/
+	unsigned long s_id;   /*session id*/
+#endif
 };
 
 #ifdef CONFIG_ARM_DMA_USE_IOMMU

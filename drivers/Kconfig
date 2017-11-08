@@ -100,6 +100,8 @@ source "drivers/memstick/Kconfig"
 
 source "drivers/leds/Kconfig"
 
+source "drivers/switch/Kconfig"
+
 source "drivers/accessibility/Kconfig"
 
 source "drivers/infiniband/Kconfig"
@@ -152,7 +154,7 @@ source "drivers/extcon/Kconfig"
 
 source "drivers/memory/Kconfig"
 
-source "drivers/iio/Kconfig"
+#source "drivers/iio/Kconfig"
 
 source "drivers/ntb/Kconfig"
 

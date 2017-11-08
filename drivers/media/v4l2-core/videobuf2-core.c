@@ -1898,11 +1898,13 @@ int vb2_mmap(struct vb2_queue *q, struct vm_area_struct *vma)
 	 * so, we need to do the same here.
 	 */
 	length = PAGE_ALIGN(vb->v4l2_planes[plane].length);
+#if 0
 	if (length < (vma->vm_end - vma->vm_start)) {
 		dprintk(1,
 			"MMAP invalid, as it would overflow buffer length\n");
 		return -EINVAL;
 	}
+#endif
 
 	ret = call_memop(q, mmap, vb->planes[plane].mem_priv, vma);
 	if (ret)

@@ -1,0 +1,108 @@
+config VIDEO_COMIP
+        tristate "Leadcore Camera support"
+        depends on VIDEO_DEV && I2C && VIDEO_V4L2_SUBDEV_API && VIDEO_V4L2
+        select VIDEOBUF2_CORE
+        select VIDEOBUF2_MEMOPS
+        ---help---
+          Driver for an leadcore camera.
+
+config VIDEO_COMIP_DEBUG
+        tristate "Leadcore Camera debug switch"
+        depends on VIDEO_COMIP
+        ---help---
+          Leadcore Camera debug switch.
+
+config VIDEO_COMIP_LOW_POWER
+	tristate "Leadcore Camera low power mode"
+	depends on VIDEO_COMIP
+	---help---
+	  Leadcore Camera low power mode.
+
+config VIDEO_COMIP_TORCH_LED
+	tristate "Leadcore Torch"
+	depends on VIDEO_COMIP
+	---help---
+	Driver for Torch Function.
+
+choice
+	prompt "ISP version"
+	depends on VIDEO_COMIP
+	config VIDEO_COMIP_ISP
+		boolean "Leadcore ISP"
+		---help---
+		Driver for Leadcore ISP (for LC1810 & LC1860).
+
+	config VIDEO_COMIP_ISP2
+		boolean "Leadcore ISP2"
+		---help---
+		Driver for Leadcore ISP2 (for LC1813).
+endchoice
+
+choice
+	prompt "CSI Version"
+	depends on VIDEO_COMIP
+	config VIDEO_COMIP_CSI
+	    tristate "Leadcore MIPI CSI"
+	    depends on VIDEO_COMIP
+	    ---help---
+	    Driver for Leadcore MIPI CSI (for LC1810 & LC1813).
+
+	config VIDEO_COMIP_CSI2
+	    tristate "Leadcore MIPI CSI2"
+	    depends on VIDEO_COMIP
+	    ---help---
+	    Driver for Leadcore MIPI CSI2 (for LC1860).
+endchoice
+
+config VIDEO_DIODE_FLASH
+	tristate "diode Flash LED Driver"
+	depends on VIDEO_V4L2
+	---help---
+	Support for the diode Flash LED Driver.
+	To compile this driver as a module, choose M here: the
+	module will be called diode Flash.
+
+config VIDEO_KTD262
+	tristate "Kinetic KTD262 Flash LED Driver"
+	depends on VIDEO_V4L2
+	---help---
+	Support for the Kinetic KTD262 Flash LED Driver.
+	To compile this driver as a module, choose M here: the
+	module will be called ktd262.
+
+config VIDEO_SGM3141
+	tristate "SGM3141 Flash LED Driver"
+	depends on VIDEO_V4L2
+	---help---
+	Support for the Kinetic KTD262 Flash LED Driver.
+	To compile this driver as a module, choose M here: the
+	module will be called ktd262.
+
+config VIDEO_OCP8111
+	tristate "OCP8111 Flash LED Driver"
+	depends on VIDEO_V4L2
+	---help---
+	Support for the Ocs Ocp8111 Flash LED Driver.
+	To compile this driver as a module, choose M here: the
+	module will be called Ocp8111.
+
+config VIDEO_CHIP_PMU
+	tristate "PMU Flash LED Driver"
+	depends on VIDEO_V4L2
+	---help---
+	Support for the Ocs Pmu Flash LED Driver.
+	To compile this driver as a module, choose M here: the
+	module will be called.
+
+config VIDEO_COMIP_STUB
+        bool "COMIP Camera stub device"
+        depends on !SPARC32 && !SPARC64 && VIDEO_V4L2
+        depends on VIDEO_COMIP
+        select VIDEOBUF2_CORE
+        select VIDEOBUF2_MEMOPS
+        ---help---
+          Enables a stub video device.
+          Say Y here if you want to test video apps or debug V4L devices.
+          In doubt, say N.
+
+source "arch/arm/plat-lc/drivers/camera/sensors/Kconfig"

@@ -52,3 +52,5 @@ obj-$(CONFIG_USB_FSL_MPH_DR_OF)	+= fsl-mph-dr-of.o
 obj-$(CONFIG_USB_OCTEON2_COMMON) += octeon2-common.o
 obj-$(CONFIG_USB_HCD_BCMA)	+= bcma-hcd.o
 obj-$(CONFIG_USB_HCD_SSB)	+= ssb-hcd.o
+obj-$(CONFIG_USB_COMIP_HCD)	+= comip/
+obj-$(CONFIG_USB_COMIP_HSIC)	+= comip_hsic/

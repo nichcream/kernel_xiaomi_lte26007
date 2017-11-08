@@ -1,0 +1,13 @@
+#
+# TI's wl128x FM driver based on TI's ST driver.
+#
+menu "Realtek FM Chip driver"
+config RADIO_RTK8723B
+	tristate "Realtek 8723B FM radio receiver support"
+	depends on I2C
+	help
+	Choose Y here if you have this FM radio chip.
+	
+	To compile this driver as a module, choose M here; the module will be called radio_rtk8723b
+
+endmenu

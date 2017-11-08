@@ -1,0 +1,164 @@
+config COMIP_PMIC
+	bool "Leadcore PMIC Support"
+	help
+	  Say yes here to support for Leacore PMIC.
+
+config COMIP_CALIBRATION
+	bool "Leadcore 32K Clock Calibration Support"
+	depends on PLAT_LC
+	help
+	  Say yes here to support for 32K Clock Calibration.
+
+config BATINFO_FILE
+	string "batinfo file"
+	default "/data/last_batinfo.dat"
+	---help---
+	Path to the batinfo file.
+
+config COMIP_LC1100HT
+	bool "Leadcore LC1100HT PMIC Support"
+	depends on I2C && I2C_COMIP && COMIP_PMIC
+	select COMIP_PMIC_REBOOT
+	help
+	  Say yes here to support for Leadcore LC1100HT. This is
+	  a Power Management IC. This driver provies common support for
+	  accessing the device, additional drivers must be enabled in order
+	  to use the functionality of the device.
+
+config COMIP_LC1100H
+	bool "Leadcore LC1100H PMIC Support"
+	depends on I2C && I2C_COMIP && COMIP_PMIC
+	select COMIP_PMIC_REBOOT
+	help
+	  Say yes here to support for Leadcore LC1100H. This is
+	  a Power Management IC. This driver provies common support for
+	  accessing the device, additional drivers must be enabled in order
+	  to use the functionality of the device.
+
+config COMIP_LC1132
+	bool "Leadcore LC1132 PMIC&CODEC Support"
+	depends on I2C && I2C_COMIP && COMIP_PMIC
+	select COMIP_PMIC_REBOOT
+	help
+	  Say yes here to support for Leadcore LC1132.
+
+config COMIP_LC1160
+	bool "Leadcore LC1160 PMIC&CODEC Support"
+	depends on I2C && I2C_COMIP && COMIP_PMIC
+	select COMIP_PMIC_REBOOT
+	help
+	  Say yes here to support for Leadcore LC1160.
+
+config BUCK_NCP6335
+	bool "On Semiconductor NCP6335 Support"
+	depends on I2C && I2C_COMIP
+	help
+	  Say yes here to support for On Semi NCP6335.
+
+config BUCK_FAN53555
+	bool "Fairchild Semiconductor FAN53555 Support"
+	depends on I2C && I2C_COMIP
+	help
+	  Say yes here to support for On Semi FAN53555.
+
+config LC1100H_ADC
+	tristate "lc1100h adc"
+	depends on COMIP_LC1100H
+	help
+	  Say Y to enable support for lc1100h adc.
+
+config LC1100H_MONITOR_BATTERY
+	tristate "lc1100h monitor battery"
+	depends on COMIP_LC1100H
+	help
+	  Say Y to enable support for lc1100h monitor battery.
+
+config LC1100H_BATTERY
+	tristate "lc1100h battery"
+	depends on I2C && I2C_COMIP
+	help
+	  Say Y to enable support for lc1100h battery.
+
+config LC1132_ADC
+	tristate "lc1132 adc"
+	depends on COMIP_LC1132
+	help
+	  Say Y to enable support for lc1132 adc.
+
+config LC1132_MONITOR_BATTERY
+	tristate "lc1132 monitor battery"
+	depends on COMIP_LC1132
+	help
+	  Say Y to enable support for lc1132 monitor battery.
+
+config LC1160_ADC
+	tristate "lc1160 adc"
+	depends on COMIP_LC1160
+	help
+	  Say Y to enable support for lc1160 adc.
+
+config LC1160_PWM
+	tristate "lc1160 pwm"
+	depends on COMIP_LC1160
+	help
+	  Say Y to enable support for lc1160 pwm.
+
+config LC1160_MONITOR_BATTERY
+	tristate "lc1160 monitor battery"
+	depends on COMIP_LC1160
+	help
+	  Say Y to enable support for lc1160 monitor battery.
+
+config CHARGER_BQ24158
+	tristate "BQ24158 charger"
+	depends on I2C && I2C_COMIP
+	help
+	  Say Y to enable support for BQ24158 battery charger
+
+config CHARGER_BQ2419X
+	tristate "bq2419x charger"
+	depends on I2C && I2C_COMIP
+	help
+	  Say Y to enable support for bq2419x charger
+
+config CHARGER_BQ24296
+	tristate "BQ24296 charger"
+	depends on I2C && I2C_COMIP
+	help
+	  Say Y to enable support for BQ24296 battery charger
+config CHARGER_NCP1851
+	tristate "ncp1851 charger"
+	depends on I2C && I2C_COMIP
+	help
+	  Say Y to enable support for ncp1851 charger
+
+config BATTERY_BQ27510
+	tristate "bq27510-battery"
+	depends on I2C && I2C_COMIP
+	help
+	  Say Y to enable support for bq27510-battery
+
+config BATTERY_BQ27421
+	tristate "bq27421-battery"
+	depends on I2C && I2C_COMIP
+	help
+	  Say Y to enable support for bq27421-battery
+
+config BATTERY_MAX17058
+	tristate "max17058-battery"
+	depends on I2C && I2C_COMIP
+	help
+	  Say Y to enable support for max17058-battery
+
+config BAT_ID_BQ2022A
+        bool "TI BQ2022A BAT_ID Support"
+        help
+          Say yes here to support for TI BQ2022A. This is
+          a BAT_ID IC. This driver provies common support for
+          accessing the device, additional drivers must be enabled in order
+          to use the functionality of the device.
+
+config CW201X_BATTERY
+	tristate "CW201X battery driver"
+	help
+	  Say Y to enable support for the cw201x on the Rockchip

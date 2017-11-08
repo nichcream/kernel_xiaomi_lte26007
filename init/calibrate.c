@@ -295,7 +295,11 @@ void __cpuinit calibrate_delay(void)
 		pr_cont("%lu.%02lu BogoMIPS (lpj=%lu)\n",
 			lpj/(500000/HZ),
 			(lpj/(5000/HZ)) % 100, lpj);
+#if defined(CONFIG_CPU_LC1860)
+/*Donot update loops_per_jiffy for SA7 cluster CPU4 */
+	if (this_cpu != 4)
+#endif
+		loops_per_jiffy = lpj;
 
-	loops_per_jiffy = lpj;
 	printed = true;
 }

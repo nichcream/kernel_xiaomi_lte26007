@@ -230,6 +230,14 @@ enum {
 extern int pm_test_level;
 
 #ifdef CONFIG_SUSPEND_FREEZER
+
+#ifdef CONFIG_CPU_LC1860
+extern int lc_sys_sync_wait(void);
+
+extern bool snd_state;
+
+#endif
+
 static inline int suspend_freeze_processes(void)
 {
 	int error;
@@ -242,7 +250,22 @@ static inline int suspend_freeze_processes(void)
 	if (error)
 		return error;
 
+#ifdef CONFIG_CPU_LC1860
+	if(!snd_state) {
+		error = lc_sys_sync_wait();
+		if (error) {
+			printk(KERN_INFO "PM: sys_sync timeout.\n");
+			goto exit;
+		}
+	}
+#endif
+
 	error = freeze_kernel_threads();
+
+
+#ifdef CONFIG_CPU_LC1860
+exit:
+#endif
 	/*
 	 * freeze_kernel_threads() thaws only kernel threads upon freezing
 	 * failure. So we have to thaw the userspace tasks ourselves.
@@ -276,6 +299,7 @@ extern int pm_autosleep_lock(void);
 extern void pm_autosleep_unlock(void);
 extern suspend_state_t pm_autosleep_state(void);
 extern int pm_autosleep_set_state(suspend_state_t state);
+extern int pm_autosleep_set_state_sync(suspend_state_t state);
 
 #else /* !CONFIG_PM_AUTOSLEEP */
 
@@ -283,6 +307,7 @@ static inline int pm_autosleep_init(void) { return 0; }
 static inline int pm_autosleep_lock(void) { return 0; }
 static inline void pm_autosleep_unlock(void) {}
 static inline suspend_state_t pm_autosleep_state(void) { return PM_SUSPEND_ON; }
+static inline suspend_state_t pm_autosleep_set_state_sync(void) { return PM_SUSPEND_ON; }
 
 #endif /* !CONFIG_PM_AUTOSLEEP */
 
@@ -294,3 +319,9 @@ extern int pm_wake_lock(const char *buf);
 extern int pm_wake_unlock(const char *buf);
 
 #endif /* !CONFIG_PM_WAKELOCKS */
+
+#ifdef CONFIG_EARLYSUSPEND
+/* kernel/power/earlysuspend.c */
+void request_suspend_state(suspend_state_t state);
+suspend_state_t get_suspend_state(void);
+#endif

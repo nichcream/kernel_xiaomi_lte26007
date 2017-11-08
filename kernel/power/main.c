@@ -313,7 +313,11 @@ static ssize_t state_show(struct kobject *kobj, struct kobj_attribute *attr,
 static suspend_state_t decode_state(const char *buf, size_t n)
 {
 #ifdef CONFIG_SUSPEND
+#ifdef CONFIG_EARLYSUSPEND
+	suspend_state_t state = PM_SUSPEND_ON;
+#else
 	suspend_state_t state = PM_SUSPEND_MIN;
+#endif
 	const char * const *s;
 #endif
 	char *p;
@@ -340,7 +344,7 @@ static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,
 {
 	suspend_state_t state;
 	int error;
-
+/*
 	error = pm_autosleep_lock();
 	if (error)
 		return error;
@@ -349,17 +353,28 @@ static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,
 		error = -EBUSY;
 		goto out;
 	}
-
+*/
 	state = decode_state(buf, n);
+
+#ifdef CONFIG_EARLYSUSPEND
+	if (state == PM_SUSPEND_ON || valid_state(state)) {
+		error = 0;
+		request_suspend_state(state);
+		pm_autosleep_set_state_sync(state);
+	}
+#else
 	if (state < PM_SUSPEND_MAX)
 		error = pm_suspend(state);
 	else if (state == PM_SUSPEND_MAX)
 		error = hibernate();
 	else
 		error = -EINVAL;
+#endif
 
+/*
  out:
 	pm_autosleep_unlock();
+*/
 	return error ? error : n;
 }
 

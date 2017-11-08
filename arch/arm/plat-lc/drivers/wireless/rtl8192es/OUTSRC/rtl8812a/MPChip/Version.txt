@@ -1,0 +1,1 @@
+CurrentVersion = RL6286_MAC_PHY_Parameter_v040_20131001

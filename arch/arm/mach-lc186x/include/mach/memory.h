@@ -1,0 +1,7 @@
+#ifndef __ARCH_ARM_MACH_LC186X_MEMORY_H__
+
+#ifdef CONFIG_ARCH_PHYS_ADDR_T_64BIT
+#define MAX_PHYSMEM_BITS	(33)
+#endif
+
+#endif

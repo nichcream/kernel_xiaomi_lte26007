@@ -1,0 +1,15 @@
+obj-$(CONFIG_SENSORS_LIS3DH)    += lis3dh_acc.o
+obj-$(CONFIG_SENSORS_BMA222E)    += bma2x2.o
+obj-$(CONFIG_SENSORS_KIONIX_ACCEL)    += kionix_accel.o
+obj-$(CONFIG_SENSORS_MMA8X5X)    += mma8x5x.o
+obj-$(CONFIG_SENSORS_ST480)    += st480.o
+obj-$(CONFIG_SENSORS_L3GD20)    += l3gd20_gyr.o
+obj-$(CONFIG_SENSORS_AK09911)	+= akm09911.o
+obj-$(CONFIG_SENSORS_LSM330) += lsm330_gyr.o lsm330_acc.o 
+obj-$(CONFIG_SENSORS_MC3XXX)	+= mc3xxx.o
+obj-y				+= light_prox/
+obj-y				+= mmc3416x/
+obj-y				+= mir3da/
+obj-y				+= qst/
+obj-y				+= compass_alps/
+obj-$(CONFIG_IIO)				+= iio/

@@ -207,6 +207,11 @@ int cfg80211_validate_key_settings(struct cfg80211_registered_device *rdev,
 	     (params->cipher == WLAN_CIPHER_SUITE_CCMP) ||
 	     (params->cipher == WLAN_CIPHER_SUITE_AES_CMAC)))
 		return -EINVAL;
+#if defined(CONFIG_RTK_WLAN_SDIO)
+	if(params->cipher == WLAN_CIPHER_SUITE_SMS4)
+		if(pairwise && (key_idx != 0) && (key_idx != 1))
+			return -EINVAL;
+#endif
 
 	switch (params->cipher) {
 	case WLAN_CIPHER_SUITE_WEP40:
@@ -229,6 +234,10 @@ int cfg80211_validate_key_settings(struct cfg80211_registered_device *rdev,
 		if (params->key_len != WLAN_KEY_LEN_AES_CMAC)
 			return -EINVAL;
 		break;
+#if defined(CONFIG_RTK_WLAN_SDIO)
+	case WLAN_CIPHER_SUITE_SMS4:
+		break;
+#endif
 	default:
 		/*
 		 * We don't know anything about this algorithm,

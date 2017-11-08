@@ -38,6 +38,28 @@ static inline void *read_part_sector(struct parsed_partitions *state,
 }
 
 static inline void
+put_named_partition(struct parsed_partitions *p, int n, sector_t from,
+	sector_t size, const char *name, size_t name_size)
+{
+	if (n < p->limit) {
+		char tmp[1 + BDEVNAME_SIZE + 10 + 1];
+
+		p->parts[n].from = from;
+		p->parts[n].size = size;
+		snprintf(tmp, sizeof(tmp), " %s%d", p->name, n);
+		strlcat(p->pp_buf, tmp, PAGE_SIZE);
+		if (name) {
+			if (name_size > PARTITION_META_INFO_VOLNAMELTH - 1)
+				name_size = PARTITION_META_INFO_VOLNAMELTH - 1;
+			memcpy(p->parts[n].info.volname, name, name_size);
+			p->parts[n].info.volname[name_size] = 0;
+			snprintf(tmp, sizeof(tmp), " (%s)", p->parts[n].info.volname);
+			strlcat(p->pp_buf, tmp, PAGE_SIZE);
+		}
+	}
+}
+
+static inline void
 put_partition(struct parsed_partitions *p, int n, sector_t from, sector_t size)
 {
 	if (n < p->limit) {

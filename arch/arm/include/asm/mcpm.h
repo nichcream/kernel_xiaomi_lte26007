@@ -42,6 +42,12 @@ extern void mcpm_entry_point(void);
 void mcpm_set_entry_vector(unsigned cpu, unsigned cluster, void *ptr);
 
 /*
+ * address must be physical, and if 0 then nothing will happen.
+ */
+void mcpm_set_early_poke(unsigned cpu, unsigned cluster,
+			 unsigned long poke_phys_addr, unsigned long poke_val);
+
+/*
  * CPU/cluster power operations API for higher subsystems to use.
  */
 
@@ -113,6 +119,7 @@ void mcpm_cpu_suspend(u64 expected_residency);
  * If the operation cannot be performed then an error code is returned.
  */
 int mcpm_cpu_powered_up(void);
+int mcpm_check_cpu_powered_down(unsigned int cpu, unsigned int cluster);
 
 /*
  * Platform specific methods used in the implementation of the above API.
@@ -122,6 +129,7 @@ struct mcpm_platform_ops {
 	void (*power_down)(void);
 	void (*suspend)(u64);
 	void (*powered_up)(void);
+	int (*powered_down)(unsigned int cpu, unsigned int cluster);
 };
 
 /**

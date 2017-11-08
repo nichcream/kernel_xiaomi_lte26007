@@ -236,6 +236,19 @@ static const char fsg_string_interface[] = "Mass Storage";
 struct fsg_dev;
 struct fsg_common;
 
+#ifdef CONFIG_FSG_SYNC_THREAD
+enum fsg_sync_state {
+	THREAD_STAT_SLEEP=0,
+	THREAD_STAT_ACTIVE,
+	THREAD_STAT_EXIT,
+	THREAD_STAT_END,
+};
+static int sync_state=THREAD_STAT_SLEEP;
+
+static int sleep_sync_thread(struct fsg_common *common);
+static void wakeup_sync_thread(struct fsg_common *common);
+#endif
+
 /* FSF callback functions */
 struct fsg_operations {
 	/*
@@ -298,7 +311,12 @@ struct fsg_common {
 	int			thread_wakeup_needed;
 	struct completion	thread_notifier;
 	struct task_struct	*thread_task;
-
+#if defined(CONFIG_FSG_SYNC_THREAD)
+	int                     sync_thread_wakeup_needed;
+	struct task_struct      *sync_thread_task;
+#elif defined(CONFIG_FSG_SYNC_WORK)
+	struct work_struct fsync_work;
+#endif
 	/* Callback functions. */
 	const struct fsg_operations	*ops;
 	/* Gadget's private data. */
@@ -1369,6 +1387,28 @@ static int do_start_stop(struct fsg_common *common)
 	return 0;
 }
 
+#ifdef CONFIG_FSG_SYNC_WORK
+static void do_fsync(struct work_struct *work)
+{
+	struct fsg_common *common =
+		container_of(work, struct fsg_common, fsync_work);
+
+	struct file *filp = common->curlun->filp;
+	static int syncing = 0;
+
+	if (common->curlun->ro || !filp)
+		return;
+
+	if(!syncing) {
+		syncing = 1;
+		printk("do_fsync+\n");
+		vfs_fsync(filp, 1);
+		syncing = 0;
+		printk("do_fsync-\n");
+	}
+}
+#endif
+
 static int do_prevent_allow(struct fsg_common *common)
 {
 	struct fsg_lun	*curlun = common->curlun;
@@ -1387,8 +1427,23 @@ static int do_prevent_allow(struct fsg_common *common)
 		return -EINVAL;
 	}
 
+#if defined (CONFIG_FSG_SYNC_THREAD)
+	/* Fix me: sync thread may introduce sync problem with fsg_main_thread. */
+	if (curlun->prevent_medium_removal && !prevent) {
+		if( THREAD_STAT_SLEEP == sync_state ) {
+			sync_state = THREAD_STAT_ACTIVE;
+			wakeup_sync_thread(common);
+		}
+	}
+#elif defined (CONFIG_FSG_SYNC_WORK)
+	if (!curlun->nofua && curlun->prevent_medium_removal && !prevent)
+		fsg_lun_fsync_sub(curlun);
+	else
+		schedule_work(&common->fsync_work);
+#else
 	if (curlun->prevent_medium_removal && !prevent)
 		fsg_lun_fsync_sub(curlun);
+#endif
 	curlun->prevent_medium_removal = prevent;
 	return 0;
 }
@@ -2552,7 +2607,16 @@ static int fsg_main_thread(void *common_)
 	spin_lock_irq(&common->lock);
 	common->thread_task = NULL;
 	spin_unlock_irq(&common->lock);
+#ifdef CONFIG_FSG_SYNC_THREAD
+	if (sync_state < THREAD_STAT_EXIT)
+		sync_state = THREAD_STAT_EXIT;
 
+	wakeup_sync_thread(common);
+	do{
+		msleep(10);
+	} while(sync_state != THREAD_STAT_END);
+	common->sync_thread_task = NULL;
+#endif
 	if (!common->ops || !common->ops->thread_exits
 	 || common->ops->thread_exits(common) < 0) {
 		struct fsg_lun *curlun = common->luns;
@@ -2572,7 +2636,60 @@ static int fsg_main_thread(void *common_)
 	/* Let fsg_unbind() know the thread has exited */
 	complete_and_exit(&common->thread_notifier, 0);
 }
+/*-------------------------------------------------------------------------*/
+#ifdef CONFIG_FSG_SYNC_THREAD
 
+static int sleep_sync_thread(struct fsg_common *common)
+{
+	int rc = 0;
+
+	/* Wait until a signal arrives or we are woken up */
+	for (;;) {
+		try_to_freeze();
+		set_current_state(TASK_INTERRUPTIBLE);
+		if (signal_pending(current)) {
+			rc = -EINTR;
+			break;
+		}
+		if (common->sync_thread_wakeup_needed)
+			break;
+		schedule();
+	}
+	__set_current_state(TASK_RUNNING);
+	common->sync_thread_wakeup_needed = 0;
+	return rc;
+}
+
+static void wakeup_sync_thread(struct fsg_common *common)
+{
+	/* Tell the main thread that something has happened */
+	common->sync_thread_wakeup_needed = 1;
+	if (common->sync_thread_task)
+	wake_up_process(common->sync_thread_task);
+}
+
+static int fsg_sync_thread(void *common_)
+{
+	struct fsg_common   *common = common_;
+
+	sync_state = THREAD_STAT_SLEEP;
+
+	while ( THREAD_STAT_EXIT != sync_state ) {
+		if(THREAD_STAT_ACTIVE == sync_state )
+			sync_state = THREAD_STAT_SLEEP;
+			sleep_sync_thread(common);
+
+		if (THREAD_STAT_EXIT != sync_state)
+			fsg_lun_fsync_sub(common->curlun);
+		else
+			break;
+	}
+	fsg_lun_fsync_sub(common->curlun);
+	sync_state = THREAD_STAT_END;
+
+	return 0;
+}
+#endif
 
 /*************************** DEVICE ATTRIBUTES ***************************/
 
@@ -2681,6 +2798,9 @@ static struct fsg_common *fsg_common_init(struct fsg_common *common,
 		curlun->ro = lcfg->cdrom || lcfg->ro;
 		curlun->initially_ro = curlun->ro;
 		curlun->removable = lcfg->removable;
+#if defined(CONFIG_FSG_SYNC_THREAD) || defined(CONFIG_FSG_SYNC_WORK)
+		curlun->nofua = lcfg->nofua;
+#endif
 		curlun->dev.release = fsg_lun_release;
 		curlun->dev.parent = &gadget->dev;
 		/* curlun->dev.driver = &fsg_driver.driver; XXX */
@@ -2767,6 +2887,17 @@ buffhds_first_it:
 		rc = PTR_ERR(common->thread_task);
 		goto error_release;
 	}
+#ifdef CONFIG_FSG_SYNC_THREAD
+	common->sync_thread_task =
+		kthread_create(fsg_sync_thread, common,"sync-thread");
+	if (IS_ERR(common->sync_thread_task)) {
+		rc = PTR_ERR(common->sync_thread_task);
+		goto error_release;
+	}
+	wake_up_process(common->sync_thread_task);
+#elif defined(CONFIG_FSG_SYNC_WORK)
+	INIT_WORK(&common->fsync_work, &do_fsync);
+#endif
 	init_completion(&common->thread_notifier);
 	init_waitqueue_head(&common->fsg_wait);
 

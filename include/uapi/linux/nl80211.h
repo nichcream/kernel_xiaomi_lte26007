@@ -807,7 +807,7 @@ enum nl80211_commands {
 
 	NL80211_CMD_CRIT_PROTOCOL_START,
 	NL80211_CMD_CRIT_PROTOCOL_STOP,
-
+	NL80211_CMD_SET_HW_SCAN_DISABLE,
 	/* add new commands above here */
 
 	/* used to define NL80211_CMD_MAX below */
@@ -1726,7 +1726,7 @@ enum nl80211_attrs {
 
 	NL80211_ATTR_CRIT_PROT_ID,
 	NL80211_ATTR_MAX_CRIT_PROT_DURATION,
-
+	NL80211_ATTR_SET_HW_SCAN_DISABLE,
 	/* add attributes here, update the policy in nl80211.c */
 
 	__NL80211_ATTR_AFTER_LAST,
@@ -2856,6 +2856,7 @@ enum nl80211_mfp {
 enum nl80211_wpa_versions {
 	NL80211_WPA_VERSION_1 = 1 << 0,
 	NL80211_WPA_VERSION_2 = 1 << 1,
+	NL80211_WAPI_VERSION_1 = 1 << 2,
 };
 
 /**

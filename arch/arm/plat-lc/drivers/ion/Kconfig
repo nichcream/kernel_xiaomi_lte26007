@@ -1,0 +1,6 @@
+config ION_LC
+        tristate "Ion for Leadcore"
+        depends on ION
+        help
+          Choose this option if you wish to use ion on an Leadcore platform.
+

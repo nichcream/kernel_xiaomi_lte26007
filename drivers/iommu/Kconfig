@@ -1,6 +1,7 @@
 # IOMMU_API always gets selected by whoever wants it.
 config IOMMU_API
-	bool
+	bool "IOMMU API"
+	default y
 
 menuconfig IOMMU_SUPPORT
 	bool "IOMMU Hardware Support"

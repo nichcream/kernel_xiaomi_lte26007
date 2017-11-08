@@ -1,0 +1,50 @@
+#
+# light and proximity driver configuration
+#
+menuconfig LIGHT_PROXIMITY
+	bool "Light and Proximity"
+	help
+	  Say Y here, and a list of supported touchscreens will be displayed.
+	  This option doesn't affect the kernel.
+
+	  If unsure, say Y.
+
+if LIGHT_PROXIMITY
+
+config LIGHT_PROXIMITY_APDS990X
+	tristate "apds990x light and proximity sensor"
+	depends on  I2C
+
+config LIGHT_PROXIMITY_LTR558
+        tristate "ltr558 light and proximity sensor"
+        depends on  I2C
+
+config LIGHT_PROXIMITY_TMD22713T
+	tristate "tmd22713t light and proximity sensor"
+	depends on  I2C
+
+config LIGHT_PROXIMITY_TAOS_TMD22713T
+	tristate "tmd22713t light and proximity sensor"
+	depends on  I2C
+
+config LIGHT_PROXIMITY_LTR55XALS
+        tristate "ltr55x light and proximity sensor"
+        depends on  I2C
+
+config LIGHT_PROXIMITY_CM36283
+        tristate "cm36283 light and proximity sensor"
+        depends on  I2C
+
+config LIGHT_PROXIMITY_GP2AP030
+        tristate "gp2ap030 light and proximity sensor"
+        depends on  I2C
+
+config LIGHT_PROXIMITY_STK3X1X
+	tristate "SensorTek stk3x1x light and proximity sensor"
+	depends on I2C
+
+config LIGHT_PROXIMITY_RPR521
+	tristate "SensorTek rpr521 light and proximity sensor"
+	depends on I2C
+
+endif

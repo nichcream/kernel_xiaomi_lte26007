@@ -923,4 +923,13 @@ static inline void rdev_crit_proto_stop(struct cfg80211_registered_device *rdev,
 	trace_rdev_return_void(&rdev->wiphy);
 }
 
+static inline int rdev_set_hw_scan_disable(struct cfg80211_registered_device *rdev,
+				      struct wireless_dev *wdev, bool state)
+{
+	int ret;
+	ret = rdev->ops->set_hw_scan_disable(&rdev->wiphy, wdev, state);
+	return ret;
+}
+
+
 #endif /* __CFG80211_RDEV_OPS */

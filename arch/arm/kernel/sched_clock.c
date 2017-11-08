@@ -193,15 +193,20 @@ void __init sched_clock_postinit(void)
 static int sched_clock_suspend(void)
 {
 	sched_clock_poll(sched_clock_timer.data);
-	cd.suspended = true;
+
+	if (cd.needs_suspend)
+		cd.suspended = true;
+
 	return 0;
 }
 
 static void sched_clock_resume(void)
 {
-	cd.epoch_cyc = read_sched_clock();
-	cd.epoch_cyc_copy = cd.epoch_cyc;
-	cd.suspended = false;
+	if (cd.needs_suspend) {
+		cd.epoch_cyc = read_sched_clock();
+		cd.epoch_cyc_copy = cd.epoch_cyc;
+		cd.suspended = false;
+	}
 }
 
 static struct syscore_ops sched_clock_ops = {

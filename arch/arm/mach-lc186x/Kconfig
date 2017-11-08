@@ -1,0 +1,312 @@
+if ARCH_LC186X
+
+menu "Leadcore LC186X Options"
+
+config MACH_LC186X
+	bool "LC186X Platform"
+	select CPU_V7
+	select ARCH_REQUIRE_GPIOLIB
+
+config CPU_LC1860
+	bool "LC1860"
+	select CPU_V7
+	select ARM_GIC
+	select ARM_L1_CACHE_SHIFT_6
+	help
+	  Leadcore CPU type LC1860
+
+choice
+	prompt "LC186X Project"
+
+config COMIP_PROJECT_LC1860
+	bool "Project LC1860"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project lc1860.
+
+config COMIP_PROJECT_USL90
+	bool "Project USL90"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project usl90.
+
+config COMIP_PROJECT_LTE26007
+	bool "Project LTE26007"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project lte26007.
+
+config COMIP_PROJECT_A310T
+	bool "Project A310T"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project a310t.
+
+config COMIP_PROJECT_M9206
+	bool "Project M9206"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project m9206.
+
+config COMIP_PROJECT_LX70A
+	bool "Project LX70A"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project lx70a.
+	  
+config COMIP_PROJECT_K706_V1_0
+	bool "Project K706 V1_0"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project k706.
+	  
+config COMIP_PROJECT_YONGDA
+	bool "Project YONGDA"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project yongda.
+	  
+config COMIP_PROJECT_SMARTMODULE
+	bool "Project SMARTMODULE"
+	depends on ARCH_LC186X && CPU_LC1860
+	help
+	  Select this option if you want to use project smartmodule.
+
+config COMIP_PROJECT_LC1860_PHONE
+        bool "Project LC1860"
+        depends on ARCH_LC186X && CPU_LC1860
+        help
+          Select this option if you want to use project lc1860 phone.
+
+config COMIP_PROJECT_FOURMODE
+        bool "Project FOURMODE"
+        depends on ARCH_LC186X && CPU_LC1860
+        help
+          Select this option if you want to use project fourmode.
+config COMIP_PROJECT_FIVEMODE
+        bool "Project FIVEMODE"
+        depends on ARCH_LC186X && CPU_LC1860
+        help
+          Select this option if you want to use project fivemode.
+
+endchoice
+
+config MENTOR_DEBUG
+	bool
+
+choice
+	prompt "LC186X Board"
+
+config COMIP_BOARD_LC1860_MENTOR
+	bool "LC1860_MENTOR"
+	select MENTOR_DEBUG
+	depends on ARCH_LC186X && COMIP_PROJECT_LC1860
+	help
+	 Select this option if you want to use lc1860 mentor board.
+
+config COMIP_BOARD_LC1860_EVB
+	bool "LC1860_EVB"
+	depends on ARCH_LC186X && COMIP_PROJECT_LC1860
+	help
+	 Select this option if you want to use lc1860 evb board.
+
+config COMIP_BOARD_LC1860_EVB2
+	bool "LC1860_EVB2"
+	depends on ARCH_LC186X && COMIP_PROJECT_LC1860
+	help
+	 Select this option if you want to use lc1860 evb2 board.
+
+config COMIP_BOARD_LC1860_EVB3
+	bool "LC1860_EVB3"
+	depends on ARCH_LC186X && COMIP_PROJECT_LC1860
+	help
+	 Select this option if you want to use lc1860 evb3 board.
+config COMIP_BOARD_LC1860_ZEUS
+	bool "LC1860_ZEUS"
+	depends on ARCH_LC186X && COMIP_PROJECT_LC1860
+	help
+	 Select this option if you want to use lc1860 ZEUS board.
+
+config COMIP_BOARD_USL90_PHONE_V1_0
+	bool "USL90_PHONE V1.0"
+	depends on ARCH_LC186X && COMIP_PROJECT_USL90
+	help
+	 Select this option if you want to use usl90 v1.0 board.
+
+config COMIP_BOARD_LTE26007_PHONE_V1_0
+	bool "LTE26007_PHONE V1.0"
+	depends on ARCH_LC186X && COMIP_PROJECT_LTE26007
+	help
+	 Select this option if you want to use lte26007 v1.0 board.
+
+config COMIP_BOARD_LTE26007_PHONE_V1_1
+	bool "LTE26007_PHONE V1.1"
+	depends on ARCH_LC186X && COMIP_PROJECT_LTE26007
+	help
+	 Select this option if you want to use lte26007 v1.1 board.
+
+config COMIP_BOARD_A310T_PHONE_V1_0
+	bool "A310T_PHONE V1.0"
+	depends on ARCH_LC186X && COMIP_PROJECT_A310T
+	help
+	 Select this option if you want to use a310t v1.0 board.
+
+config COMIP_BOARD_A310T_PHONE_V1_1
+	bool "A310T_PHONE V1.0"
+	depends on ARCH_LC186X && COMIP_PROJECT_A310T
+	help
+	 Select this option if you want to use a310t v1.1 board.
+config COMIP_BOARD_M9206_V1_0
+	bool "M9206 V1_0"
+	depends on ARCH_LC186X && COMIP_PROJECT_M9206
+	help
+	 Select this option if you want to use m9206 v1.0 board.
+config COMIP_BOARD_LX70A_V1_0
+	bool "LX70A V1_0"
+	depends on ARCH_LC186X && COMIP_PROJECT_LX70A
+	help
+	 Select this option if you want to use lx70a v1.0 board.
+
+config COMIP_BOARD_LC1860_PHONE
+	bool "LC1860_PHONE"
+	depends on ARCH_LC186X && CONFIG_COMIP_PROJECT_LC1860_PHONE
+	help
+	 Select this option if you want to use lc1860 phone board.
+
+config COMIP_BOARD_SMARTMODULE_V1_0
+        bool "SMARTMODULE_V1_0"
+        depends on ARCH_LC186X && CONFIG_COMIP_PROJECT_SMARTMODULE
+        help
+         Select this option if you want to use smartmodule phone board.
+
+config COMIP_BOARD_YONGDA_V1_0
+        bool "YONGDA_V1_0"
+        depends on ARCH_LC186X && CONFIG_COMIP_PROJECT_YONGDA
+        help
+         Select this option if you want to use yongda phone board.
+
+config COMIP_BOARD_FOURMODE_V1_0
+        bool "FOURMODE_V1_0"
+        depends on ARCH_LC186X && COMIP_PROJECT_FOURMODE
+        help
+         Select this option if you want to use fourmode board.
+config COMIP_BOARD_FIVEMODE_V1_0
+        bool "FIVEMODE_V1_0"
+        depends on ARCH_LC186X && COMIP_PROJECT_FIVEMODE
+        help
+         Select this option if you want to use fivemode board.
+endchoice
+
+comment "LC186X Feature Selections"
+
+config COMIP_32K_TIMER
+	bool "Use 32KHz timer"
+	depends on ARCH_LC186X
+	help
+	  Select this option if you want to enable the COMIP 32KHz timer.
+
+config COMIP_USE_WK_TIMER
+	bool "Use wake up timer"
+	depends on ARCH_LC186X
+	help
+	  Select this option if you want to use the wake up timer.
+
+config SLEEP_CODE_IN_RAM
+	bool "code about sleep are put into RAM"
+	default n
+
+
+config COMIP_HOTPLUG
+	bool "comip hotplug"
+	depends on HOTPLUG_CPU
+	default n
+
+config CPU_IDLE_LOWEST_FREQ
+	bool "cpu cluster is in lowest freq when idle"
+	default n
+
+config DDR_FREQ_ADJUST
+	bool "dynamicly adjust DDR frequence"
+	select SLEEP_CODE_IN_RAM
+	default n
+
+config IRQ_MON_DEBUG
+	bool "cpu0 irq handler is monitored by Timer"
+	default n
+
+config CPU_FREQ_DIV2
+	bool "cpu frequency div2"
+	depends on CPU_LC1813
+
+comment "LC186X Driver Selections"
+
+config SERIAL_COMIP
+	bool "Leadcore COMIP serial port support"
+	depends on ARM && ARCH_LC186X
+	select SERIAL_CORE
+	help
+	  If you have a machine based on an leadcor comip CPU you
+	  can enable its onboard serial ports by enabling this option.
+
+config SERIAL_COMIP_CONSOLE
+	bool "Console on comip serial port"
+	depends on SERIAL_COMIP
+	select SERIAL_CORE_CONSOLE
+	help
+	  If you have enabled the serial port on the leadcore comip console
+	  CPU you can make it the console by answering Y to this option.
+
+config WATCHDOG_COMIP
+	tristate "Leadcore COMIP watchdog"
+	depends on ARCH_LC186X
+	help
+	  Say Y here to use COMIP watchdog.
+
+config USB_GADGET_COMIP
+	boolean "COMIP USB 2.0 controller"
+	help
+	   COMIP TD-SCDMA DBB processor(Leadcore Tech Co.,Ltd) include a high speed USB 2.0 device
+	   controller, which support high speed and full speed USB Peripheral.
+
+config USB_COMIP
+	tristate "Leadcore USB module"
+	depends on USB_GADGET_COMIP
+	default USB_GADGET
+	select USB_GADGET_SELECTED
+
+config COMIP_MODEM
+	bool "Leadcore COMIP modem support"
+	default y
+	help
+	  support leadcore modem rest&&start&bridge conmunication.
+
+config BRIDGE_DEBUG_LOOP_TEST
+	bool "Leadcore bridge loopback test debug"
+	depends on COMIP_MODEM
+	default n
+
+config COMIP_MODEM_WCDMA
+	bool "Leadcore COMIP modem wcdma support"
+	default n
+	help
+	  support leadcore modem wcdma
+
+#SMMU
+config COMIP_IOMMU
+	bool "COMIP IOMMU DRIVER"
+	depends on IOMMU_API
+	default n
+	---help---
+	LeadCore support LCD ON2 ISP 2D smmu function.
+
+#FLOWCAL
+config LC186X_FLOWCAL
+	bool "COMIP FLOWCAL DRIVER"
+	default n
+	---help---
+	LeadCore flow calculation function.
+
+source "arch/arm/mach-lc186x/sound/Kconfig"
+
+endmenu
+endif

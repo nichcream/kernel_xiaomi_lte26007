@@ -1,0 +1,37 @@
+config VIVANTE
+	tristate "VIVANTE 2D support"
+	depends on ARM
+	---help---
+	  This enables support for the vivante 2d.
+
+menu "VIVANTE 2D Configuration"
+
+menuconfig 2D_PERFORMANCE
+	tristate "2d performance support"
+	depends on VIVANTE
+	default n
+	help
+	  Enable this option to build support for a VIVANTE 2D.
+
+choice
+	prompt "2d performance level"
+	depends on 2D_PERFORMANCE
+	default 2D_DEFAULT_FREQ
+
+config 2D_HIGH_FREQ
+	bool "High Performance"
+	help
+	  Choose high frequency for better performance.
+
+config 2D_DEFAULT_FREQ
+	bool "Standard Performance"
+	help
+	  Choose standard frequency.
+
+config 2D_LOW_FREQ
+	bool "Low Performance"
+	help
+	  Choose low frequency for better consumption.
+endchoice
+
+endmenu

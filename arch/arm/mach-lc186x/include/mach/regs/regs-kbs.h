@@ -1,0 +1,35 @@
+#ifndef __ASM_ARCH_REGS_KBS_H
+#define __ASM_ARCH_REGS_KBS_H
+
+#define KBS_DIRKEY_CTL				(0x04)
+#define KBS_MASK				(0x08)
+#define KBS_DETECT_INTVAL			(0x0C)
+#define KBS_LPRS_INTVAL				(0x14)
+#define KBS_DIRKEY_INT				(0x34)
+#define KBS_DIRKEY_INT_RAW			(0x3C)
+#define KBS_DIRKEY_INT_EN			(0x44)
+
+/* KBS_DIRKEY_CTL. */
+#define KBS_DIRKEY_PULL_CFG			24
+#define KBS_DIRKEY_LPRS_EN			16
+#define KBS_DIRKEY_RPRS_EN			8
+#define KBS_DIRKEY_EN				0
+
+/* KBS_MASK. */
+#define KBS_DIRKEY_MASK				16
+
+/* KBS_DETECT_INTVAL. */
+#define KBS_DIRKEY_RLS_INTVAL			24
+#define KBS_DIRKEY_PRS_INTVAL			16
+
+/* KBS_LPRS_INTVAL. */
+#define KBS_LONG_INTVAL				10
+#define KBS_REPEAT_INTVAL			0
+
+/* KBS_DIRKEY_INT. */
+#define KBS_DIRKEY_RLS_INTR			24
+#define KBS_DIRKEY_LPRS_INTR			16
+#define KBS_DIRKEY_RPRS_INTR			8
+#define KBS_DIRKEY_PRS_INTR			0
+
+#endif /* __ASM_ARCH_REGS_KBS_H. */

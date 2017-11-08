@@ -64,7 +64,7 @@ static inline void __get_page_tail_foll(struct page *page,
  * follow_page() and it must be called while holding the proper PT
  * lock while the pte (or pmd_trans_huge) is still mapping the page.
  */
-static inline void get_page_foll(struct page *page)
+static inline int get_page_foll(struct page *page)
 {
 	if (unlikely(PageTail(page)))
 		/*
@@ -78,9 +78,12 @@ static inline void get_page_foll(struct page *page)
 		 * Getting a normal page or the head of a compound page
 		 * requires to already have an elevated page->_count.
 		 */
-		VM_BUG_ON(atomic_read(&page->_count) <= 0);
-		atomic_inc(&page->_count);
+		 if (unlikely(atomic_read(&page->_count) <= 0)) {
+			return -1;
+		 } else
+			 atomic_inc(&page->_count);
 	}
+	return 0;
 }
 
 extern unsigned long highest_memmap_pfn;

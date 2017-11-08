@@ -1,0 +1,16 @@
+config UMP_MALI400
+	tristate "UMP support for mali400"
+	depends on MALI_DRIVER_400
+	---help---
+	  This enables support for the UMP memory allocation and sharing API.
+
+	  To compile this driver as a module, choose M here: the module will be
+	  called ump.
+
+config UMP_DEBUG
+	bool "Enable extra debug in UMP"
+	depends on UMP_MALI400
+	default y
+	---help---
+	  This enabled extra debug checks and messages in UMP.
+

@@ -1,0 +1,457 @@
+if PLAT_LC
+
+menu "Leadcore Platform Options"
+
+comment "Platform Feature Selections"
+
+config WERROR
+	bool "Treat all warnings as errors and Enable section missmatch check"
+	default n
+	select DEBUG_SECTION_MISMATCH
+	help
+	    Select this option if you want to do strict check.
+
+config COMIP_SDCARD_DETECT
+	bool "Enable SD card detect"
+	default n
+	help
+	  Select this option if you want to enable SD card detect.
+
+config COMIP_PMIC_REBOOT
+	bool
+
+comment "Platform Driver Selections"
+
+config BACKLIGHT_COMIP
+    tristate "Leadcore COMIP BACKLIGHT"
+    depends on BACKLIGHT_LCD_SUPPORT
+    default m
+    help
+      This driver controls the LCD backlight level and power for
+      the PMIC module of COMIP processors.  Say Y if your board
+      uses this hardware.
+
+config CAMERA_DRIVING_RECODE
+	bool "Enable Camera driving recode function"
+	default n
+	help
+	Select this option if you want to enable driving recode function.
+config DMAS_COMIP
+	tristate "LeadCore DMAS support"
+	help
+	  Say yes here to support the Leadcore DMAS module.
+
+config DMAS2_COMIP
+	tristate "LeadCore DMAS support"
+	select DMAS_COMIP
+	help
+	  DMAS2 module support the function of match address.
+	  Say yes here to support the Leadcore DMAS2 module.
+
+config DMAG_COMIP
+	tristate "LeadCore DMAG support"
+	help
+	  Say yes here to support the Leadcore DMAG module.
+
+config GPIO_COMIP
+	tristate "Leadcore GPIO support"
+	select GPIO_GENERIC
+	select ARCH_REQUIRE_GPIOLIB
+	select ARCH_HAVE_CUSTOM_GPIO_H
+	select NEED_MACH_GPIO_H
+	help
+	  Say yes here to support the Leadcore GPIO device.
+
+config I2C_COMIP
+	tristate "Leadcore COMIP adapter"
+	help
+	  If you have devices in the comip bus, say yes to this option.
+	  This driver can also be built as a module.  If so, the module
+	  will be called i2c-comip.
+
+config KEYBOARD_COMIP
+	tristate "Leadcore COMIP keypad support"
+	help
+	  Say Y here if you want to use the COMIP keypad.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called comip-keypad.
+
+config KEYBOARD_GPIO_COMIP
+	tristate "Leadcore COMIP GPIO Buttons"
+	help
+	  This driver implements support for buttons connected
+	  to GPIO pins of various CPUs (and some other chips).
+
+	  Say Y here if your device has buttons connected
+	  directly to such GPIO pins.  Your board-specific
+	  setup logic must also provide a platform device,
+	  with configuration data saying which GPIOs are used.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called gpio_keys.
+
+config MFP_COMIP
+	tristate "LeadCore multi-pin support"
+	help
+	  Say yes here to support the Leadcore multi-pin module.
+
+config MFP2_COMIP
+	tristate "LeadCore multi-pin2 support"
+	help
+	  Say yes here to support the Leadcore multi-pin2 module.
+
+config MMC_COMIP
+	tristate "LeadCore COMIP Multimedia Card Interface support"
+	help
+	  This selects the LeadCore COMIP Multimedia card Interface.
+	  If you have a COMIP platform with a Multimedia Card slot,
+	  say Y or M here.
+	  If unsure, say N.
+
+config MMC_COMIP_TUNING
+	bool "LeadCore COMIP Multimedia Card phase tuning support"
+	depends on MMC_COMIP
+
+config MMC_COMIP_IOPOWER
+	bool "LeadCore COMIP Multimedia Card phase io power support"
+	depends on MMC_COMIP
+
+config NAND_BBM_COMIP
+	bool "Leadcore COMIP Bad Block Management"
+	depends on NAND_COMIP
+
+config NAND_COMIP
+	bool "Support for NAND flash devices on COMIP"
+	select MTD
+	select MTD_NAND
+	help
+	  This enables the driver for the NAND flash device found on
+	  COMIP processors
+
+config ON2_COMIP
+	tristate "Leadcore COMIP ON2 Codec support"
+	help
+	  Say Y here to use COMIP ON2 Codec.
+
+config PWM_COMIP
+	select PWM
+	bool "Leadcore COMIP pwm support"
+
+
+config RESET_COMIP
+	tristate "LeadCore RESET support"
+	help
+	  Say yes here to support the Leadcore RESET module.
+
+config SERIAL_COMIP
+	bool "Leadcore COMIP serial port support"
+	depends on ARM
+	select SERIAL_CORE
+	help
+	  If you have a machine based on an leadcor comip CPU you
+	  can enable its onboard serial ports by enabling this option.
+
+config SERIAL_COMIP_CONSOLE
+	bool "Console on comip serial port"
+	depends on SERIAL_COMIP
+	select SERIAL_CORE_CONSOLE
+	help
+	  If you have enabled the serial port on the leadcore comip console
+	  CPU you can make it the console by answering Y to this option.
+
+config SPI_COMIP
+	tristate "Leadcore COMIP SSP SPI master"
+	help
+	  This enables using a COMIP SSP port as a SPI master controller.	  
+
+config TPZ_COMIP
+	bool "Leadcore COMIP tpz support"
+
+config TPZ2_COMIP
+	bool "Leadcore COMIP tpz2 support"
+
+config WATCHDOG_COMIP
+	tristate "Leadcore COMIP watchdog"
+	help
+	  Say Y here to use COMIP watchdog.
+
+comment "Device Driver Selections"
+
+config MONITOR_COMIP
+    tristate "Leadcore COMIP monitor debug support"
+    help
+      Select this option if you want to use the monitor debug.
+
+config APANIC_COMIP
+	bool "Android kernel panic diagnostics driver for mmc or nand"
+	default n
+	help
+	  Driver which handles kernel panics and attempts to write
+	  critical debugging data to mmc or nand.
+
+config POWERKEY_COMIP
+	tristate "Leadcore COMIP power key support"
+	depends on INPUT
+	help
+	  Select this option if you want to use COMIP power key.
+
+config RTC_COMIP
+	tristate "Leadcore COMIP RTC support"
+	depends on RTC_CLASS
+	help
+	  Select this option if you want to use COMIP RTC.
+
+config SWITCH_COMIP
+	tristate "Leadcore COMIP switch support"
+	help
+	  Say Y here to enable switch support on COMIP.
+
+config SWITCH_COMIP_PMIC
+	tristate "Use pmic switch"
+	select SWITCH_COMIP
+	help
+	  Select this option if you want to use pmic switch.
+
+config SWITCH_COMIP_CODEC
+	tristate "Use codec switch"
+	select SWITCH_COMIP
+	help
+	  Select this option if you want to use codec switch.
+
+config THERMAL_COMIP
+	tristate "thermal"
+	help
+	  Select this option if you want to use thermal.
+
+config METS_COMIP
+	tristate "mets"
+	help
+	  Select this option if you want to use chip inside thermal monitor.
+
+config UREG_COMIP
+	tristate "Leadcore COMIP ureg debug support"
+	help
+	  Select this option if you want to use the ureg debug.
+
+config VIBRATOR_COMIP
+	tristate "Leadcore COMIP vibrator support"
+	depends on ANDROID_TIMED_OUTPUT
+	help
+	  Select this option if you want to use COMIP vibrator.
+
+config BIH_COMIP
+	tristate "Leadcore COMIP BIH support"
+	depends on IPV6 && NETFILTER
+	help
+	  Select this option if you want to use COMIP BIH.
+
+config DEVINFO_COMIP
+	bool "Export main device info to sysfs"
+	default n
+	help
+	  Select this option if you want to export device
+	  info to sysfs.
+
+source "arch/arm/plat-lc/drivers/sound/Kconfig"
+source "arch/arm/plat-lc/drivers/gpu/Kconfig"
+source "arch/arm/plat-lc/drivers/2d/Kconfig"
+source "arch/arm/plat-lc/drivers/pmic/Kconfig"
+source "arch/arm/plat-lc/drivers/camera/Kconfig"
+source "arch/arm/plat-lc/drivers/touchscreen/Kconfig"
+source "arch/arm/plat-lc/drivers/sensor/Kconfig"
+source "arch/arm/plat-lc/drivers/ion/Kconfig"
+source "arch/arm/plat-lc/drivers/video/Kconfig"
+source "arch/arm/plat-lc/drivers/leds/Kconfig"
+source "arch/arm/plat-lc/drivers/wireless/cg2900/Kconfig"
+source "arch/arm/plat-lc/drivers/wireless/rtl8192es/Kconfig"
+comment "Device Selections"
+
+config BRCM_GPS
+	bool "brcm gps support"
+	help
+	  support brcm gps.
+
+config BRCM_BLUETOOTH
+	bool "brcm bluetooth support"
+	help
+	    support brcm bluetooth.
+
+config BRCM_FM
+	bool "brcm fm support"
+	help
+	    support brcm fm.
+
+config BRCM_WIFI
+	bool "brcm wifi support"
+	help
+	  support brcm wifi.
+
+config BROADCOM_BCM4330
+	bool "Use BCM4330"
+	depends on MMC_COMIP
+	select BRCM_BLUETOOTH
+	select BRCM_WIFI
+	help
+	  Select this option if you want to use BCM4330.
+
+config BROADCOM_BCM4751
+	bool "Use BCM4751"
+	select BRCM_GPS
+	help
+	  Select this option if you want to use BCM4751.
+
+config BROADCOM_BCM4752
+	bool "Use BCM4752"
+	select BRCM_GPS
+	help
+	  Select this option if you want to use BCM4752.
+
+config BROADCOM_BCM43362
+	bool "Use BCM43362"
+	depends on MMC_COMIP
+	select BRCM_WIFI
+	help
+	  Select this option if you want to use BCM43362.
+
+config BROADCOM_BCM2076
+	bool "Use BCM2076"
+	select BRCM_BLUETOOTH
+	select BRCM_FM
+	help
+	  Select this option if you want to use CM2076.
+
+config RTK_BLUETOOTH
+	bool "Realtek bluetooth support"
+	help
+	  support Realtek bluetooth.
+
+config BT_SLEEP
+	tristate "bluesleep driver support"
+	depends on BT
+	help
+	  Bluetooth Bluesleep Driver.
+	  This driver provides the dynamic active power saving mechanism for
+	  bluetooth radio devices.
+
+	  Say Y here to compile support for bluesleep support into the kernel
+	  or say M to compile it as module (bluesleep).
+
+config GPS_UBLOX
+	bool "ublox gps support"
+	help
+	  support ublox gps.
+
+#
+# These are for the compat-wireless git
+#
+
+config COMPAT_WIRELESS
+       tristate "Compat Wireless"
+       default n
+       ---help---
+         To compile this code as a module, choose M here.
+if COMPAT_WIRELESS
+
+config COMPAT_WIRELESS_MODULES
+       tristate "Wireless modules"
+       default n
+       ---help---
+         To compile this code as a module, choose M here.
+
+config CFG80211
+       tristate "Compat CFG80211"
+       default n
+       ---help---
+         To compile this code as a module, choose M here.
+
+config MAC80211
+       tristate "Compat MAC80211"
+       default n
+       ---help---
+         To compile this code as a module, choose M here.
+
+config COMPAT_MAC80211_RC_DEFAULT
+       string "MAC80211_RC_DEFAULT"
+       default "minstrel_ht"
+       ---help---
+
+config COMPAT_RFKILL
+       tristate "Compat RFKILL"
+       depends on COMPAT_WIRELESS
+       default y
+       ---help---
+
+config NL80211_TESTMODE
+       bool "Compat NL80211 testmode"
+       depends on COMPAT_WIRELESS
+       default y
+       ---help---
+
+config CFG80211_DEFAULT_PS
+       bool "CFG80211_DEFAULT_PS"
+       depends on COMPAT_WIRELESS
+       default y
+       ---help---
+
+config CFG80211_REG_DEBUG
+       bool "CFG80211_REG_DEBUG"
+       depends on COMPAT_WIRELESS
+       default y
+       ---help---
+
+config MAC80211_RC_PID
+       bool "MAC80211_RC_PID"
+       depends on COMPAT_WIRELESS
+       default y
+       ---help---
+
+config MAC80211_RC_MINSTREL
+       bool "MAC80211_RC_MINSTREL"
+       depends on COMPAT_WIRELESS
+       default y
+       ---help---
+
+config MAC80211_RC_MINSTREL_HT
+       bool "Minstrel 802.11n support" if EXPERT
+       depends on MAC80211_RC_MINSTREL
+       default y
+       ---help---
+         This option enables the 'minstrel_ht' TX rate control algorithm
+
+config MAC80211_LEDS
+       bool "MAC80211_LEDS"
+       depends on COMPAT_WIRELESS
+       default y
+       ---help---
+
+config MAC80211_MESH
+       bool "MAC80211_MESH"
+       depends on COMPAT_WIRELESS
+       default y
+       ---help---
+	   
+config STE_WIFI
+	bool "STE Wi-Fi support"
+    default y
+
+if	STE_WIFI
+config CW1200
+	tristate "CW1200 WLAN support"
+	select MAC80211
+	select CFG80211
+	default m
+
+endif
+endif
+
+#
+# End compat-wireless
+#
+
+source "arch/arm/plat-lc/drivers/wireless/rtl8723bs/Kconfig"
+source "arch/arm/plat-lc/drivers/radio/realtek/Kconfig"
+source "arch/arm/plat-lc/drivers/wireless/bcmdhd/Kconfig"
+source "arch/arm/plat-lc/drivers/wireless/cw1100/Kconfig"
+endmenu
+endif

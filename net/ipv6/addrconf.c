@@ -191,6 +191,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly = {
 	.max_addresses		= IPV6_MAX_ADDRESSES,
 	.accept_ra_defrtr	= 1,
 	.accept_ra_pinfo	= 1,
+	.ra_info_flag		= 0,
 #ifdef CONFIG_IPV6_ROUTER_PREF
 	.accept_ra_rtr_pref	= 1,
 	.rtr_probe_interval	= 60 * HZ,
@@ -225,6 +226,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mostly = {
 	.max_addresses		= IPV6_MAX_ADDRESSES,
 	.accept_ra_defrtr	= 1,
 	.accept_ra_pinfo	= 1,
+	.ra_info_flag		= 0,
 #ifdef CONFIG_IPV6_ROUTER_PREF
 	.accept_ra_rtr_pref	= 1,
 	.rtr_probe_interval	= 60 * HZ,
@@ -4171,6 +4173,8 @@ static inline void ipv6_store_devconf(struct ipv6_devconf *cnf,
 	array[DEVCONF_ACCEPT_DAD] = cnf->accept_dad;
 	array[DEVCONF_FORCE_TLLAO] = cnf->force_tllao;
 	array[DEVCONF_NDISC_NOTIFY] = cnf->ndisc_notify;
+	array[DEVCONF_RA_INFO_FLAG] = cnf->ra_info_flag;
+
 }
 
 static inline size_t inet6_ifla6_size(void)
@@ -4919,6 +4923,13 @@ static struct addrconf_sysctl_table
 			.data           = &ipv6_devconf.force_tllao,
 			.maxlen         = sizeof(int),
 			.mode           = 0644,
+			.proc_handler   = proc_dointvec
+		},
+		{
+			.procname               = "ra_info_flag",
+			.data                   = &ipv6_devconf.ra_info_flag,
+			.maxlen                 = sizeof(int),
+			.mode                   = 0644,
 			.proc_handler   = proc_dointvec
 		},
 		{

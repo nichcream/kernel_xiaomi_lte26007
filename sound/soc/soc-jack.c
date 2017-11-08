@@ -19,6 +19,15 @@
 #include <linux/delay.h>
 #include <linux/export.h>
 #include <trace/events/asoc.h>
+#ifdef CONFIG_SWITCH
+#include <linux/switch.h>
+#endif
+#ifdef CONFIG_SWITCH
+/* Android jack detection */
+static struct switch_dev android_switch = {
+	.name = "h2w",
+};
+#endif
 
 /**
  * snd_soc_jack_new - Create a new jack
@@ -41,6 +50,9 @@ int snd_soc_jack_new(struct snd_soc_codec *codec, const char *id, int type,
 	INIT_LIST_HEAD(&jack->pins);
 	INIT_LIST_HEAD(&jack->jack_zones);
 	BLOCKING_INIT_NOTIFIER_HEAD(&jack->notifier);
+#ifdef CONFIG_SWITCH
+	switch_dev_register(&android_switch);
+#endif
 
 	return snd_jack_new(codec->card->snd_card, id, type, &jack->jack);
 }
@@ -66,6 +78,17 @@ void snd_soc_jack_report(struct snd_soc_jack *jack, int status, int mask)
 	struct snd_soc_dapm_context *dapm;
 	struct snd_soc_jack_pin *pin;
 	int enable;
+
+#ifdef CONFIG_SWITCH
+	if (mask & SND_JACK_HEADSET) {
+		if (status & SND_JACK_MICROPHONE)
+			switch_set_state(&android_switch, 1);
+		else if (status & SND_JACK_HEADPHONE)
+			switch_set_state(&android_switch, 2);
+		else
+			switch_set_state(&android_switch, 0);
+	}
+#endif
 
 	trace_snd_soc_jack_report(jack, mask, status);
 

@@ -1,0 +1,36 @@
+#################################
+ETF Driver v002
+#################################
+- Changes etf_drivers/Makefile so that modifications are no more needed in SI
+	before compiling ETF application and drivers. Although before building,
+	make sure to do lunch <...-eng> command first.
+- Added ioctl IOCTL_ST90TDS_CHIP_VERSION to detect chip version before loading
+	firmware
+
+#################################
+ETF Driver v001
+#################################
+- Moves etf_drivers folder out of retf/petf/uetf directory so that single
+	etf_drivers source code is used for all 3 flavors
+- Combines folders drv_etf_ioctl and test_sdio so that instead of the earlier
+	2 drivers (viz. drv_etf_ioctl and test_sdio), only a single etf driver
+	 (named etf_driver.ko) is created
+- Replaces UMAC/UMI prefixed functions and identifiers to start with ETF
+- Removes WORKAROUND & FIRMWARE_FILE macro and related code since it is redundant
+- Support for PETF API sleepstatus to find sleep status of device
+
+
+#################################
+ETF Driver v0.1 (since RETF v009)
+#################################
+- Change logic of reading GPIO pins
+- Compilation now moved to <Release>/kernel/drivers/etf_drivers from the earlier
+	<Release>/vendor/…/cw1200/etf_drivers
+- Removed dependency of function u8500_sdio_detect_card() and used
+	cw1200_detect_card() instead for mmc card scan
+- Chip detection logic changed, new code detects CW1250 cut1.1 also
+- The ETF drivers can run in any of the 3 flavours viz. RETF, PETF and UETF using
+	etf_flavour argument during insmod
+- Adds dynamic log support:  insmod etf_driver.ko debug_level=<dbg_num>
+- Code formatted and warnings removed
+

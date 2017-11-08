@@ -378,6 +378,7 @@ static const struct nla_policy nl80211_policy[NL80211_ATTR_MAX+1] = {
 	[NL80211_ATTR_MDID] = { .type = NLA_U16 },
 	[NL80211_ATTR_IE_RIC] = { .type = NLA_BINARY,
 				  .len = IEEE80211_MAX_DATA_LEN },
+	[NL80211_ATTR_SET_HW_SCAN_DISABLE] = {.type = NLA_U32 },
 };
 
 /* policy for the key attributes */
@@ -5834,8 +5835,14 @@ static int nl80211_dump_survey(struct sk_buff *skb,
 
 static bool nl80211_valid_wpa_versions(u32 wpa_versions)
 {
+	#if defined(CONFIG_RTK_WLAN_SDIO)
 	return !(wpa_versions & ~(NL80211_WPA_VERSION_1 |
+				  NL80211_WPA_VERSION_2|NL80211_WAPI_VERSION_1));
+	#else
+	return !(wpa_versions & ~(NL80211_WPA_VERSION_1 |
+				  NL80211_WAPI_VERSION_1|
 				  NL80211_WPA_VERSION_2));
+	#endif
 }
 
 static int nl80211_authenticate(struct sk_buff *skb, struct genl_info *info)
@@ -8287,6 +8294,30 @@ static int nl80211_crit_protocol_stop(struct sk_buff *skb,
 	return 0;
 }
 
+static int nl80211_set_hw_scan_disable(struct sk_buff *skb, struct genl_info *info)
+{
+	struct cfg80211_registered_device *rdev = info->user_ptr[0];
+	struct wireless_dev *wdev;
+	struct net_device *dev = info->user_ptr[1];
+	bool state;
+	int err;
+	printk("nl80211_set_hw_scan_disable enter!\n");
+	if (!info->attrs[NL80211_ATTR_SET_HW_SCAN_DISABLE])
+		return -EINVAL;
+
+	state = nla_get_u32(info->attrs[NL80211_ATTR_SET_HW_SCAN_DISABLE]);
+
+	wdev = dev->ieee80211_ptr;
+
+	if (!rdev->ops->set_hw_scan_disable)
+		return -EOPNOTSUPP;
+
+	err = rdev_set_hw_scan_disable(rdev, wdev, state);
+	return err;
+
+}
+
+
 #define NL80211_FLAG_NEED_WIPHY		0x01
 #define NL80211_FLAG_NEED_NETDEV	0x02
 #define NL80211_FLAG_NEED_RTNL		0x04
@@ -8991,7 +9022,16 @@ static struct genl_ops nl80211_ops[] = {
 		.flags = GENL_ADMIN_PERM,
 		.internal_flags = NL80211_FLAG_NEED_WDEV_UP |
 				  NL80211_FLAG_NEED_RTNL,
-	}
+	},
+	{
+		.cmd = NL80211_CMD_SET_HW_SCAN_DISABLE,
+		.doit = nl80211_set_hw_scan_disable,
+		.policy = nl80211_policy,
+		.flags = GENL_ADMIN_PERM,
+		.internal_flags = NL80211_FLAG_NEED_WDEV_UP |
+				  NL80211_FLAG_NEED_RTNL,
+
+	},
 };
 
 static struct genl_multicast_group nl80211_mlme_mcgrp = {

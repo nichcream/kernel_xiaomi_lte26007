@@ -379,7 +379,7 @@ struct mem_cgroup {
 static size_t memcg_size(void)
 {
 	return sizeof(struct mem_cgroup) +
-		nr_node_ids * sizeof(struct mem_cgroup_per_node);
+		nr_node_ids * sizeof(struct mem_cgroup_per_node *);
 }
 
 /* internal only representation about the status of kmem accounting. */
@@ -1220,7 +1220,7 @@ struct mem_cgroup *mem_cgroup_iter(struct mem_cgroup *root,
 			if (dead_count == iter->last_dead_count) {
 				smp_rmb();
 				last_visited = iter->last_visited;
-				if (last_visited &&
+				if (last_visited && last_visited != root &&
 				    !css_tryget(&last_visited->css))
 					last_visited = NULL;
 			}
@@ -1229,7 +1229,7 @@ struct mem_cgroup *mem_cgroup_iter(struct mem_cgroup *root,
 		memcg = __mem_cgroup_iter_next(root, last_visited);
 
 		if (reclaim) {
-			if (last_visited)
+			if (last_visited && last_visited != root)
 				css_put(&last_visited->css);
 
 			iter->last_visited = memcg;
@@ -1796,7 +1796,7 @@ static void mem_cgroup_out_of_memory(struct mem_cgroup *memcg, gfp_t gfp_mask,
 	 * select it.  The goal is to allow it to allocate so that it may
 	 * quickly exit and free its memory.
 	 */
-	if (fatal_signal_pending(current) || current->flags & PF_EXITING) {
+	if (fatal_signal_pending(current) || task_will_free_mem(current)) {
 		set_thread_flag(TIF_MEMDIE);
 		return;
 	}

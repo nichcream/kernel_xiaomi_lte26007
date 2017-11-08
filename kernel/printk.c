@@ -45,11 +45,15 @@
 #include <linux/poll.h>
 #include <linux/irq_work.h>
 #include <linux/utsname.h>
-
+#include <asm/cputype.h>
 #include <asm/uaccess.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/printk.h>
+
+#ifdef        CONFIG_DEBUG_LL
+extern void printascii(char *);
+#endif
 
 /* printk's without a loglevel use this.. */
 #define DEFAULT_MESSAGE_LOGLEVEL CONFIG_DEFAULT_MESSAGE_LOGLEVEL
@@ -208,6 +212,7 @@ struct log {
 	u8 facility;		/* syslog facility */
 	u8 flags:5;		/* internal record flags */
 	u8 level:3;		/* syslog level */
+	u8 this_cpu;	/* smp processor id */
 };
 
 /*
@@ -355,6 +360,8 @@ static void log_store(int facility, int level,
 		msg->ts_nsec = ts_nsec;
 	else
 		msg->ts_nsec = local_clock();
+
+	msg->this_cpu = smp_processor_id();
 	memset(log_dict(msg) + dict_len, 0, pad_len);
 	msg->len = sizeof(struct log) + text_len + dict_len + pad_len;
 
@@ -866,9 +873,10 @@ static bool printk_time = 1;
 #else
 static bool printk_time;
 #endif
+
 module_param_named(time, printk_time, bool, S_IRUGO | S_IWUSR);
 
-static size_t print_time(u64 ts, char *buf)
+static size_t print_time(u64 ts, u8 this_cpu, char *buf)
 {
 	unsigned long rem_nsec;
 
@@ -880,8 +888,8 @@ static size_t print_time(u64 ts, char *buf)
 	if (!buf)
 		return snprintf(NULL, 0, "[%5lu.000000] ", (unsigned long)ts);
 
-	return sprintf(buf, "[%5lu.%06lu] ",
-		       (unsigned long)ts, rem_nsec / 1000);
+	return sprintf(buf, "[%5lu.%06lu]{%u} ",
+		       (unsigned long)ts, rem_nsec / 1000, this_cpu);
 }
 
 static size_t print_prefix(const struct log *msg, bool syslog, char *buf)
@@ -903,7 +911,7 @@ static size_t print_prefix(const struct log *msg, bool syslog, char *buf)
 		}
 	}
 
-	len += print_time(msg->ts_nsec, buf ? buf + len : NULL);
+	len += print_time(msg->ts_nsec, msg->this_cpu, buf ? buf + len : NULL);
 	return len;
 }
 
@@ -1030,7 +1038,7 @@ static int syslog_print(char __user *buf, int size)
 	return len;
 }
 
-static int syslog_print_all(char __user *buf, int size, bool clear)
+/*static*/ int syslog_print_all(char __user *buf, int size, bool clear)
 {
 	char *text;
 	int len = 0;
@@ -1471,7 +1479,7 @@ static size_t cont_print_text(char *text, size_t size)
 	size_t len;
 
 	if (cont.cons == 0 && (console_prev & LOG_NEWLINE)) {
-		textlen += print_time(cont.ts_nsec, text);
+		textlen += print_time(cont.ts_nsec, smp_processor_id(), text);
 		size -= textlen;
 	}
 
@@ -1551,6 +1559,10 @@ asmlinkage int vprintk_emit(int facility, int level,
 	 * prefix which might be passed-in as a parameter.
 	 */
 	text_len = vscnprintf(text, sizeof(textbuf), fmt, args);
+
+#ifdef	CONFIG_DEBUG_LL
+	printascii(text);
+#endif
 
 	/* mark and strip a trailing newline */
 	if (text_len && text[text_len-1] == '\n') {
@@ -1895,7 +1907,7 @@ void suspend_console(void)
 {
 	if (!console_suspend_enabled)
 		return;
-	printk("Suspending console(s) (use no_console_suspend to debug)\n");
+	printk(KERN_DEBUG "Suspending console(s) (use no_console_suspend to debug)\n");
 	console_lock();
 	console_suspended = 1;
 	up(&console_sem);

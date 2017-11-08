@@ -1,0 +1,38 @@
+#ifndef __ASM_ARCH_REGS_I2S_H
+#define __ASM_ARCH_REGS_I2S_H
+
+#define I2S_SCLK_CFG			(0x00)
+#define I2S_FSYNC_CFG			(0x04)
+#define I2S_FIFO_STA			(0x08)
+#define I2S_MODE			(0x10)
+#define I2S_REC_FIFO			(0x14)
+#define I2S_TRAN_FIFO			(0x18)
+
+/* I2SX_FSYNC_CFG. */
+#define I2S_FSYNC_CFG_CHANNEL_NUM	16
+#define I2S_FSYNC_CFG_FSYNC_BIT		12
+#define I2S_FSYNC_CFG_FSYNC_DIV		0
+
+/* I2SX_FIFO_STA. */
+#define I2S_FIFO_STA_IBUF_AF		9
+#define I2S_FIFO_STA_IBUF_HF		8
+#define I2S_FIFO_STA_IBUF_NE		7
+#define I2S_FIFO_STA_IBUF_FL		6
+#define I2S_FIFO_STA_OBUF_NF		5
+#define I2S_FIFO_STA_OBUF_HE		4
+#define I2S_FIFO_STA_OBUF_AE		3
+#define I2S_FIFO_STA_OBUF_EMF		2
+#define I2S_FIFO_STA_IBUF_RE		1
+#define I2S_FIFO_STA_OBUF_OV		0
+
+/* I2SX_MODE. */
+#define I2S_MODE_I2S0_MODE		8
+#define I2S_MODE_DLY_MODE		6
+#define I2S_MODE_FLUSH_TRAN_BUF		5
+#define I2S_MODE_FLUSH_REC_BUF		4
+#define I2S_MODE_I2S0_EN		3
+#define I2S_MODE_REC_EN			2
+#define I2S_MODE_TRAN_EN		1
+#define I2S_MODE_SLAVE_EN		0
+
+#endif /* __ASM_ARCH_REGS_I2S_H */

@@ -637,6 +637,24 @@ config USB_RENESAS_USBHS_HCD
 	  To compile this driver as a module, choose M here: the
 	  module will be called renesas-usbhs.
 
+config USB_COMIP_HCD
+	boolean "COMIP HCD support"
+	depends on USB
+	help
+	  The COMIP is a USB 2.0 host and peripheral controller.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called comip-hcd.
+
+config USB_COMIP_HSIC
+        boolean "COMIP HSIC support"
+        depends on USB
+        help
+          The COMIP is a USB 2.0 host and peripheral controller.
+
+          To compile this driver as a module, choose M here: the
+          module will be called comip-hcd.
+
 config USB_WHCI_HCD
 	tristate "Wireless USB Host Controller Interface (WHCI) driver"
 	depends on PCI && USB && UWB

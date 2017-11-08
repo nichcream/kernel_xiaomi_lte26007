@@ -293,12 +293,12 @@ static ssize_t state_show(struct kobject *kobj, struct kobj_attribute *attr,
 {
 	char *s = buf;
 #ifdef CONFIG_SUSPEND
-	int i;
+	suspend_state_t i;
 
-	for (i = 0; i < PM_SUSPEND_MAX; i++) {
-		if (pm_states[i] && valid_state(i))
-			s += sprintf(s,"%s ", pm_states[i]);
-	}
+	for (i = PM_SUSPEND_MIN; i < PM_SUSPEND_MAX; i++)
+		if (pm_states[i].state)
+			s += sprintf(s,"%s ", pm_states[i].label);
+
 #endif
 #ifdef CONFIG_HIBERNATION
 	s += sprintf(s, "%s\n", "disk");
@@ -313,12 +313,8 @@ static ssize_t state_show(struct kobject *kobj, struct kobj_attribute *attr,
 static suspend_state_t decode_state(const char *buf, size_t n)
 {
 #ifdef CONFIG_SUSPEND
-#ifdef CONFIG_EARLYSUSPEND
-	suspend_state_t state = PM_SUSPEND_ON;
-#else
 	suspend_state_t state = PM_SUSPEND_MIN;
-#endif
-	const char * const *s;
+	struct pm_sleep_state *s;
 #endif
 	char *p;
 	int len;
@@ -332,8 +328,9 @@ static suspend_state_t decode_state(const char *buf, size_t n)
 
 #ifdef CONFIG_SUSPEND
 	for (s = &pm_states[state]; state < PM_SUSPEND_MAX; s++, state++)
-		if (*s && len == strlen(*s) && !strncmp(buf, *s, len))
-			return state;
+		if (s->state && len == strlen(s->label)
+		    && !strncmp(buf, s->label, len))
+			return s->state;
 #endif
 
 	return PM_SUSPEND_ON;
@@ -344,7 +341,7 @@ static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,
 {
 	suspend_state_t state;
 	int error;
-/*
+
 	error = pm_autosleep_lock();
 	if (error)
 		return error;
@@ -353,28 +350,17 @@ static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,
 		error = -EBUSY;
 		goto out;
 	}
-*/
-	state = decode_state(buf, n);
 
-#ifdef CONFIG_EARLYSUSPEND
-	if (state == PM_SUSPEND_ON || valid_state(state)) {
-		error = 0;
-		request_suspend_state(state);
-		pm_autosleep_set_state_sync(state);
-	}
-#else
+	state = decode_state(buf, n);
 	if (state < PM_SUSPEND_MAX)
 		error = pm_suspend(state);
 	else if (state == PM_SUSPEND_MAX)
 		error = hibernate();
 	else
 		error = -EINVAL;
-#endif
 
-/*
  out:
 	pm_autosleep_unlock();
-*/
 	return error ? error : n;
 }
 
@@ -460,8 +446,8 @@ static ssize_t autosleep_show(struct kobject *kobj,
 
 #ifdef CONFIG_SUSPEND
 	if (state < PM_SUSPEND_MAX)
-		return sprintf(buf, "%s\n", valid_state(state) ?
-						pm_states[state] : "error");
+		return sprintf(buf, "%s\n", pm_states[state].state ?
+					pm_states[state].label : "error");
 #endif
 #ifdef CONFIG_HIBERNATION
 	return sprintf(buf, "disk\n");

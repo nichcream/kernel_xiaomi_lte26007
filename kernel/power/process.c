@@ -1,5 +1,5 @@
 /*
- * drivers/power/process.c - Functions for starting/stopping processes on
+ * drivers/power/process.c - Functions for starting/stopping processes on 
  *                           suspend transitions.
  *
  * Originally from swsusp.
@@ -18,30 +18,10 @@
 #include <linux/workqueue.h>
 #include <linux/kmod.h>
 
-#define  FREEZE_ABORT_TIMEOUT	(30 * USEC_PER_SEC)	/*second*/
-
-/*
+/* 
  * Timeout for stopping processes
  */
 unsigned int __read_mostly freeze_timeout_msecs = 20 * MSEC_PER_SEC;
-static ktime_t freeze_abort_prev = {.tv64 = 0};
-
-static int freeze_abort_check(void)
-{
-	ktime_t now;
-	ktime_t end;
-	int abort_flag = 0;
-
-	now = ktime_get();
-	if (!ktime_equal(freeze_abort_prev, ktime_set(0,0))) {
-		end = ktime_add_us(freeze_abort_prev, FREEZE_ABORT_TIMEOUT);
-		if (ktime_compare(now, end) < 0)
-			abort_flag = 1;
-	}
-	freeze_abort_prev = now;
-
-	return abort_flag;
-}
 
 static int try_to_freeze_tasks(bool user_only)
 {
@@ -50,10 +30,9 @@ static int try_to_freeze_tasks(bool user_only)
 	unsigned int todo;
 	bool wq_busy = false;
 	struct timeval start, end;
-	u64 elapsed_msecs64;
-	unsigned int elapsed_msecs;
+	u64 elapsed_csecs64;
+	unsigned int elapsed_csecs;
 	bool wakeup = false;
-	int sleep_usecs = USEC_PER_MSEC;
 
 	do_gettimeofday(&start);
 
@@ -89,25 +68,22 @@ static int try_to_freeze_tasks(bool user_only)
 
 		/*
 		 * We need to retry, but first give the freezing tasks some
-		 * time to enter the refrigerator.  Start with an initial
-		 * 1 ms sleep followed by exponential backoff until 8 ms.
+		 * time to enter the refrigerator.
 		 */
-		usleep_range(sleep_usecs / 2, sleep_usecs);
-		if (sleep_usecs < 8 * USEC_PER_MSEC)
-			sleep_usecs *= 2;
+		msleep(10);
 	}
 
 	do_gettimeofday(&end);
-	elapsed_msecs64 = timeval_to_ns(&end) - timeval_to_ns(&start);
-	do_div(elapsed_msecs64, NSEC_PER_MSEC);
-	elapsed_msecs = elapsed_msecs64;
+	elapsed_csecs64 = timeval_to_ns(&end) - timeval_to_ns(&start);
+	do_div(elapsed_csecs64, NSEC_PER_SEC / 100);
+	elapsed_csecs = elapsed_csecs64;
 
 	if (todo) {
 		printk("\n");
-		printk(KERN_ERR "Freezing of tasks %s after %d.%03d seconds "
+		printk(KERN_ERR "Freezing of tasks %s after %d.%02d seconds "
 		       "(%d tasks refusing to freeze, wq_busy=%d):\n",
 		       wakeup ? "aborted" : "failed",
-		       elapsed_msecs / 1000, elapsed_msecs % 1000,
+		       elapsed_csecs / 100, elapsed_csecs % 100,
 		       todo - wq_busy, wq_busy);
 
 		if (!wakeup) {
@@ -118,16 +94,35 @@ static int try_to_freeze_tasks(bool user_only)
 					sched_show_task(p);
 			} while_each_thread(g, p);
 			read_unlock(&tasklist_lock);
-
-			if (freeze_abort_check())
-				todo = 0;
 		}
 	} else {
-		printk(KERN_DEBUG "(elapsed %d.%03d seconds) ", elapsed_msecs / 1000,
-			elapsed_msecs % 1000);
+		printk("(elapsed %d.%02d seconds) ", elapsed_csecs / 100,
+			elapsed_csecs % 100);
 	}
 
 	return todo ? -EBUSY : 0;
+}
+
+/*
+ * Returns true if all freezable tasks (except for current) are frozen already
+ */
+static bool check_frozen_processes(void)
+{
+	struct task_struct *g, *p;
+	bool ret = true;
+
+	read_lock(&tasklist_lock);
+	for_each_process_thread(g, p) {
+		if (p != current && !freezer_should_skip(p) &&
+		    !frozen(p)) {
+			ret = false;
+			goto done;
+		}
+	}
+done:
+	read_unlock(&tasklist_lock);
+
+	return ret;
 }
 
 /**
@@ -138,6 +133,7 @@ static int try_to_freeze_tasks(bool user_only)
 int freeze_processes(void)
 {
 	int error;
+	int oom_kills_saved;
 
 	error = __usermodehelper_disable(UMH_FREEZING);
 	if (error)
@@ -146,15 +142,30 @@ int freeze_processes(void)
 	if (!pm_freezing)
 		atomic_inc(&system_freezing_cnt);
 
-	printk(KERN_DEBUG "Freezing user space processes ... ");
+	printk("Freezing user space processes ... ");
 	pm_freezing = true;
+	oom_kills_saved = oom_kills_count();
 	error = try_to_freeze_tasks(true);
 	if (!error) {
-		printk(KERN_DEBUG "done.");
 		__usermodehelper_set_disable_depth(UMH_DISABLED);
 		oom_killer_disable();
+
+		/*
+		 * There might have been an OOM kill while we were
+		 * freezing tasks and the killed task might be still
+		 * on the way out so we have to double check for race.
+		 */
+		if (oom_kills_count() != oom_kills_saved &&
+				!check_frozen_processes()) {
+			__usermodehelper_set_disable_depth(UMH_ENABLED);
+			printk("OOM in progress.");
+			error = -EBUSY;
+			goto done;
+		}
+		printk("done.");
 	}
-	printk(KERN_DEBUG "\n");
+done:
+	printk("\n");
 	BUG_ON(in_atomic());
 
 	if (error)
@@ -174,13 +185,13 @@ int freeze_kernel_threads(void)
 {
 	int error;
 
-	printk(KERN_DEBUG "Freezing remaining freezable tasks ... ");
+	printk("Freezing remaining freezable tasks ... ");
 	pm_nosig_freezing = true;
 	error = try_to_freeze_tasks(false);
 	if (!error)
-		printk(KERN_DEBUG "done.");
+		printk("done.");
 
-	printk(KERN_DEBUG "\n");
+	printk("\n");
 	BUG_ON(in_atomic());
 
 	if (error)
@@ -199,8 +210,9 @@ void thaw_processes(void)
 
 	oom_killer_enable();
 
-	printk(KERN_DEBUG "Restarting tasks ... ");
+	printk("Restarting tasks ... ");
 
+	__usermodehelper_set_disable_depth(UMH_FREEZING);
 	thaw_workqueues();
 
 	read_lock(&tasklist_lock);
@@ -212,7 +224,7 @@ void thaw_processes(void)
 	usermodehelper_enable();
 
 	schedule();
-	printk(KERN_DEBUG "done.\n");
+	printk("done.\n");
 }
 
 void thaw_kernel_threads(void)
@@ -220,7 +232,7 @@ void thaw_kernel_threads(void)
 	struct task_struct *g, *p;
 
 	pm_nosig_freezing = false;
-	printk(KERN_DEBUG "Restarting kernel threads ... ");
+	printk("Restarting kernel threads ... ");
 
 	thaw_workqueues();
 
@@ -232,5 +244,5 @@ void thaw_kernel_threads(void)
 	read_unlock(&tasklist_lock);
 
 	schedule();
-	printk(KERN_DEBUG "done.\n");
+	printk("done.\n");
 }

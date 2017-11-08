@@ -150,6 +150,8 @@ void snd_ctl_notify(struct snd_card *card, unsigned int mask,
 	
 	if (snd_BUG_ON(!card || !id))
 		return;
+	if (card->shutdown)
+		return;
 	read_lock(&card->ctl_files_rwlock);
 #if defined(CONFIG_SND_MIXER_OSS) || defined(CONFIG_SND_MIXER_OSS_MODULE)
 	card->mixer_oss_change_count++;
@@ -1086,7 +1088,7 @@ static int snd_ctl_elem_user_tlv(struct snd_kcontrol *kcontrol,
 		mutex_lock(&ue->card->user_ctl_lock);
 		change = ue->tlv_data_size != size;
 		if (!change)
-			change = memcmp(ue->tlv_data, new_data, size);
+			change = memcmp(ue->tlv_data, new_data, size) != 0;
 		kfree(ue->tlv_data);
 		ue->tlv_data = new_data;
 		ue->tlv_data_size = size;
@@ -1167,6 +1169,10 @@ static int snd_ctl_elem_add(struct snd_ctl_file *file,
 	int idx, err;
 
 	if (info->count < 1)
+		return -EINVAL;
+	if (!*info->id.name)
+		return -EINVAL;
+	if (strnlen(info->id.name, sizeof(info->id.name)) >= sizeof(info->id.name))
 		return -EINVAL;
 	access = info->access == 0 ? SNDRV_CTL_ELEM_ACCESS_READWRITE :
 		(info->access & (SNDRV_CTL_ELEM_ACCESS_READWRITE|
@@ -1320,6 +1326,8 @@ static int snd_ctl_tlv_ioctl(struct snd_ctl_file *file,
 	if (copy_from_user(&tlv, _tlv, sizeof(tlv)))
 		return -EFAULT;
 	if (tlv.length < sizeof(unsigned int) * 2)
+		return -EINVAL;
+	if (!tlv.numid)
 		return -EINVAL;
 	down_read(&card->controls_rwsem);
 	kctl = snd_ctl_find_numid(card, tlv.numid);

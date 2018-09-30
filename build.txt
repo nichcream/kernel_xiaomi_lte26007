@@ -1,0 +1,5 @@
+rm -rf 4.6; git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.6/ -b android-4.4.4_r2.0.1 4.6
+export PATH=$PATH:$PWD/4.6/bin
+make lte26007_phone_v1_1_defconfig
+make ARCH=arm CROSS_COMPILE=arm-eabi- -j8
+cp arch/arm/boot/zImage ./zImage

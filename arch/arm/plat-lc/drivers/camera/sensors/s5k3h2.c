@@ -33,9 +33,6 @@
 
 #define S5K3H2_FULLHD_USING_FULLSIZE_CROP	(1)
 
-
-static char* factory_oflim = "oflim";
-
 //#define S5K3H2_DEBUG_FUNC
 
 
@@ -1945,33 +1942,6 @@ static int s5k3h2_g_chip_ident(struct v4l2_subdev *sd,
 
 	return v4l2_chip_ident_i2c_client(client, chip, V4L2_IDENT_S5K3H2, 0);
 }
-static int s5k3h2_get_module_factory(struct v4l2_subdev *sd, char **module_factory)
-{
-	//struct i2c_client *client = v4l2_get_subdevdata(sd);
-
-	if (!module_factory)
-		return -1;
-	else
-		*module_factory = factory_oflim;
-
-	return 0;
-}
-
-static long s5k3h2_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg)
-{
-	long ret = 0;
-	char **module_factory = NULL;
-
-	switch (cmd) {
-		case SUBDEVIOC_MODULE_FACTORY:
-			module_factory = (char**)arg;
-			ret = s5k3h2_get_module_factory(sd, module_factory);
-			break;
-		default:
-			ret = -ENOIOCTLCMD;
-	}
-	return ret;
-}
 
 #ifdef CONFIG_VIDEO_ADV_DEBUG
 static int s5k3h2_g_register(struct v4l2_subdev *sd, struct v4l2_dbg_register *reg)
@@ -2013,7 +1983,6 @@ static const struct v4l2_subdev_core_ops s5k3h2_core_ops = {
 	.queryctrl = s5k3h2_queryctrl,
 	.reset = s5k3h2_reset,
 	.init = s5k3h2_init,
-	.ioctl = s5k3h2_ioctl,
 #ifdef CONFIG_VIDEO_ADV_DEBUG
 	.g_register = s5k3h2_g_register,
 	.s_register = s5k3h2_s_register,

@@ -29,10 +29,6 @@
 #define COMIP_DEBUGTOOL_REGS_BLACKLIST_FILENAME "/data/media/DCIM/Camera/camera_isp_regs_blacklist"
 
 
-#define COMIP_DEBUGTOOL_LOAD_PREVIEW_RAW_FILENAME "/data/media/DCIM/Camera/preview.raw"
-
-int comip_debugtool_preview_load_raw_file(struct comip_camera_dev* camdev, char* filename);
-
 int comip_debugtool_load_isp_setting(struct isp_device* isp, char* filename);
 int comip_debugtool_load_regs_blacklist(struct isp_device* isp, char *filename);
 void comip_debugtool_save_raw_file(struct comip_camera_dev* camdev);

@@ -610,8 +610,6 @@ static int isp_set_parameters(struct isp_device *isp)
 		isp_reg_writeb(isp, iparm->out_width & 0xff, MAC_MEMORY_WIDTH + 1);
 	}
 
-	if (camdev->load_preview_raw)
-		comip_debugtool_preview_load_raw_file(camdev, COMIP_DEBUGTOOL_LOAD_PREVIEW_RAW_FILENAME);
 	isp_reg_writeb(isp, 0x00, ISP_INPUT_H_START_3D);
 	isp_reg_writeb(isp, 0x00, ISP_INPUT_H_START_3D + 1);
 	isp_reg_writeb(isp, 0x00, ISP_INPUT_V_START_3D);
@@ -2500,7 +2498,6 @@ static int isp_start_capture(struct isp_device *isp, struct isp_capture *cap)
 	isp->buf_start = cap->buf;
 	isp->save_raw = cap->save_raw;
 	isp->load_raw = cap->load_raw;
-	isp->load_preview_raw = cap->load_preview_raw;
 	isp->process = cap->process;
 	iparm->real_vts = cap->vts;
 
@@ -3539,7 +3536,7 @@ static void saturation_work_handler(struct work_struct *work)
 
 static void lens_threshold_work_handler(struct work_struct * work)
 {
-	struct isp_device *isp = container_of(work, struct isp_device, lens_threshold_work);
+	struct isp_device *isp = container_of(work, struct isp_device, saturation_work);
 
 	if (!isp->running || isp->snapshot)
 		return;

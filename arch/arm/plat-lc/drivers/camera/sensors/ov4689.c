@@ -85,8 +85,7 @@ static struct regval_list ov4689_init_regs[] = {
 	{0x3500, 0x00},
 	{0x3501, 0x4c},
 	{0x3502, 0x00},
-	//{0x3503, 0x04},
-	{0x3503, 0x34},
+	{0x3503, 0x04},
 	{0x3504, 0x00},
 	{0x3505, 0x00},
 	{0x3506, 0x00},
@@ -243,9 +242,7 @@ static struct regval_list ov4689_init_regs[] = {
 	{0x4001, 0x40},
 	{0x4002, 0x04},
 	{0x4003, 0x14},
-	{0x4005, 0x10},	
 	{0x400e, 0x00},
-	
 	{0x4011, 0x00},
 	{0x401a, 0x00},
 	{0x401b, 0x00},
@@ -334,84 +331,10 @@ static struct regval_list ov4689_stream_off[] = {
 };
 
 static struct regval_list ov4689_win_sxga[] = {
-
-	{0x0100,0x00},//Stream Off 
-	{0x3708,0x66},
-	{0x3709,0x52},
-	{0x370c,0xc3},
-	{0x3800,0x00},// x start = 0
-	{0x3801,0x00},// x start
-	{0x3802,0x00},// y start = 0
-	{0x3803,0x00},// y start
-	{0x3804,0x0a},// xend = 2623
-	{0x3805,0x3f},// xend
-	{0x3806,0x07},// yend = 1955
-	{0x3807,0xa3},// yend
-	{0x3808,0x05},// x output size = 1296
-	{0x3809,0x00},// x output size
-	{0x380a,0x03},// y output size = 972
-	{0x380b,0xc0},// y output size
-	{0x380c,0x0b},// hts = 2816
-	{0x380d,0x20},// hts
-	{0x380e,0x03},// vts = 992
-	{0x380f,0xe8},//E0;// vts    
-	{0x3810,0x00},// isp x win = 8
-	{0x3811,0x08},// isp x win
-	{0x3812,0x00},// isp y win = 4
-	{0x3813,0x04},// isp y win
-	{0x3814,0x31},// x inc
-	{0x3815,0x31},// y inc
-	{0x3817,0x00},// hsync start
-	{0x3820,0x08},// flip off, v bin off
-	{0x3821,0x07},// mirror on, h bin on
-	{0x4004,0x02},// black line number    //6c 4005 1a;// blc normal freeze
-	{0x4005,0x18},// blc normal freeze
-	{0x4050,0x37},// blc normal freeze
-	{0x4051,0x8f},// blc normal freeze    //6c 350b 80;// gain = 8x
-	{0x4837,0x17},// MIPI global timing    
-	{0x0100,0x01},//Stream On
-
 	{ov4689_REG_END, 0x00},	/* END MARKER */
 };
 
 static struct regval_list ov4689_win_4m[] = {
-#if 0
-
-	{0x0100,0x00},//Stream Off 
-	{0x3708,0x63},   
-	{0x3709,0x12},
-	{0x370c,0xc0},
-	{0x3800,0x00},// xstart = 0
-	{0x3801,0x00},// xstart
-	{0x3802,0x00},// ystart = 0
-	{0x3803,0x00},// ystart
-	{0x3804,0x0a},// xend = 2623
-	{0x3805,0x3f},// xend
-	{0x3806,0x07},// yend = 1955
-	{0x3807,0xa3},// yend
-	{0x3808,0x0a},// x output size = 2592
-	{0x3809,0x00},//20;// x output size
-	{0x380a,0x07},// y output size = 1944             
-	{0x380b,0x80},//98;// y output size               
-	{0x380c,0x0b},// hts = 2816                      
-	{0x380d,0x20},// hts                      
-	{0x380e,0x07},// vts = 1984                      
-	{0x380f,0xd0},// vts                          
-	{0x3810,0x00},// isp x win = 16                   
-	{0x3811,0x10},// isp x win                      
-	{0x3812,0x00},// isp y win = 6                    
-	{0x3813,0x06},// isp y win                      
-	{0x3814,0x11},// x inc                      
-	{0x3815,0x11},// y inc                      
-	{0x3817,0x00},// hsync start                      
-	{0x3820,0x40},// flip off, v bin off              
-	{0x3821,0x06},// mirror on, v bin off             
-	{0x4004,0x04},// black line number                
-	{0x4005,0x1a},// blc always update    //6c 350b 40;// gain = 4x
-	{0x4837,0x17},// MIPI global timing               
-	{0x0100,0x01},//Stream On    
-
-#endif
 	{ov4689_REG_END, 0x00},	/* END MARKER */
 };
 
@@ -1239,9 +1162,9 @@ static struct ov4689_win_size {
 		.height		= MAX_HEIGHT,
 		.vts		= 0x48a,//0x7b6
 		.framerate	= 30,//10,
-		.max_gain_dyn_frm = 0xf8,
+		.max_gain_dyn_frm = 0x40,
 		.min_gain_dyn_frm = 0x10,
-		.max_gain_fix_frm = 0xf8,
+		.max_gain_fix_frm = 0x40,
 		.min_gain_fix_frm = 0x10,
 		.regs 		= ov4689_win_4m,
 		.regs_aecgc_win_matrix	 	    = isp_aecgc_win_5M_matrix,

@@ -998,13 +998,8 @@ int isp_set_scene(struct isp_device *isp, int val)
 		isp_reg_writew(isp, min_gain, REG_ISP_MIN_GAIN);
 
 	for(i = 0; i < 3; i++) {
-		if(isp->parm.brightness>=BRIGHTNESS_H0)
-			Pregain_local[i]=0x80;
-		else
-			Pregain_local[i] = 0x20 + isp->parm.brightness * 0x20;
-
+		Pregain_local[i] = 0x20 + isp->parm.brightness * 0x20;
 		Pregain_local[i] = (Pregain_local[i] * Pregaincurrent[i] + 0x40) >> 7;
-
 		if (Pregain_local[i] < 0)
 			Pregain_local[i] = 0;
 		else if (Pregain_local[i] > 225)

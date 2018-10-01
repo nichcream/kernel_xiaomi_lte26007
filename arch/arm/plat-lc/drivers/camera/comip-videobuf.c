@@ -290,7 +290,6 @@ static void *__comip_vb2_init_ctx(struct device *dev)
 	unsigned int max_frame_size = 0;
 	int ret = 0;
 	size_t len;
-	unsigned long size_r;
 
 	conf = kzalloc(sizeof *conf, GFP_KERNEL);
 	if (!conf)
@@ -308,11 +307,7 @@ static void *__comip_vb2_init_ctx(struct device *dev)
 	if (conf->size < COMIP_CAMERA_BUFFER_MIN)
 		conf->size = COMIP_CAMERA_BUFFER_MIN;
 	conf->size += COMIP_CAMERA_BUFFER_THUMBNAIL;
-if (camdev->load_preview_raw)
-{
-	size_r = conf->size;
-	conf->size += (csd->max_width *  csd->max_height * 2 + 32);
-}
+
 	conf->ion_camera_handle = ion_alloc(conf->ion_camera_client, conf->size, PAGE_SIZE, LC_ION_HEAP_LCMEM_MASK,
 							ION_HEAP_LC_ISP_KERNEL_MASK | ION_FLAG_CACHED | ION_FLAG_CACHED_NEEDS_SYNC);
 
@@ -336,13 +331,7 @@ if (camdev->load_preview_raw)
 		kfree(conf);
 		return NULL;
 	}
-if (camdev->load_preview_raw)
-{
-	camdev->preview_vaddr = conf->vaddr + size_r;
-	camdev->preview_paddr = (unsigned long)conf->paddr + size_r;
-//********************
-conf->size -= (csd->max_width *  csd->max_height * 2 + 32);
-}
+
 	printk("isp memory: paddr=0x%lx, vaddr=0x%lx, size=0x%lx.\n",
 		conf->paddr, (unsigned long)conf->vaddr, conf->size);
 

@@ -567,7 +567,6 @@ static int comip_camera_start_capture(struct comip_camera_dev *camdev)
 	cap.snapshot = camdev->snapshot;
 	cap.snap_flag = camdev->snap_flag;
 	cap.save_raw = camdev->save_raw;
-	cap.load_preview_raw = camdev->load_preview_raw;
 	cap.load_raw = camdev->load_raw;
 	cap.vts = capture->cur_vts;
 
@@ -1775,15 +1774,12 @@ static int comip_vidioc_g_parm(struct file *file, void *priv,
 static int comip_v4l2_open(struct file *file)
 {
 	struct comip_camera_dev *camdev = video_drvdata(file);
-	struct isp_device * isp = camdev->isp;
 
 	CAMERA_PRINT("Open camera. refcnt %d\n", camdev->refcnt);
 
 	if (++camdev->refcnt == 1) {
 		camdev->input = -1;
 	}
-	isp->raw_file = NULL;
-	isp->vraw_addr = NULL;
 
 	return 0;
 }
@@ -2007,7 +2003,6 @@ static int __init comip_camera_probe(struct platform_device *pdev)
 	camdev->save_yuv = 0;
 	camdev->save_raw = 0;
 	camdev->load_raw = 0;
-	camdev->load_preview_raw = 0;
 	camdev->alloc_ctx = NULL;
 	camdev->if_pip = 0;
 

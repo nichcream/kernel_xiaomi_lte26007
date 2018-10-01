@@ -103,7 +103,7 @@ static uint8_t csi_phy_read(unsigned int id)
 	return (csi_reg_readl(CSI_CTRL1(id))& 0xFF00)>>8;
 }
 
-//Ä¿Ç°Ö»ÓÃPHY0£¬ËùÒÔÖ»Ğ£×¼PHY0
+//ç›®å‰åªç”¨PHY0ï¼Œæ‰€ä»¥åªæ ¡å‡†PHY0
 int csi_phy_software_calibration(unsigned int id)
 {
 	int retval = 0;
@@ -119,10 +119,10 @@ int csi_phy_software_calibration(unsigned int id)
 	int Write_error = 0;
 
 	CSI_PRINT("[CSI]id %d\n",id);
-//ÅäÖÃÇ°£¬Ìá¹©µçÑ¹
+//é…ç½®å‰ï¼Œæä¾›ç”µå‹
 	testdata[0] = 0<<3;
 	csi_phy_write(id,0x20, testdata, 1);
-//ÊÇ·ñĞèÒªÎÈ¶¨Ò»ÏÂ?
+//æ˜¯å¦éœ€è¦ç¨³å®šä¸€ä¸‹?
 	udelay(100);
 
 
@@ -250,7 +250,7 @@ int csi_phy_software_calibration(unsigned int id)
 
 	CSI_PRINT(" [CSI]6.AUX_LAST %d\n",AUX_LAST);
 
-//ÅäÖÃºó£¬¹Ø±ÕµçÑ¹
+//é…ç½®åï¼Œå…³é—­ç”µå‹
 	testdata[0] = 1<<3;
 	csi_phy_write(id,0x20, testdata, 1);
 	udelay(100);
@@ -261,11 +261,11 @@ int csi_phy_software_calibration(unsigned int id)
 
 ENDP:
 
-	//ÏÂÃæ2¸öÖµÓÃÓÚdebug
-	//AUX_LAST Îª×îºóµÄµÃ³öÓ¦Ğ´Èë0x20µÄÖµ
-	//Flag_Change ±êÊ¾±È½ÏÖĞÊÇ·ñ·¢Éú¹ı±ä»¯
+	//ä¸‹é¢2ä¸ªå€¼ç”¨äºdebug
+	//AUX_LAST ä¸ºæœ€åçš„å¾—å‡ºåº”å†™å…¥0x20çš„å€¼
+	//Flag_Change æ ‡ç¤ºæ¯”è¾ƒä¸­æ˜¯å¦å‘ç”Ÿè¿‡å˜åŒ–
 
-	if(Write_error)	//Ğ´µÄ¹ı³ÌÖĞ·¢Éú´íÎó
+	if(Write_error)	//å†™çš„è¿‡ç¨‹ä¸­å‘ç”Ÿé”™è¯¯
 		retval = -1;
 	else
 		retval = 0;
@@ -365,14 +365,14 @@ int csi_phy_release(void)
 int csi_phy_start(unsigned int id, unsigned int lane_num, unsigned int freq)
 {
 	int i;
-	int retries = 2;
+	int retries = 3;
 
 	if (id >= CSI_NUM)
 		return -EINVAL;
 
 	pmic_voltage_set(PMIC_POWER_CAMERA_CSI_PHY, 0, PMIC_POWER_VOLTAGE_ENABLE);
 
-	//mdelay(5);
+	mdelay(5);
 
 	/* cphyx_mode */
 	csi_reg_writel(0x0, CSI_MODE(id));
@@ -381,13 +381,15 @@ int csi_phy_start(unsigned int id, unsigned int lane_num, unsigned int freq)
 	csi_reg_writel(0x7f, CSI_RSTZ(id));
 
 	/* wait  */
-	//mdelay(5);
+	mdelay(10);
 
 	csi_phy_configure(id, freq * 1000, 26000, 2);
 
 	for (i = 0; i < retries; i++) {
 		if (csi_phy_ready(id, lane_num))
 			break;
+
+		printk(KERN_DEBUG "CSI PHY is not ready, retrying...");
 
 		mdelay(10);
 	}
